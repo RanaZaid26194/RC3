@@ -396,6 +396,7 @@ export default function CandidateReviewPage() {
           open={inspectModalOpen}
           onClose={() => setInspectModalOpen(false)}
           title={`Explainable Match Audit: ${selectedApp.candidateName}`}
+          size="2xl"
         >
           <div className="space-y-5">
             <div className="rounded-lg border border-neutral-200 bg-neutral-50 p-4 dark:border-neutral-800 dark:bg-neutral-800/50 space-y-3">

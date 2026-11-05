@@ -56,6 +56,7 @@ export function CandidateComparisonModal({
       open={open}
       onClose={onClose}
       title={`Side-by-Side Candidate Comparison: ${job.title}`}
+      size="3xl"
     >
       <div className="space-y-6 max-h-[75vh] overflow-y-auto pr-1">
         {/* Candidate Selector Chips */}

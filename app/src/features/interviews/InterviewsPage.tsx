@@ -575,6 +575,7 @@ export default function InterviewsPage() {
         open={isScheduleOpen}
         title="Schedule Interview & Generate Question Kit"
         onClose={() => setIsScheduleOpen(false)}
+        size="xl"
         footer={
           <>
             <Button variant="ghost" onClick={() => setIsScheduleOpen(false)}>
@@ -864,6 +865,7 @@ export default function InterviewsPage() {
           open={Boolean(feedbackInterview)}
           title={`Interview Evaluation: ${feedbackInterview.candidateName}`}
           onClose={() => setFeedbackInterview(null)}
+          size="xl"
           footer={
             <>
               <Button variant="ghost" onClick={() => setFeedbackInterview(null)}>
