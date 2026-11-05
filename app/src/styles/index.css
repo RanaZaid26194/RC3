@@ -235,6 +235,10 @@ h1, h2, h3, h4 { font-family: var(--font-display); letter-spacing: -0.01em; }
   .dot-grid { background-image: radial-gradient(circle, rgb(255 255 255 / 0.07) 1px, transparent 1px); }
 }
 
+/* Data bars grow in on mount */
+@keyframes bar-grow { from { transform: scaleX(0); } to { transform: scaleX(1); } }
+.bar-grow { transform-origin: left center; animation: bar-grow 720ms var(--ease-out-expo) both; }
+
 /* Gentle lift for nav glyphs */
 .nav-glyph { transition: transform 220ms var(--ease-out-expo); }
 .group:hover .nav-glyph, .group:focus-visible .nav-glyph { transform: translateY(-1px) scale(1.08); }
@@ -273,7 +277,7 @@ h1, h2, h3, h4 { font-family: var(--font-display); letter-spacing: -0.01em; }
 
 /* Motion-safety: disable decorative motion for reduced-motion users */
 @media (prefers-reduced-motion: reduce) {
-  .page-enter, .animate-fade-up, .animate-fade-in-scale, .animate-pop { animation: none !important; opacity: 1; transform: none; filter: none; }
+  .page-enter, .animate-fade-up, .animate-fade-in-scale, .animate-pop, .bar-grow { animation: none !important; opacity: 1; transform: none; filter: none; }
   .animate-float, .aurora-blob,
   .animate-breathe, .pulse, .animate-pulse-ring { animation: none !important; }
   .reveal-on-scroll { opacity: 1; transform: none; }

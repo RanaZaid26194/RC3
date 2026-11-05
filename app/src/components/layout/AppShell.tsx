@@ -169,6 +169,10 @@ export function AppShell({ children }: { children: ReactNode }) {
 
         {/* Footer actions with Logout and Reset */}
         <div className="border-t border-neutral-200 pt-3 space-y-1.5 dark:border-neutral-800">
+          <div className="mb-2 flex items-center gap-2 px-2 text-[10px] font-semibold uppercase tracking-wider text-neutral-400 dark:text-neutral-500">
+            <span className="animate-breathe h-1.5 w-1.5 rounded-full bg-emerald-500" aria-hidden="true" />
+            Local workspace · offline ready
+          </div>
           <Button
             variant="ghost"
             size="sm"

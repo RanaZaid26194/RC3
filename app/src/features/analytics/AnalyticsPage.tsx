@@ -283,7 +283,7 @@ export default function AnalyticsPage() {
                   </div>
                   <div className="h-2.5 w-full rounded-full bg-neutral-100 dark:bg-neutral-800">
                     <div
-                      className="h-2.5 rounded-full bg-brand-600 transition-all duration-500"
+                      className="bar-grow h-2.5 rounded-full bg-brand-600"
                       style={{ width: `${Math.max(stagePct, stage.count > 0 ? 4 : 0)}%` }}
                     />
                   </div>
@@ -321,7 +321,7 @@ export default function AnalyticsPage() {
                   </div>
                   <div className="h-2 w-full rounded-full bg-neutral-100 dark:bg-neutral-800">
                     <div
-                      className="h-2 rounded-full bg-rose-500 transition-all duration-500"
+                      className="bar-grow h-2 rounded-full bg-rose-500"
                       style={{ width: `${item.percent}%` }}
                     />
                   </div>
@@ -364,7 +364,7 @@ export default function AnalyticsPage() {
                   </div>
                   <div className="h-1.5 w-full rounded-full bg-neutral-100 dark:bg-neutral-800">
                     <div
-                      className={`h-1.5 rounded-full ${bucket.color}`}
+                      className={`bar-grow h-1.5 rounded-full ${bucket.color}`}
                       style={{ width: `${pct}%` }}
                     />
                   </div>
