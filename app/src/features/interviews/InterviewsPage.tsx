@@ -64,24 +64,49 @@ export default function InterviewsPage() {
   const [feedbackDecision, setFeedbackDecision] = useState<'Hire' | 'Strong Hire' | 'Borderline' | 'No Hire'>('Hire');
   const [feedbackComments, setFeedbackComments] = useState('');
 
-  // Conflict Detection Engine
-  const detectConflict = (interviewer: string, date: string, time: string, currentInterviewId?: string) => {
-    return interviews.find(
-      (intv) =>
-        intv.id !== currentInterviewId &&
-        intv.status === 'scheduled' &&
-        intv.interviewer.trim().toLowerCase() === interviewer.trim().toLowerCase() &&
-        intv.scheduledDate === date &&
-        intv.scheduledTime === time
-    );
+  // Fall back to the first available candidate/job so scheduling still works if
+  // the stored ids were never initialised (e.g. page mounted before seed data).
+  const activeCandidateId = selectedCandidateId || candidates[0]?.id || '';
+  const activeJobId = selectedJobId || jobs[0]?.id || '';
+
+  // Conflict Detection Engine — catches exact clashes and partial time overlaps
+  const toMinutes = (time: string) => {
+    const [h, m] = time.split(':').map(Number);
+    return (h || 0) * 60 + (m || 0);
   };
 
-  const currentConflict = detectConflict(selectedInterviewer, scheduledDate, scheduledTime);
+  const detectConflict = (
+    interviewer: string,
+    date: string,
+    time: string,
+    duration: number,
+    currentInterviewId?: string
+  ) => {
+    if (!date || !time) return undefined;
+    const start = toMinutes(time);
+    const end = start + duration;
+    return interviews.find((intv) => {
+      if (intv.id === currentInterviewId) return false;
+      if (intv.status !== 'scheduled') return false;
+      if (intv.scheduledDate !== date) return false;
+      if (intv.interviewer.trim().toLowerCase() !== interviewer.trim().toLowerCase()) return false;
+      const otherStart = toMinutes(intv.scheduledTime);
+      const otherEnd = otherStart + (intv.durationMinutes || 45);
+      return start < otherEnd && otherStart < end;
+    });
+  };
+
+  const currentConflict = detectConflict(
+    selectedInterviewer,
+    scheduledDate,
+    scheduledTime,
+    durationMinutes
+  );
 
   // Handle Question Generation inside Modal
   const handleGenerateQuestions = async () => {
-    const candidate = candidates.find((c) => c.id === selectedCandidateId);
-    const job = jobs.find((j) => j.id === selectedJobId);
+    const candidate = candidates.find((c) => c.id === activeCandidateId);
+    const job = jobs.find((j) => j.id === activeJobId);
     if (!candidate || !job) return;
 
     setIsGeneratingQuestions(true);
@@ -108,8 +133,9 @@ export default function InterviewsPage() {
 
   // Save Scheduled Interview
   const handleSaveInterview = () => {
-    const candidate = candidates.find((c) => c.id === selectedCandidateId);
-    const job = jobs.find((j) => j.id === selectedJobId);
+    if (currentConflict) return;
+    const candidate = candidates.find((c) => c.id === activeCandidateId);
+    const job = jobs.find((j) => j.id === activeJobId);
     if (!candidate || !job) return;
 
     // Default questions if none generated
@@ -429,7 +455,7 @@ export default function InterviewsPage() {
             </Button>
             <Button
               onClick={handleSaveInterview}
-              disabled={Boolean(currentConflict)}
+              disabled={Boolean(currentConflict) || !scheduledDate || !scheduledTime}
               className="gap-2"
             >
               <Check className="h-4 w-4" /> Confirm Schedule
@@ -440,7 +466,10 @@ export default function InterviewsPage() {
         <div className="space-y-4 text-left">
           {/* Calendar Conflict Alert */}
           {currentConflict && (
-            <div className="flex items-start gap-2.5 rounded-lg border border-amber-300 bg-amber-50 p-3 text-xs text-amber-900 dark:border-amber-700 dark:bg-amber-950/50 dark:text-amber-200">
+            <div
+              role="alert"
+              className="flex items-start gap-2.5 rounded-lg border border-amber-300 bg-amber-50 p-3 text-xs text-amber-900 dark:border-amber-700 dark:bg-amber-950/50 dark:text-amber-200"
+            >
               <AlertTriangle className="h-4 w-4 shrink-0 text-amber-600 mt-0.5" />
               <div>
                 <p className="font-bold">⚠️ Calendar Conflict Detected!</p>
@@ -465,7 +494,7 @@ export default function InterviewsPage() {
               <select
                 id="sched-candidate-select"
                 aria-label="Candidate"
-                value={selectedCandidateId}
+                value={activeCandidateId}
                 onChange={(e) => setSelectedCandidateId(e.target.value)}
                 className="w-full rounded-lg border border-neutral-300 bg-white p-2.5 text-xs focus:border-blue-500 focus:outline-none dark:border-neutral-700 dark:bg-neutral-900 dark:text-white"
               >
@@ -484,7 +513,7 @@ export default function InterviewsPage() {
               <select
                 id="sched-role-select"
                 aria-label="Target Role"
-                value={selectedJobId}
+                value={activeJobId}
                 onChange={(e) => setSelectedJobId(e.target.value)}
                 className="w-full rounded-lg border border-neutral-300 bg-white p-2.5 text-xs focus:border-blue-500 focus:outline-none dark:border-neutral-700 dark:bg-neutral-900 dark:text-white"
               >

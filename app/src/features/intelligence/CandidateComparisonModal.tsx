@@ -7,7 +7,8 @@ import {
 import { Modal } from '@/components/ui/Modal';
 import { Button } from '@/components/ui/Button';
 import { calculateCandidateMatch } from '@/lib/ai/matcher';
-import type { Job, CandidateProfile } from '@/types';
+import { load } from '@/lib/storage';
+import type { Job, CandidateProfile, Application } from '@/types';
 
 interface Props {
   open: boolean;
@@ -28,6 +29,15 @@ export function CandidateComparisonModal({
   );
 
   const comparedCandidates = candidates.filter((c) => selectedIds.includes(c.id));
+
+  // Reuse the score stored with the application so every screen reports the same explainable breakdown.
+  const applications = load<Application[]>('applications', []);
+  const matchFor = (candidate: CandidateProfile) => {
+    const stored = applications.find(
+      (app) => app.jobId === job.id && app.candidateId === candidate.id
+    );
+    return stored?.scoreBreakdown || calculateCandidateMatch(job, candidate);
+  };
 
   const toggleSelect = (id: string) => {
     if (selectedIds.includes(id)) {
@@ -79,7 +89,7 @@ export function CandidateComparisonModal({
               <tr className="border-b border-neutral-200 dark:border-neutral-800">
                 <th className="py-3 px-3 font-semibold text-neutral-500 w-44">Evaluation Metric</th>
                 {comparedCandidates.map((c) => {
-                  const match = calculateCandidateMatch(job, c);
+                  const match = matchFor(c);
                   return (
                     <th key={c.id} className="py-3 px-3 font-bold text-neutral-900 dark:text-white min-w-48">
                       <div className="flex items-center justify-between">
@@ -99,7 +109,7 @@ export function CandidateComparisonModal({
               <tr className="bg-neutral-50/50 dark:bg-neutral-900/40 font-semibold">
                 <td className="py-2.5 px-3 text-neutral-600 dark:text-neutral-300">Weighted Breakdown</td>
                 {comparedCandidates.map((c) => {
-                  const match = calculateCandidateMatch(job, c);
+                  const match = matchFor(c);
                   return (
                     <td key={c.id} className="py-2.5 px-3 text-[11px] text-neutral-700 dark:text-neutral-300">
                       Skills: <strong>{match.skillsScore}/50</strong> | Exp: <strong>{match.experienceScore}/25</strong>
@@ -132,7 +142,7 @@ export function CandidateComparisonModal({
                     {req.skill} <span className="text-[10px] text-neutral-400">(w:{req.weight})</span>
                   </td>
                   {comparedCandidates.map((c) => {
-                    const match = calculateCandidateMatch(job, c);
+                    const match = matchFor(c);
                     const evidence = match.matchedSkills.find((m) => m.skill === req.skill);
                     const isMissing = match.missingSkills.includes(req.skill);
 
@@ -181,7 +191,7 @@ export function CandidateComparisonModal({
               <tr>
                 <td className="py-2.5 px-3 font-medium text-neutral-500">Recommended Learning</td>
                 {comparedCandidates.map((c) => {
-                  const match = calculateCandidateMatch(job, c);
+                  const match = matchFor(c);
                   return (
                     <td key={c.id} className="py-2.5 px-3">
                       {match.suggestedLearning.length > 0 ? (

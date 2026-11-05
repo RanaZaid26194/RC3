@@ -11,30 +11,56 @@ import { Button } from '@/components/ui/Button';
 import { Card } from '@/components/ui/Card';
 import { Input } from '@/components/ui/Input';
 import { uid } from '@/lib/storage';
+import { extractResumeText } from '@/lib/resumeText';
 import type { CandidateProfile, ParsedProject } from '@/types';
 
 interface Props {
   onParsed: (profile: CandidateProfile) => void;
   onCancel?: () => void;
+  submitLabel?: string;
 }
 
-export function ResumeUploader({ onParsed, onCancel }: Props) {
+const COMMON_SKILLS = [
+  'Python', 'Django', 'PostgreSQL', 'Docker', 'React', 'TypeScript', 'JavaScript',
+  'FastAPI', 'Redis', 'Kubernetes', 'AWS', 'Flask', 'SQL', 'Git', 'Linux', 'REST APIs',
+  'Celery', 'GraphQL', 'Tailwind', 'Node.js', 'CI/CD', 'Java', 'Go', 'Rust', 'C++',
+  'Machine Learning', 'TensorFlow', 'PyTorch', 'MongoDB', 'Microservices',
+];
+
+const SKILL_ALIASES: Record<string, string> = {
+  'js': 'JavaScript',
+  'nodejs': 'Node.js',
+  'node.js': 'Node.js',
+  'reactjs': 'React',
+  'react.js': 'React',
+  'postgres': 'PostgreSQL',
+  'psql': 'PostgreSQL',
+  'k8s': 'Kubernetes',
+  'golang': 'Go',
+  'amazon web services': 'AWS',
+  'google cloud': 'GCP',
+  'rest': 'REST APIs',
+};
+
+export function ResumeUploader({ onParsed, onCancel, submitLabel = 'Save & Apply with Verified Resume' }: Props) {
   const [isParsing, setIsParsing] = useState(false);
   const [parseError, setParseError] = useState<string | null>(null);
   const [parsedData, setParsedData] = useState<CandidateProfile | null>(null);
   const [newSkill, setNewSkill] = useState('');
+  const [fileName, setFileName] = useState('');
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   const handleFileSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
     const selected = e.target.files?.[0];
     if (!selected) return;
 
-    if (!selected.name.endsWith('.pdf') && !selected.name.endsWith('.txt') && !selected.name.endsWith('.docx')) {
-      setParseError('Unsupported format. Please upload a PDF, DOCX, or TXT document.');
+    if (!/\.(pdf|txt|md|docx)$/i.test(selected.name)) {
+      setParseError('Unsupported format. Please upload a PDF, DOCX, Markdown, or TXT document.');
       return;
     }
 
     setParseError(null);
+    setFileName(selected.name);
     parseDocument(selected);
   };
 
@@ -43,98 +69,91 @@ export function ResumeUploader({ onParsed, onCancel }: Props) {
     setParseError(null);
 
     try {
-      let extractedText = '';
+      const extractedText = (await extractResumeText(doc)).trim();
+      if (extractedText.replace(/[^A-Za-z0-9]/g, '').length < 30) {
+        throw new Error('No readable text was found. Scanned PDFs need OCR before upload.');
+      }
 
-      if (doc.type === 'text/plain' || doc.name.endsWith('.txt')) {
-        extractedText = await doc.text();
-      } else {
-        // For PDF / other binary formats, extract readable ASCII strings
-        const buffer = await doc.arrayBuffer();
-        const decoder = new TextDecoder('utf-8', { fatal: false });
-        const rawString = decoder.decode(buffer);
-        // Filter out non-printable binary characters to retain readable text
-        extractedText = rawString
-          .replace(/[^\x20-\x7E\t\r\n]/g, ' ')
-          .replace(/\s+/g, ' ')
-          .trim();
-
-        if (extractedText.length < 50) {
-          extractedText = `Candidate: ${doc.name.replace(/\.[^/.]+$/, '')}
-Summary: Experienced software engineer with hands-on development tenure in modern web technologies and backend systems.
-Skills: Python, Django, PostgreSQL, Docker, REST APIs, Git
-Experience: 3.5 years of industry engineering experience.
-Education: Bachelor of Science in Computer Science.`;
+      const lines = extractedText
+        .split(/\r?\n/)
+        .map((line) => line.trim())
+        .filter(Boolean);
+      // Skills: direct matches plus common aliases, de-duplicated.
+      const detectedSet = new Set(
+        COMMON_SKILLS.filter((skill) => new RegExp(`\\b${skill.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')}\\b`, 'i').test(extractedText))
+      );
+      Object.entries(SKILL_ALIASES).forEach(([alias, canonical]) => {
+        if (new RegExp(`\\b${alias.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')}\\b`, 'i').test(extractedText)) {
+          detectedSet.add(canonical);
         }
-      }
+      });
+      const detectedSkills = [...detectedSet];
 
-      // Parsing heuristics
-      const textLower = extractedText.toLowerCase();
+      const email = extractedText.match(/[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}/)?.[0] ?? '';
+      const phone = extractedText.match(/(\+?\d{1,3}[-.\s]?)?\(?\d{3}\)?[-.\s]?\d{3}[-.\s]?\d{4}/)?.[0] ?? '';
 
-      // Extract skills
-      const commonSkills = [
-        'Python', 'Django', 'PostgreSQL', 'Docker', 'React', 'TypeScript', 'JavaScript',
-        'FastAPI', 'Redis', 'Kubernetes', 'AWS', 'Flask', 'SQL', 'Git', 'Linux', 'REST APIs',
-        'Celery', 'GraphQL', 'Tailwind', 'Node.js', 'CI/CD'
-      ];
+      const nameLine = lines.find(
+        (line) =>
+          /^[A-Z][A-Za-z.'-]+(?:\s+[A-Z][A-Za-z.'-]+){1,3}$/.test(line) &&
+          !/resume|curriculum|vitae|profile|engineer|developer|summary/i.test(line)
+      );
+      const fileGuess = doc.name
+        .replace(/\.[^/.]+$/, '')
+        .replace(/[-_]+/g, ' ')
+        .replace(/\b(cv|resume)\b/gi, '')
+        .trim();
+      const name = nameLine || (fileGuess ? fileGuess.replace(/\b\w/g, (c) => c.toUpperCase()) : 'Unknown Candidate');
 
-      const detectedSkills = commonSkills.filter(s => textLower.includes(s.toLowerCase()));
+      const locationMatch = extractedText.match(/\b[A-Z][a-zA-Z]+(?:[ ,]+[A-Z][a-zA-Z]+)*,\s*[A-Z]{2}\b/);
+      const locationLine = locationMatch?.[0]?.slice(0, 80) ?? '';
 
-      // Extract email
-      const emailMatch = extractedText.match(/[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}/);
-      const email = emailMatch ? emailMatch[0] : 'candidate@example.com';
+      const expMatch = extractedText.match(/(\d+(?:\.\d+)?)\+?\s*years?/i);
+      const expYears = expMatch ? parseFloat(expMatch[1]) : 0;
 
-      // Extract phone
-      const phoneMatch = extractedText.match(/(\+?\d{1,3}[-.\s]?)?\(?\d{3}\)?[-.\s]?\d{3}[-.\s]?\d{4}/);
-      const phone = phoneMatch ? phoneMatch[0] : '+1 (555) 019-2834';
+      let education = lines.find((line) => /university|college|bachelor|master|ph\.?d|b\.s\.|m\.s\./i.test(line)) || '';
+      education = education
+        .replace(/^(education|qualifications?|academic background)\s*[:\-–]\s*/i, '')
+        .slice(0, 160);
 
-      // Extract candidate name
-      const nameGuess = doc.name.replace(/\.[^/.]+$/, '').replace(/[-_]/g, ' ');
-      const name = nameGuess.charAt(0).toUpperCase() + nameGuess.slice(1);
+      const summaryLine = lines.find((line) => /experience|engineer|developer|specialist|professional/i.test(line));
+      const summary = (summaryLine || lines.slice(0, 2).join(' ')).slice(0, 280);
 
-      // Extract experience years
-      const expMatch = extractedText.match(/(\d+)\+?\s*years?/i);
-      const expYears = expMatch ? parseFloat(expMatch[1]) : 3;
+      const projectLines = lines
+        .filter((line) => /project|built|developed|implemented|designed|platform/i.test(line) && line.length > 30)
+        .slice(0, 3);
+      const projects: ParsedProject[] = projectLines.map((description, index) => ({
+        id: uid('proj'),
+        name: description.split(/\s+/).slice(0, 6).join(' ').replace(/[.,;:]$/, ''),
+        description,
+        techStack: detectedSkills.slice(0, 4),
+        relevanceScore: Math.max(60, 92 - index * 8),
+      }));
 
-      // Extract education
-      let education = 'B.S. in Computer Science or related degree';
-      if (textLower.includes('master') || textLower.includes('m.s.')) {
-        education = 'M.S. in Computer Science / Engineering';
-      } else if (textLower.includes('bachelor') || textLower.includes('b.s.')) {
-        education = 'B.S. in Computer Science / Software Engineering';
-      }
-
-      const sampleProjects: ParsedProject[] = [
-        {
-          id: uid('proj'),
-          name: 'Scalable Microservices Backend',
-          description: 'Designed and deployed containerized REST APIs processing high query volumes.',
-          techStack: detectedSkills.slice(0, 4),
-          relevanceScore: 90,
-        },
-      ];
+      const excerpts: Record<string, string> = {};
+      detectedSkills.forEach((skill) => {
+        const line = lines.find((candidateLine) => candidateLine.toLowerCase().includes(skill.toLowerCase()));
+        if (line) excerpts[skill] = line.slice(0, 220);
+      });
 
       const profile: CandidateProfile = {
         id: uid('cand'),
-        name: name || 'Applicant',
+        name,
         email,
         phone,
-        location: 'Remote / Hybrid',
-        summary: extractedText.slice(0, 250) + '...',
-        skills: detectedSkills.length > 0 ? detectedSkills : ['Python', 'PostgreSQL', 'Git'],
+        location: locationLine?.slice(0, 80) ?? '',
+        summary: summary || 'Imported resume awaiting recruiter review.',
+        skills: detectedSkills,
         experienceYears: expYears,
         education,
-        projects: sampleProjects,
+        projects,
         rawResumeText: extractedText,
-        excerpts: {
-          Python: 'Demonstrated experience developing backend services and modules in Python.',
-          PostgreSQL: 'Managed relational schemas and optimized queries in PostgreSQL.',
-        },
+        excerpts,
         createdAt: new Date().toISOString(),
       };
 
       setParsedData(profile);
-    } catch (err: any) {
-      setParseError(`Failed to parse resume: ${err.message}. Please try another file.`);
+    } catch (err) {
+      setParseError(err instanceof Error ? `Failed to parse resume: ${err.message}` : 'Resume parsing failed. Please try another file.');
     } finally {
       setIsParsing(false);
     }
@@ -169,22 +188,43 @@ Education: Bachelor of Science in Computer Science.`;
       {/* Upload Zone */}
       {!parsedData && (
         <div
+          role="button"
+          tabIndex={0}
           onClick={() => fileInputRef.current?.click()}
-          className="flex cursor-pointer flex-col items-center justify-center rounded-xl border-2 border-dashed border-neutral-300 bg-neutral-50/50 p-8 text-center transition hover:border-blue-500 hover:bg-blue-50/30 dark:border-neutral-700 dark:bg-neutral-900/50"
+          onKeyDown={(event) => {
+            if (event.key === 'Enter' || event.key === ' ') {
+              event.preventDefault();
+              fileInputRef.current?.click();
+            }
+          }}
+          onDragOver={(event) => event.preventDefault()}
+          onDrop={(event) => {
+            event.preventDefault();
+            const dropped = event.dataTransfer.files?.[0];
+            if (!dropped) return;
+            if (!/\.(pdf|txt|md|docx)$/i.test(dropped.name)) {
+              setParseError('Unsupported format. Please upload a PDF, DOCX, Markdown, or TXT document.');
+              return;
+            }
+            setParseError(null);
+            setFileName(dropped.name);
+            void parseDocument(dropped);
+          }}
+          className="flex cursor-pointer flex-col items-center justify-center rounded-xl border-2 border-dashed border-neutral-300 bg-neutral-50/50 p-8 text-center transition hover:border-blue-500 hover:bg-blue-50/30 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 dark:border-neutral-700 dark:bg-neutral-900/50"
         >
           <input
             type="file"
             ref={fileInputRef}
             aria-label="Upload resume document"
             onChange={handleFileSelect}
-            accept=".pdf,.txt,.docx"
+            accept=".pdf,.txt,.md,.docx"
             className="hidden"
           />
           <div className="flex h-12 w-12 items-center justify-center rounded-full bg-blue-100 text-blue-600 dark:bg-blue-900/40 dark:text-blue-300 mb-3">
             <Upload className="h-6 w-6" />
           </div>
           <h3 className="text-sm font-semibold text-neutral-900 dark:text-white">
-            Upload Resume (PDF, DOCX, TXT)
+            {fileName ? `Selected: ${fileName}` : 'Upload Resume (PDF, DOCX, TXT)'}
           </h3>
           <p className="mt-1 text-xs text-neutral-500">
             Drag and drop your resume file or click to browse.
@@ -316,7 +356,7 @@ Education: Bachelor of Science in Computer Science.`;
               </Button>
             )}
             <Button size="sm" onClick={handleConfirmSubmission} className="gap-1.5 bg-emerald-600 hover:bg-emerald-700">
-              <CheckCircle2 className="h-4 w-4" /> Save & Apply with Verified Resume
+              <CheckCircle2 className="h-4 w-4" /> {submitLabel}
             </Button>
           </div>
         </Card>

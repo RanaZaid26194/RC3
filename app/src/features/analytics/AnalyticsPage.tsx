@@ -18,6 +18,7 @@ export default function AnalyticsPage() {
   const interviews = load<Interview[]>('interviews', []);
 
   const [selectedJobId, setSelectedJobId] = useState<string>('all');
+  const [exported, setExported] = useState(false);
 
   // Filter applications by role if chosen
   const filteredApps = selectedJobId === 'all' ? apps : apps.filter((a) => a.jobId === selectedJobId);
@@ -68,15 +69,33 @@ export default function AnalyticsPage() {
     })
     .sort((a, b) => b.percent - a.percent);
 
-  // Conversion Funnel Data
+  // Conversion Funnel Data — each stage counts every application that reached it
+  const stageRank: Record<Application['status'], number> = {
+    Submitted: 0,
+    Parsed: 1,
+    'AI Assessment Available': 2,
+    'Recruiter Review': 3,
+    Shortlisted: 4,
+    Interview: 5,
+    Selected: 6,
+    Rejected: 0,
+  };
+  const reachedStage = (rank: number) =>
+    filteredApps.filter((a) => {
+      if (stageRank[a.status] >= rank) return true;
+      const completedInterview = interviews.some(
+        (i) => i.applicationId === a.id && i.status === 'completed'
+      );
+      return completedInterview && rank >= 4 && rank <= 5;
+    }).length;
   const funnelStages = [
     { name: 'Submitted', count: filteredApps.length },
-    { name: 'Parsed', count: filteredApps.filter((a) => a.status !== 'Submitted').length },
-    { name: 'AI Assessed', count: filteredApps.filter((a) => a.matchScore !== undefined).length },
-    { name: 'Recruiter Review', count: filteredApps.filter((a) => ['Recruiter Review', 'Shortlisted', 'Interview', 'Selected'].includes(a.status)).length },
-    { name: 'Shortlisted', count: filteredApps.filter((a) => ['Shortlisted', 'Interview', 'Selected'].includes(a.status)).length },
-    { name: 'Interviewed', count: filteredApps.filter((a) => ['Interview', 'Selected'].includes(a.status)).length },
-    { name: 'Offer / Selected', count: filteredApps.filter((a) => a.status === 'Selected').length },
+    { name: 'Parsed', count: reachedStage(1) },
+    { name: 'AI Assessed', count: reachedStage(2) },
+    { name: 'Recruiter Review', count: reachedStage(3) },
+    { name: 'Shortlisted', count: reachedStage(4) },
+    { name: 'Interviewed', count: reachedStage(5) },
+    { name: 'Offer / Selected', count: reachedStage(6) },
   ];
 
   // Score Distribution
@@ -112,6 +131,8 @@ export default function AnalyticsPage() {
     a.download = `recrulens-analytics-${new Date().toISOString().split('T')[0]}.json`;
     a.click();
     URL.revokeObjectURL(url);
+    setExported(true);
+    window.setTimeout(() => setExported(false), 2500);
   };
 
   return (
@@ -128,6 +149,8 @@ export default function AnalyticsPage() {
         </div>
         <div className="flex items-center gap-3">
           <select
+            id="analytics-vacancy-filter"
+            name="vacancy"
             aria-label="Filter Analytics by Vacancy"
             value={selectedJobId}
             onChange={(e) => setSelectedJobId(e.target.value)}
@@ -141,7 +164,7 @@ export default function AnalyticsPage() {
             ))}
           </select>
           <Button variant="outline" size="sm" onClick={handleExportData} className="gap-2 text-xs">
-            <Download className="h-3.5 w-3.5" /> Export Report
+            <Download className="h-3.5 w-3.5" /> {exported ? 'Report Downloaded' : 'Export Report'}
           </Button>
         </div>
       </div>
