@@ -10,13 +10,16 @@ import type { Job, Application, CandidateProfile } from '@/types';
 
 export default function CandidatePortalPage() {
   const user = getCurrentUser() || DEFAULT_CANDIDATE;
-  const jobs = load<Job[]>('jobs', []).filter((j) => j.status === 'open');
+  const allJobs = load<Job[]>('jobs', []);
+  const jobs = allJobs.filter((j) => j.status === 'open');
   const [applications, setApplications] = useState<Application[]>(load<Application[]>('applications', []));
   const [candidates, setCandidates] = useState<CandidateProfile[]>(load<CandidateProfile[]>('candidates', []));
   const [activeTab, setActiveTab] = useState<'jobs' | 'applications'>('jobs');
   const [feedbackMsg, setFeedbackMsg] = useState<string | null>(null);
   const [uploadModalOpen, setUploadModalOpen] = useState(false);
   const [targetJobForUpload, setTargetJobForUpload] = useState<Job | null>(null);
+
+  const pipelineStages = ['Submitted', 'Parsed', 'AI Assessment Available', 'Recruiter Review', 'Shortlisted', 'Interview', 'Selected'] as const;
 
   const myProfile = candidates.find((c) => c.email.toLowerCase() === user.email.toLowerCase()) || candidates[0];
 
@@ -180,7 +183,7 @@ export default function CandidatePortalPage() {
                       {job.salary}
                     </span>
                     {hasApplied ? (
-                      <span className="flex items-center gap-1 text-xs font-medium text-emerald-600">
+                      <span className="flex items-center gap-1 text-xs font-medium text-emerald-700">
                         <CheckCircle2 className="h-4 w-4" /> Applied
                       </span>
                     ) : (
@@ -222,7 +225,8 @@ export default function CandidatePortalPage() {
           ) : (
             <div className="space-y-3">
               {myApplications.map((app) => {
-                const job = jobs.find((j) => j.id === app.jobId);
+                const job = allJobs.find((j) => j.id === app.jobId);
+                const currentStageIndex = pipelineStages.indexOf(app.status as (typeof pipelineStages)[number]);
                 return (
                   <Card key={app.id} className="p-5 space-y-3">
                     <div className="flex flex-col justify-between gap-2 sm:flex-row sm:items-center">
@@ -239,20 +243,26 @@ export default function CandidatePortalPage() {
                       </span>
                     </div>
 
-                    <div className="grid grid-cols-4 gap-2 pt-2 text-center text-[10px] font-medium text-neutral-500">
-                      <div className="rounded bg-emerald-100 p-1.5 text-emerald-800 dark:bg-emerald-950/60 dark:text-emerald-300">
-                        1. Submitted ✓
+                    {app.status === 'Rejected' ? (
+                      <div className="rounded bg-red-50 p-2 text-center text-xs font-semibold text-red-700 dark:bg-red-950/40 dark:text-red-300">
+                        Application closed after recruiter review
                       </div>
-                      <div className={`rounded p-1.5 ${['Parsed', 'AI Assessment Available', 'Recruiter Review', 'Shortlisted', 'Interview', 'Selected'].includes(app.status) ? 'bg-emerald-100 text-emerald-800 dark:bg-emerald-950/60 dark:text-emerald-300' : 'bg-neutral-100 dark:bg-neutral-800'}`}>
-                        2. AI Assessment
+                    ) : (
+                      <div className="grid gap-2 pt-2 text-center text-[10px] font-medium text-neutral-500 sm:grid-cols-4 lg:grid-cols-7">
+                        {pipelineStages.map((stage, index) => {
+                          const completed = currentStageIndex >= index;
+                          return (
+                            <div
+                              key={stage}
+                              className={`rounded p-1.5 ${completed ? 'bg-emerald-100 text-emerald-800 dark:bg-emerald-950/60 dark:text-emerald-300' : 'bg-neutral-100 dark:bg-neutral-800'}`}
+                            >
+                              {index + 1}. {stage === 'AI Assessment Available' ? 'AI Assessment' : stage}
+                              {completed ? ' ✓' : ''}
+                            </div>
+                          );
+                        })}
                       </div>
-                      <div className={`rounded p-1.5 ${['Recruiter Review', 'Shortlisted', 'Interview', 'Selected'].includes(app.status) ? 'bg-blue-100 text-blue-800 dark:bg-blue-950/60 dark:text-blue-300' : 'bg-neutral-100 dark:bg-neutral-800'}`}>
-                        3. Recruiter Review
-                      </div>
-                      <div className={`rounded p-1.5 ${['Shortlisted', 'Interview', 'Selected'].includes(app.status) ? 'bg-purple-100 text-purple-800 dark:bg-purple-950/60 dark:text-purple-300' : 'bg-neutral-100 dark:bg-neutral-800'}`}>
-                        4. Interview / Decision
-                      </div>
-                    </div>
+                    )}
                   </Card>
                 );
               })}
