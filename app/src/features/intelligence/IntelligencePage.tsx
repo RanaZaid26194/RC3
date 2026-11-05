@@ -9,13 +9,19 @@ import type { CandidateProfile } from '@/types';
 export default function IntelligencePage() {
   const candidates = load<CandidateProfile[]>('candidates', []);
   const [query, setQuery] = useState('Python developers with REST API experience');
+  const [submittedQuery, setSubmittedQuery] = useState(query);
   const [blindMode, setBlindMode] = useState(false);
 
   const matched = candidates.filter((c) => {
     const text = (c.skills.join(' ') + ' ' + c.summary + ' ' + (c.rawResumeText || '')).toLowerCase();
-    const qWords = query.toLowerCase().split(' ').filter(w => w.length > 2);
+    const qWords = submittedQuery.toLowerCase().split(' ').filter(w => w.length > 2);
     return qWords.some(w => text.includes(w));
   });
+
+  const runSearch = (event: React.FormEvent<HTMLFormElement>) => {
+    event.preventDefault();
+    setSubmittedQuery(query.trim());
+  };
 
   return (
     <div className="space-y-6">
@@ -45,7 +51,7 @@ export default function IntelligencePage() {
         <label htmlFor="nl-search" className="block text-xs font-semibold uppercase tracking-wider text-neutral-500">
           Natural Language Semantic Talent Query
         </label>
-        <div className="flex gap-2">
+        <form className="flex gap-2" onSubmit={runSearch}>
           <div className="relative flex-1">
             <Search className="absolute left-3 top-3 h-4 w-4 text-neutral-400" />
             <Input
@@ -56,10 +62,10 @@ export default function IntelligencePage() {
               className="pl-9"
             />
           </div>
-          <Button className="gap-2">
+          <Button type="submit" className="gap-2" disabled={!query.trim()}>
             <Sparkles className="h-4 w-4" /> Run Search
           </Button>
-        </div>
+        </form>
         <div className="flex items-center gap-2 text-xs text-neutral-500">
           <span>Try quick queries:</span>
           {['Python and Docker', 'REST APIs with Redis', 'FastAPI microservices'].map((suggestion) => (
@@ -87,8 +93,13 @@ export default function IntelligencePage() {
           )}
         </div>
 
-        <div className="grid gap-4 md:grid-cols-2">
-          {matched.map((cand, idx) => (
+        {matched.length === 0 ? (
+          <Card className="p-8 text-center text-sm text-neutral-500">
+            No candidates match “{submittedQuery}”. Try a broader skills or experience query.
+          </Card>
+        ) : (
+          <div className="grid gap-4 md:grid-cols-2">
+            {matched.map((cand, idx) => (
             <Card key={cand.id} className="p-5 space-y-3">
               <div className="flex items-start justify-between">
                 <div>
@@ -119,8 +130,9 @@ export default function IntelligencePage() {
                 ))}
               </div>
             </Card>
-          ))}
-        </div>
+            ))}
+          </div>
+        )}
       </div>
     </div>
   );
