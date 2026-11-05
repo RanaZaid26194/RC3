@@ -63,6 +63,7 @@ export default function InterviewsPage() {
   const [feedbackCommRating, setFeedbackCommRating] = useState(4);
   const [feedbackDecision, setFeedbackDecision] = useState<'Hire' | 'Strong Hire' | 'Borderline' | 'No Hire'>('Hire');
   const [feedbackComments, setFeedbackComments] = useState('');
+  const [feedbackError, setFeedbackError] = useState<string | null>(null);
 
   // Conflict Detection Engine
   const detectConflict = (interviewer: string, date: string, time: string, currentInterviewId?: string) => {
@@ -111,6 +112,8 @@ export default function InterviewsPage() {
     const candidate = candidates.find((c) => c.id === selectedCandidateId);
     const job = jobs.find((j) => j.id === selectedJobId);
     if (!candidate || !job) return;
+    if (scheduledDate < new Date().toISOString().split('T')[0]) return;
+    if (currentConflict) return;
 
     // Default questions if none generated
     const finalQuestions: InterviewQuestion[] =
@@ -164,6 +167,10 @@ export default function InterviewsPage() {
   // Submit Feedback
   const handleSubmitFeedback = () => {
     if (!feedbackInterview) return;
+    if (!feedbackComments.trim()) {
+      setFeedbackError('Add concise feedback before completing the interview.');
+      return;
+    }
 
     const updated = interviews.map((intv) =>
       intv.id === feedbackInterview.id
@@ -186,6 +193,7 @@ export default function InterviewsPage() {
     save('interviews', updated);
     setFeedbackInterview(null);
     setFeedbackComments('');
+    setFeedbackError(null);
   };
 
   // Filtered interviews
@@ -630,7 +638,7 @@ export default function InterviewsPage() {
         <Modal
           open={Boolean(feedbackInterview)}
           title={`Interview Evaluation: ${feedbackInterview.candidateName}`}
-          onClose={() => setFeedbackInterview(null)}
+          onClose={() => { setFeedbackInterview(null); setFeedbackError(null); }}
           footer={
             <>
               <Button variant="ghost" onClick={() => setFeedbackInterview(null)}>
@@ -643,6 +651,11 @@ export default function InterviewsPage() {
           }
         >
           <div className="space-y-4 text-left">
+            {feedbackError && (
+              <p role="alert" className="rounded-lg bg-rose-50 p-3 text-xs font-medium text-rose-700 dark:bg-rose-950/40 dark:text-rose-300">
+                {feedbackError}
+              </p>
+            )}
             <div className="rounded-lg bg-neutral-50 p-3 text-xs dark:bg-neutral-900 border border-neutral-200 dark:border-neutral-800">
               <span className="font-semibold">{feedbackInterview.jobTitle}</span>
               <p className="text-neutral-500">Interviewer: {feedbackInterview.interviewer}</p>
