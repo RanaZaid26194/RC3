@@ -8,6 +8,7 @@ import {
   ArrowRight,
   Filter,
   Pencil,
+  Search,
 } from 'lucide-react';
 import { Button } from '@/components/ui/Button';
 import { AnimatedCard } from '@/components/ui/Card';
@@ -176,7 +177,7 @@ export default function JobsPage() {
                     <Users className="h-4 w-4 text-blue-600" />
                     <strong>{appCount}</strong> candidate{appCount !== 1 ? 's' : ''} applied
                   </span>
-                  <span className="flex items-center gap-2">
+                  <span className="flex flex-wrap items-center justify-end gap-x-2 gap-y-1">
                     <button
                       type="button"
                       onClick={() => navigate(`/jobs/${job.id}/edit`)}
@@ -191,6 +192,23 @@ export default function JobsPage() {
                       className="text-[11px] text-neutral-500 hover:text-neutral-800 dark:hover:text-neutral-200 underline"
                     >
                       {isOpen ? 'Close vacancy' : 'Reopen vacancy'}
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() =>
+                        navigate(
+                          `/intelligence?q=${encodeURIComponent(
+                            job.requiredSkills
+                              .slice(0, 5)
+                              .map((req) => req.skill)
+                              .join(' ')
+                          )}`
+                        )
+                      }
+                      aria-label={`Search talent pool for ${job.title}`}
+                      className="inline-flex items-center gap-1 text-[11px] font-medium text-blue-600 hover:text-blue-800 dark:text-blue-400 dark:hover:text-blue-300"
+                    >
+                      <Search className="h-3 w-3" /> Talent pool
                     </button>
                   </span>
                 </div>
