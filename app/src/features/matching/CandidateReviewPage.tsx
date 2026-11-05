@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, type CSSProperties } from 'react';
 import { useSearchParams, useNavigate } from 'react-router-dom';
 import {
   CheckCircle2,
@@ -17,6 +17,39 @@ import { CandidateComparisonModal } from '@/features/intelligence/CandidateCompa
 import { load, save } from '@/lib/storage';
 import { calculateCandidateMatch } from '@/lib/ai/matcher';
 import type { Job, Application, CandidateProfile } from '@/types';
+
+function ScoreRing({ score }: { score: number }) {
+  const radius = 26;
+  const circumference = 2 * Math.PI * radius;
+  const tone =
+    score >= 75 ? 'stroke-emerald-600' : score >= 60 ? 'stroke-blue-600' : 'stroke-neutral-500';
+  return (
+    <div className="relative h-16 w-16" role="img" aria-label={`Job relevance ${score} percent`}>
+      <svg viewBox="0 0 64 64" className="h-16 w-16 -rotate-90" aria-hidden="true">
+        <circle cx="32" cy="32" r={radius} fill="none" strokeWidth="6" className="stroke-neutral-200 dark:stroke-neutral-700" />
+        <circle
+          cx="32"
+          cy="32"
+          r={radius}
+          fill="none"
+          strokeWidth="6"
+          strokeLinecap="round"
+          strokeDasharray={circumference}
+          style={
+            {
+              strokeDashoffset: circumference * (1 - score / 100),
+              '--ring-circumference': circumference,
+            } as CSSProperties
+          }
+          className={`score-ring ${tone}`}
+        />
+      </svg>
+      <span className="absolute inset-0 flex items-center justify-center text-sm font-black tabular-nums text-neutral-900 dark:text-white">
+        {score}%
+      </span>
+    </div>
+  );
+}
 
 export default function CandidateReviewPage() {
   const [searchParams] = useSearchParams();
@@ -227,7 +260,6 @@ export default function CandidateReviewPage() {
         <div className="space-y-4">
           {evaluatedApps.map(({ app, cand, breakdown, score }) => {
             const isTopMatch = score >= 85;
-            const isMediumMatch = score >= 65 && score < 85;
 
             return (
               <Card
@@ -306,22 +338,9 @@ export default function CandidateReviewPage() {
 
                   <div className="flex flex-col items-end gap-3 shrink-0">
                     <div className="text-right">
-                      <div className="flex items-center justify-end gap-1.5">
-                        <span className="text-[11px] font-semibold uppercase text-neutral-600 dark:text-neutral-400">Job Relevance:</span>
-                        <span
-                          className={`text-2xl font-black ${
-                            isTopMatch
-                              ? 'text-emerald-700 dark:text-emerald-400'
-                              : isMediumMatch
-                              ? 'text-blue-700 dark:text-blue-400'
-                              : 'text-neutral-600'
-                          }`}
-                        >
-                          {score}%
-                        </span>
-                      </div>
-                      <span className="text-[10px] text-neutral-600 dark:text-neutral-400">
-                        Skills (50%) + Exp (25%) + Proj (15%) + Edu (10%)
+                      <ScoreRing score={score} />
+                      <span className="mt-1 block text-[10px] font-medium text-neutral-500 dark:text-neutral-400">
+                        Job relevance · skills 50 / exp 25 / projects 15 / edu 10
                       </span>
                     </div>
 
