@@ -7,6 +7,7 @@ import InterviewsPage from '@/features/interviews/InterviewsPage';
 import AnalyticsPage from '@/features/analytics/AnalyticsPage';
 import IntelligencePage from '@/features/intelligence/IntelligencePage';
 import CandidatePortalPage from '@/features/candidate-portal/CandidatePortalPage';
+import ResumeUploadPage from '@/features/resumes/ResumeUploadPage';
 import Settings from '@/pages/Settings';
 import NotFound from '@/pages/NotFound';
 
@@ -21,6 +22,7 @@ export function AppRoutes() {
       <Route path="/interviews" element={<InterviewsPage />} />
       <Route path="/analytics" element={<AnalyticsPage />} />
       <Route path="/intelligence" element={<IntelligencePage />} />
+      <Route path="/resumes" element={<ResumeUploadPage />} />
       <Route path="/portal" element={<CandidatePortalPage />} />
       <Route path="/portal/applications" element={<CandidatePortalPage />} />
       <Route path="/settings" element={<Settings />} />
