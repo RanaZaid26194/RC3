@@ -267,7 +267,7 @@ export default function IntelligencePage() {
                   <span className="text-[11px] font-medium text-emerald-600 dark:text-emerald-400 flex items-center gap-1">
                     <CheckCircle className="h-3 w-3" /> Semantic Match
                   </span>
-                  <span className="text-[11px] text-neutral-400">
+                  <span className="text-[11px] text-neutral-600 dark:text-neutral-400">
                     ID: {cand.id}
                   </span>
                 </div>

@@ -87,7 +87,7 @@ export function AppShell({ children }: { children: ReactNode }) {
   );
 
   return (
-    <div className="min-h-screen bg-neutral-50 text-neutral-900 dark:bg-neutral-950 dark:text-neutral-100 lg:grid lg:grid-cols-[260px_1fr]">
+    <div className="min-h-screen bg-neutral-50 text-neutral-900 dark:bg-neutral-950 dark:text-neutral-100 lg:grid lg:grid-cols-[260px_minmax(0,1fr)]">
       <a
         href="#main"
         className="sr-only focus:not-sr-only focus:fixed focus:left-3 focus:top-3 focus:z-[70] focus:rounded focus:bg-white focus:px-4 focus:py-2 focus:shadow-lg dark:focus:bg-neutral-900"
@@ -219,7 +219,7 @@ export function AppShell({ children }: { children: ReactNode }) {
       )}
 
       {/* Main Content Area */}
-      <main id="main" tabIndex={-1} className="mx-auto w-full max-w-7xl p-4 sm:p-6 lg:p-8">
+      <main id="main" tabIndex={-1} className="mx-auto w-full min-w-0 max-w-7xl p-4 sm:p-6 lg:p-8">
         {children}
       </main>
     </div>

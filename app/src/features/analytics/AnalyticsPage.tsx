@@ -156,7 +156,7 @@ export default function AnalyticsPage() {
             </div>
           </div>
           <div className="mt-3 text-2xl font-bold text-neutral-900 dark:text-white">{activeJobs}</div>
-          <span className="text-xs text-neutral-400">{totalJobs} total published</span>
+          <span className="text-xs text-neutral-600 dark:text-neutral-400">{totalJobs} total published</span>
         </Card>
 
         <Card className="p-5">
@@ -178,7 +178,7 @@ export default function AnalyticsPage() {
             </div>
           </div>
           <div className="mt-3 text-2xl font-bold text-neutral-900 dark:text-white">{conversionRate}%</div>
-          <span className="text-xs text-neutral-400">{shortlistedCount} advanced to final rounds</span>
+          <span className="text-xs text-neutral-600 dark:text-neutral-400">{shortlistedCount} advanced to final rounds</span>
         </Card>
 
         <Card className="p-5">
@@ -189,7 +189,7 @@ export default function AnalyticsPage() {
             </div>
           </div>
           <div className="mt-3 text-2xl font-bold text-neutral-900 dark:text-white">{avgScore}%</div>
-          <span className="text-xs text-neutral-400">Avg. cycle: {averageProcessingDays} days</span>
+          <span className="text-xs text-neutral-600 dark:text-neutral-400">Avg. cycle: {averageProcessingDays} days</span>
         </Card>
       </div>
 
