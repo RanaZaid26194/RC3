@@ -1,6 +1,6 @@
 import { useState, useEffect, type ReactNode } from 'react';
 import { NavLink, useNavigate, useLocation } from 'react-router-dom';
-import { Menu, X, UserCheck, ShieldCheck, RefreshCw, LogOut } from 'lucide-react';
+import { Menu, X, UserCheck, ShieldCheck, RefreshCw, LogOut, Sparkles } from 'lucide-react';
 import { cn } from '@/lib/cn';
 import { Button } from '../ui/Button';
 import { NAV_ITEMS } from '@/app/nav';
@@ -96,29 +96,22 @@ export function AppShell({ children }: { children: ReactNode }) {
       </a>
 
       {/* Desktop Sidebar */}
-      <aside className="hidden flex-col justify-between border-r border-neutral-200 bg-white p-4 dark:border-neutral-800 dark:bg-neutral-900 lg:flex">
+      <aside className="hidden flex-col justify-between border-r border-neutral-200 bg-white p-6 dark:border-neutral-800 dark:bg-neutral-900 lg:flex">
         <div>
-          {/* Logo & Brand */}
-          <div className="mb-6 flex items-center justify-between px-2 pt-2">
-            <div className="flex items-center gap-3">
-              <img
-                src="/logo.png"
-                alt="RecruLens Logo"
-                className="h-12 w-12 rounded-xl object-contain shadow-sm border border-neutral-200 dark:border-neutral-700 bg-white dark:bg-neutral-800 p-1"
-                onError={(e) => {
-                  // Fallback if image fails to load
-                  (e.target as HTMLElement).style.display = 'none';
-                }}
-              />
-              <div>
-                <span className="font-display text-xl font-bold tracking-tight text-neutral-900 dark:text-white">
-                  {APP_NAME}
-                </span>
-                <span className="block text-[11px] font-semibold uppercase tracking-wider text-neutral-500">
-                  Talent Intelligence
-                </span>
-              </div>
+          {/* Logo & Brand - Centered at top */}
+          <div className="mb-8 flex items-center justify-center gap-3 px-2 pt-4">
+            <div className="relative flex h-12 w-12 items-center justify-center rounded-xl bg-gradient-to-br from-brand-600 to-brand-700 text-white shadow-lg shadow-brand-500/30 ring-1 ring-white/20">
+              <Sparkles className="h-7 w-7" aria-hidden="true" />
+              <div className="absolute -right-1 -top-1 h-3 w-3 rounded-full bg-accent-400 ring-2 ring-white/30" />
             </div>
+          </div>
+          <div className="mb-6 flex flex-col items-center gap-1">
+            <span className="font-display text-2xl font-bold tracking-tight text-neutral-900 dark:text-white">
+              {APP_NAME}
+            </span>
+            <span className="text-[10px] font-semibold uppercase tracking-widest text-neutral-500">
+              Talent Intelligence Platform
+            </span>
           </div>
 
           {/* Role Indicator Banner */}
