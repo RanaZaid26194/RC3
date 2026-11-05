@@ -314,8 +314,25 @@ export default function RegisterPage() {
                 />
                 <span>
                   I agree to the{' '}
-                  <span className="text-brand-600 font-medium hover:underline">Terms of Service</span> and{' '}
-                  <span className="text-brand-600 font-medium hover:underline">Privacy Policy</span>.
+                  <Link
+                    to="/terms"
+                    target="_blank"
+                    rel="noreferrer"
+                    className="text-brand-600 font-semibold hover:underline dark:text-brand-400"
+                    onClick={(e) => e.stopPropagation()}
+                  >
+                    Terms of Service
+                  </Link>{' '}
+                  and{' '}
+                  <Link
+                    to="/privacy"
+                    target="_blank"
+                    rel="noreferrer"
+                    className="text-brand-600 font-semibold hover:underline dark:text-brand-400"
+                    onClick={(e) => e.stopPropagation()}
+                  >
+                    Privacy Policy
+                  </Link>.
                 </span>
               </label>
             </div>

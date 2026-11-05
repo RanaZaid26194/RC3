@@ -260,10 +260,21 @@ export default function LoginPage() {
           </div>
         </Card>
 
-        {/* Security assurance */}
-        <div className="flex items-center justify-center gap-2 text-[11px] text-neutral-400 dark:text-neutral-500">
-          <Shield className="h-3.5 w-3.5" />
-          <span>Encrypted session authentication & client-side security</span>
+        {/* Security assurance & Legal */}
+        <div className="flex flex-col items-center justify-center gap-1.5 text-[11px] text-neutral-400 dark:text-neutral-500">
+          <div className="flex items-center gap-1.5">
+            <Shield className="h-3.5 w-3.5 text-brand-600 dark:text-brand-400" />
+            <span>Encrypted session authentication & client-side security</span>
+          </div>
+          <div className="flex items-center gap-3 text-[10px]">
+            <Link to="/terms" className="hover:text-neutral-600 hover:underline dark:hover:text-neutral-300">
+              Terms of Service
+            </Link>
+            <span>•</span>
+            <Link to="/privacy" className="hover:text-neutral-600 hover:underline dark:hover:text-neutral-300">
+              Privacy Policy
+            </Link>
+          </div>
         </div>
       </div>
 
