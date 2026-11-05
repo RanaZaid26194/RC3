@@ -1,5 +1,5 @@
 import { useState, useEffect, type ReactNode } from 'react';
-import { NavLink, useNavigate, useLocation } from 'react-router-dom';
+import { NavLink, useNavigate, useLocation, Navigate } from 'react-router-dom';
 import { Menu, X, UserCheck, ShieldCheck, RefreshCw, LogOut } from 'lucide-react';
 import { cn } from '@/lib/cn';
 import { Button } from '../ui/Button';
@@ -34,8 +34,7 @@ export function AppShell({ children }: { children: ReactNode }) {
 
   // Not logged in -> redirect to login
   if (!user) {
-    navigate('/login', { replace: true });
-    return null;
+    return <Navigate to="/login" replace />;
   }
 
   const handleSwitchAccount = (targetUser: StoredUser) => {
