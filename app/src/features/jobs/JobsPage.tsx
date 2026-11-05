@@ -146,7 +146,7 @@ export default function JobsPage() {
 
                 {/* Skill Weights Badges */}
                 <div className="space-y-1 pt-1">
-                  <span className="text-[10px] font-semibold uppercase tracking-wider text-neutral-400">
+                  <span className="text-[10px] font-semibold uppercase tracking-wider text-neutral-600 dark:text-neutral-400">
                     Required Skills (with weights):
                   </span>
                   <div className="flex flex-wrap gap-1.5">

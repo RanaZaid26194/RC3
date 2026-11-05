@@ -1,0 +1,21 @@
+# Robots.txt for RecruLens (https://recrulens.vercel.app)
+User-agent: *
+Allow: /
+Disallow: /settings
+Disallow: /api/
+
+# Sitemaps
+Sitemap: https://recrulens.vercel.app/sitemap.xml
+
+# LLM Crawler policy
+User-agent: GPTBot
+Allow: /
+Allow: /llms.txt
+
+User-agent: ClaudeBot
+Allow: /
+Allow: /llms.txt
+
+User-agent: PerplexityBot
+Allow: /
+Allow: /llms.txt

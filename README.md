@@ -4,6 +4,12 @@
 
 ---
 
+## 🌐 Live Production Deployment
+- **Live URL:** **[https://recrulens.vercel.app](https://recrulens.vercel.app)**
+- **Status:** 🟢 Production Ready (Deployed on Vercel with Global CDN Edge Routing)
+
+---
+
 ## ⚡ Quick Start (No Install Needed, Node.js 18+)
 
 RecruLens ships with a prebuilt production distribution in `app/dist` and a zero-dependency server:

@@ -8,7 +8,8 @@ export const DEFAULT_GROQ_MODEL = 'llama-3.3-70b-versatile';
 export function getGroqApiKey(): string {
   const localKey = load<string>(GROQ_KEY_STORAGE, '');
   if (localKey && localKey.trim().length > 5) return localKey.trim();
-  const envKey = (import.meta as any).env?.VITE_GROQ_API_KEY || '';
+  const env = (import.meta as any).env || {};
+  const envKey = env.VITE_GROQ_API_KEY || env.GROQ_API_KEY || '';
   return envKey ? envKey.trim() : '';
 }
 
