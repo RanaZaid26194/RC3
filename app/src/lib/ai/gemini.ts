@@ -17,7 +17,8 @@ export function setGeminiModel(model: string): void {
 export function getGeminiApiKey(): string {
   const localKey = load<string>(GEMINI_KEY_STORAGE, '');
   if (localKey && localKey.trim().length > 5) return localKey.trim();
-  const envKey = (import.meta as any).env?.VITE_GEMINI_API_KEY || '';
+  const env = (import.meta as any).env || {};
+  const envKey = env.VITE_GEMINI_API_KEY || env.GEMINI_API_KEY || '';
   return envKey ? envKey.trim() : '';
 }
 
