@@ -6,18 +6,27 @@ import { Input } from '@/components/ui/Input';
 import { ConfirmDialog } from '@/components/ui/Modal';
 import { useToast } from '@/components/ui/Toast';
 import { resetDemoData } from '@/lib/storage';
-import { getGeminiApiKey, setGeminiApiKey, hasGeminiApiKey } from '@/lib/ai/gemini';
+import {
+  getGeminiApiKey,
+  setGeminiApiKey,
+  hasGeminiApiKey,
+  getGeminiModel,
+  setGeminiModel,
+  DEFAULT_GEMINI_MODEL,
+} from '@/lib/ai/gemini';
 
 export default function Settings() {
   const [confirm, setConfirm] = useState(false);
   const [apiKey, setApiKey] = useState(getGeminiApiKey());
+  const [model, setModel] = useState(getGeminiModel() || DEFAULT_GEMINI_MODEL);
   const [testStatus, setTestStatus] = useState<'idle' | 'testing' | 'success' | 'error'>('idle');
   const [testMessage, setTestMessage] = useState('');
   const toast = useToast();
 
-  const handleSaveApiKey = () => {
+  const handleSaveConfig = () => {
     setGeminiApiKey(apiKey);
-    toast.success('Gemini API key saved');
+    setGeminiModel(model);
+    toast.success('Gemini AI configuration saved');
   };
 
   const handleTestConnection = async () => {
@@ -28,10 +37,10 @@ export default function Settings() {
     }
 
     setTestStatus('testing');
-    setTestMessage('Testing live connection to Google Gemini API...');
+    setTestMessage(`Testing live connection to Google Gemini API using ${model}...`);
 
     try {
-      const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${apiKey.trim()}`;
+      const url = `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${apiKey.trim()}`;
       const res = await fetch(url, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -47,9 +56,10 @@ export default function Settings() {
       const data = await res.json();
       const text = data?.candidates?.[0]?.content?.parts?.[0]?.text;
       setTestStatus('success');
-      setTestMessage(`Connection verified! Live Gemini model response: "${text?.trim()}"`);
+      setTestMessage(`Connection verified! Live ${model} response: "${text?.trim()}"`);
       setGeminiApiKey(apiKey.trim());
-      toast.success('Gemini AI connected successfully');
+      setGeminiModel(model);
+      toast.success(`Connected to ${model} successfully`);
     } catch (err: any) {
       setTestStatus('error');
       setTestMessage(`Connection test failed: ${err.message}. Local AI rule fallback will be used.`);
@@ -64,7 +74,7 @@ export default function Settings() {
           System & AI Engine Settings
         </h1>
         <p className="text-sm text-neutral-500">
-          Configure Google Gemini API keys, monitor AI status, and manage local application persistence.
+          Configure Google Gemini API keys, select model versions, and manage local application persistence.
         </p>
       </div>
 
@@ -80,7 +90,7 @@ export default function Settings() {
                 Google Gemini API Integration
               </h2>
               <p className="text-xs text-neutral-500">
-                Powers real-time semantic extraction, intelligent question generation, and candidate reasoning.
+                Primary model: <strong className="text-blue-600 dark:text-blue-400">{model}</strong> with local offline fallback.
               </p>
             </div>
           </div>
@@ -104,56 +114,74 @@ export default function Settings() {
           </span>
         </div>
 
-        <div className="space-y-2">
-          <div className="flex gap-2">
+        <div className="grid gap-3 sm:grid-cols-3">
+          <div className="sm:col-span-2">
             <Input
               label="Gemini API Key"
               type="password"
               value={apiKey}
               onChange={(e) => setApiKey(e.target.value)}
               placeholder="AIzaSy..."
-              className="flex-1 font-mono text-xs"
+              className="font-mono text-xs"
             />
-            <div className="flex items-end gap-2">
-              <Button size="sm" onClick={handleSaveApiKey} className="text-xs">
-                Save Key
-              </Button>
-              <Button
-                size="sm"
-                variant="outline"
-                loading={testStatus === 'testing'}
-                onClick={handleTestConnection}
-                className="text-xs"
-              >
-                Test Connection
-              </Button>
-            </div>
           </div>
-          <p className="text-[11px] text-neutral-400">
-            Stored locally in your browser. If not provided or offline, RecruLens automatically uses its embedded NLP and semantic scoring algorithms.
-          </p>
-
-          {testStatus !== 'idle' && (
-            <div
-              className={`flex items-center gap-2 rounded-lg p-3 text-xs font-medium ${
-                testStatus === 'success'
-                  ? 'bg-emerald-50 text-emerald-800 border border-emerald-200 dark:bg-emerald-950/40 dark:text-emerald-300 dark:border-emerald-800'
-                  : testStatus === 'error'
-                  ? 'bg-rose-50 text-rose-800 border border-rose-200 dark:bg-rose-950/40 dark:text-rose-300 dark:border-rose-800'
-                  : 'bg-blue-50 text-blue-800 dark:bg-blue-950/40 dark:text-blue-300'
-              }`}
+          <div>
+            <label htmlFor="gemini-model" className="block text-xs font-medium text-neutral-700 dark:text-neutral-300 mb-1">
+              Gemini Model
+            </label>
+            <select
+              id="gemini-model"
+              value={model}
+              onChange={(e) => setModel(e.target.value)}
+              className="w-full rounded-md border border-neutral-300 bg-white px-3 py-2 text-xs font-medium dark:border-neutral-700 dark:bg-neutral-900 dark:text-white min-h-10"
             >
-              {testStatus === 'success' ? (
-                <CheckCircle2 className="h-4 w-4 shrink-0 text-emerald-600" />
-              ) : testStatus === 'error' ? (
-                <AlertCircle className="h-4 w-4 shrink-0 text-rose-600" />
-              ) : (
-                <Sparkles className="h-4 w-4 shrink-0 animate-spin text-blue-600" />
-              )}
-              <span>{testMessage}</span>
-            </div>
-          )}
+              <option value="gemini-3.6-flash">gemini-3.6-flash (Primary)</option>
+              <option value="gemini-3.8-flash">gemini-3.8-flash</option>
+              <option value="gemini-2.5-flash">gemini-2.5-flash</option>
+            </select>
+          </div>
         </div>
+
+        <div className="flex items-center justify-between pt-1">
+          <p className="text-[11px] text-neutral-400">
+            Stored locally in browser. If not provided or offline, RecruLens uses embedded semantic scoring heuristics.
+          </p>
+          <div className="flex items-center gap-2">
+            <Button size="sm" onClick={handleSaveConfig} className="text-xs">
+              Save Config
+            </Button>
+            <Button
+              size="sm"
+              variant="outline"
+              loading={testStatus === 'testing'}
+              onClick={handleTestConnection}
+              className="text-xs"
+            >
+              Test Connection
+            </Button>
+          </div>
+        </div>
+
+        {testStatus !== 'idle' && (
+          <div
+            className={`flex items-center gap-2 rounded-lg p-3 text-xs font-medium ${
+              testStatus === 'success'
+                ? 'bg-emerald-50 text-emerald-800 border border-emerald-200 dark:bg-emerald-950/40 dark:text-emerald-300 dark:border-emerald-800'
+                : testStatus === 'error'
+                ? 'bg-rose-50 text-rose-800 border border-rose-200 dark:bg-rose-950/40 dark:text-rose-300 dark:border-rose-800'
+                : 'bg-blue-50 text-blue-800 dark:bg-blue-950/40 dark:text-blue-300'
+            }`}
+          >
+            {testStatus === 'success' ? (
+              <CheckCircle2 className="h-4 w-4 shrink-0 text-emerald-600" />
+            ) : testStatus === 'error' ? (
+              <AlertCircle className="h-4 w-4 shrink-0 text-rose-600" />
+            ) : (
+              <Sparkles className="h-4 w-4 shrink-0 animate-spin text-blue-600" />
+            )}
+            <span>{testMessage}</span>
+          </div>
+        )}
       </Card>
 
       {/* Demo Data Management */}

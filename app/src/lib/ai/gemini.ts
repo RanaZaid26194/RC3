@@ -2,6 +2,17 @@ import { load, save } from '../storage';
 import type { SkillRequirement, InterviewQuestion } from '@/types';
 
 const GEMINI_KEY_STORAGE = 'config:gemini_api_key';
+const GEMINI_MODEL_STORAGE = 'config:gemini_model';
+
+export const DEFAULT_GEMINI_MODEL = 'gemini-3.6-flash';
+
+export function getGeminiModel(): string {
+  return load<string>(GEMINI_MODEL_STORAGE, DEFAULT_GEMINI_MODEL);
+}
+
+export function setGeminiModel(model: string): void {
+  save(GEMINI_MODEL_STORAGE, model.trim());
+}
 
 export function getGeminiApiKey(): string {
   const localKey = load<string>(GEMINI_KEY_STORAGE, '');
@@ -20,6 +31,7 @@ export function hasGeminiApiKey(): boolean {
 
 /**
  * Call Gemini API using direct REST (zero external dependencies required)
+ * Uses gemini-3.6-flash primarily as requested, with fallback models.
  */
 async function callGemini(prompt: string, systemInstruction?: string): Promise<string> {
   const apiKey = getGeminiApiKey();
@@ -27,43 +39,58 @@ async function callGemini(prompt: string, systemInstruction?: string): Promise<s
     throw new Error('No Gemini API Key configured. Using local fallback.');
   }
 
-  // Model cascade: try gemini-2.5-flash / gemini-1.5-flash on v1beta endpoint
-  const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${apiKey}`;
+  const primaryModel = getGeminiModel();
+  const candidateModels = [primaryModel, 'gemini-3.8-flash', 'gemini-2.5-flash'];
+  // Deduplicate
+  const models = Array.from(new Set(candidateModels));
 
-  const payload = {
-    contents: [
-      {
-        parts: [{ text: prompt }],
-      },
-    ],
-    ...(systemInstruction && {
-      systemInstruction: {
-        parts: [{ text: systemInstruction }],
-      },
-    }),
-    generationConfig: {
-      temperature: 0.2,
-      maxOutputTokens: 1024,
-    },
-  };
+  let lastError: Error | null = null;
 
-  const res = await fetch(url, {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify(payload),
-  });
+  for (const model of models) {
+    try {
+      const url = `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${apiKey}`;
 
-  if (!res.ok) {
-    const errText = await res.text();
-    throw new Error(`Gemini API Error (${res.status}): ${errText}`);
+      const payload = {
+        contents: [
+          {
+            parts: [{ text: prompt }],
+          },
+        ],
+        ...(systemInstruction && {
+          systemInstruction: {
+            parts: [{ text: systemInstruction }],
+          },
+        }),
+        generationConfig: {
+          temperature: 0.2,
+          maxOutputTokens: 1024,
+        },
+      };
+
+      const res = await fetch(url, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(payload),
+      });
+
+      if (!res.ok) {
+        const errText = await res.text();
+        throw new Error(`Gemini API Error on ${model} (${res.status}): ${errText}`);
+      }
+
+      const data = await res.json();
+      const text = data?.candidates?.[0]?.content?.parts?.[0]?.text;
+      if (!text) {
+        throw new Error(`Empty response from Gemini API model ${model}`);
+      }
+      return text;
+    } catch (err: any) {
+      lastError = err;
+      console.warn(`Attempt with ${model} failed, trying next fallback:`, err.message);
+    }
   }
 
-  const data = await res.json();
-  const text = data?.candidates?.[0]?.content?.parts?.[0]?.text;
-  if (!text) {
-    throw new Error('Empty response from Gemini API');
-  }
-  return text;
+  throw lastError || new Error('All Gemini model invocations failed');
 }
 
 /**
