@@ -1,44 +1,176 @@
 import { useState, type ReactNode } from 'react';
-import { NavLink } from 'react-router-dom';
-import { Menu, X, Home, Settings, Sparkles } from 'lucide-react';
+import { NavLink, useNavigate } from 'react-router-dom';
+import { Menu, X, Sparkles, UserCheck, ShieldCheck, RefreshCw } from 'lucide-react';
 import { cn } from '@/lib/cn';
 import { Button } from '../ui/Button';
+import { NAV_ITEMS } from '@/app/nav';
+import { getCurrentUser, switchRole } from '@/lib/auth';
+import { resetDemoData } from '@/lib/storage';
 
-// TODO: replace with real product name + navigation items (keep it under ~6).
-export const APP_NAME = 'App Name';
-export const NAV = [
-  { to: '/', label: 'Home', icon: Home },
-  { to: '/settings', label: 'Settings', icon: Settings },
-];
+export const APP_NAME = 'RecruLens';
 
 export function AppShell({ children }: { children: ReactNode }) {
   const [open, setOpen] = useState(false);
-  const link = ({ isActive }: { isActive: boolean }) => cn(
-    'flex min-h-11 items-center gap-3 rounded-[var(--radius-sm)] px-3 text-sm font-medium transition',
-    isActive ? 'bg-brand-100 text-brand-900' : 'text-ink-muted hover:bg-brand-50 hover:text-ink');
+  const [user, setUser] = useState(getCurrentUser());
+  const navigate = useNavigate();
+
+  const handleToggleRole = () => {
+    const nextRole = user.role === 'recruiter' ? 'candidate' : 'recruiter';
+    const updated = switchRole(nextRole);
+    setUser(updated);
+    if (nextRole === 'candidate') {
+      navigate('/portal');
+    } else {
+      navigate('/jobs');
+    }
+  };
+
+  const handleResetData = () => {
+    if (window.confirm('Reset all demo data back to clean initial state?')) {
+      resetDemoData();
+      window.location.reload();
+    }
+  };
+
+  const visibleNav = NAV_ITEMS.filter((item) => item.roles.includes(user.role));
+
+  const link = ({ isActive }: { isActive: boolean }) =>
+    cn(
+      'flex min-h-11 items-center gap-3 rounded-[var(--radius-sm)] px-3 text-sm font-medium transition',
+      isActive
+        ? 'bg-blue-50 text-blue-700 font-semibold dark:bg-blue-950/40 dark:text-blue-300'
+        : 'text-neutral-600 hover:bg-neutral-100 hover:text-neutral-900 dark:text-neutral-400 dark:hover:bg-neutral-800 dark:hover:text-neutral-100'
+    );
+
   const nav = (
-    <nav aria-label="Main" className="flex flex-col gap-1">
-      {NAV.map(({ to, label, icon: I }) => (
-        <NavLink key={to} to={to} end={to === '/'} className={link} onClick={() => setOpen(false)}>
-          <I className="h-5 w-5" aria-hidden="true" />{label}
-        </NavLink>))}
+    <nav aria-label="Main" className="flex flex-col gap-1.5">
+      {visibleNav.map(({ to, label, icon: I }) => (
+        <NavLink
+          key={to}
+          to={to}
+          end={to === '/jobs' || to === '/portal'}
+          className={link}
+          onClick={() => setOpen(false)}
+        >
+          <I className="h-5 w-5 shrink-0" aria-hidden="true" />
+          <span>{label}</span>
+        </NavLink>
+      ))}
     </nav>
   );
+
   return (
-    <div className="min-h-screen lg:grid lg:grid-cols-[250px_1fr]">
-      <a href="#main" className="sr-only focus:not-sr-only focus:fixed focus:left-3 focus:top-3 focus:z-[70] focus:rounded focus:bg-surface focus:px-4 focus:py-2 focus:shadow-lg">Skip to main content</a>
-      <aside className="hidden border-r border-line bg-surface p-4 lg:block">
-        <div className="mb-6 flex items-center gap-2 px-2 pt-2 font-display text-xl font-semibold"><Sparkles className="h-6 w-6 text-brand-600" aria-hidden="true" />{APP_NAME}</div>
-        {nav}
+    <div className="min-h-screen bg-neutral-50 text-neutral-900 dark:bg-neutral-950 dark:text-neutral-100 lg:grid lg:grid-cols-[260px_1fr]">
+      <a
+        href="#main"
+        className="sr-only focus:not-sr-only focus:fixed focus:left-3 focus:top-3 focus:z-[70] focus:rounded focus:bg-white focus:px-4 focus:py-2 focus:shadow-lg dark:focus:bg-neutral-900"
+      >
+        Skip to main content
+      </a>
+
+      {/* Desktop Sidebar */}
+      <aside className="hidden flex-col justify-between border-r border-neutral-200 bg-white p-4 dark:border-neutral-800 dark:bg-neutral-900 lg:flex">
+        <div>
+          {/* Logo & Brand */}
+          <div className="mb-6 flex items-center justify-between px-2 pt-2">
+            <div className="flex items-center gap-2.5">
+              <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-blue-600 text-white shadow-sm shadow-blue-500/30">
+                <Sparkles className="h-5 w-5" aria-hidden="true" />
+              </div>
+              <div>
+                <span className="font-display text-lg font-bold tracking-tight text-neutral-900 dark:text-white">
+                  {APP_NAME}
+                </span>
+                <span className="block text-[10px] font-medium uppercase tracking-wider text-neutral-500">
+                  Talent Intelligence
+                </span>
+              </div>
+            </div>
+          </div>
+
+          {/* Role Indicator Banner */}
+          <div className="mb-4 rounded-lg border border-neutral-200 bg-neutral-50 p-2.5 dark:border-neutral-800 dark:bg-neutral-800/60">
+            <div className="flex items-center justify-between text-xs">
+              <span className="flex items-center gap-1.5 font-medium text-neutral-600 dark:text-neutral-300">
+                {user.role === 'recruiter' ? (
+                  <>
+                    <ShieldCheck className="h-3.5 w-3.5 text-blue-600" /> Recruiter Mode
+                  </>
+                ) : (
+                  <>
+                    <UserCheck className="h-3.5 w-3.5 text-emerald-600" /> Candidate Mode
+                  </>
+                )}
+              </span>
+              <button
+                type="button"
+                onClick={handleToggleRole}
+                className="text-[11px] font-semibold text-blue-600 hover:underline dark:text-blue-400"
+              >
+                Switch
+              </button>
+            </div>
+            <p className="mt-1 text-[11px] text-neutral-500 truncate">{user.name}</p>
+          </div>
+
+          {/* Navigation Links */}
+          {nav}
+        </div>
+
+        {/* Footer actions */}
+        <div className="border-t border-neutral-200 pt-3 dark:border-neutral-800">
+          <Button
+            variant="ghost"
+            size="sm"
+            onClick={handleResetData}
+            className="w-full justify-start text-xs text-neutral-500 hover:text-neutral-700 dark:hover:text-neutral-300"
+          >
+            <RefreshCw className="mr-2 h-3.5 w-3.5" />
+            Reset Demo Data
+          </Button>
+        </div>
       </aside>
-      <header className="sticky top-0 z-40 flex items-center justify-between border-b border-line bg-surface px-4 py-2 lg:hidden">
-        <span className="flex items-center gap-2 font-display text-lg font-semibold"><Sparkles className="h-5 w-5 text-brand-600" aria-hidden="true" />{APP_NAME}</span>
-        <Button variant="ghost" aria-label={open ? 'Close menu' : 'Open menu'} aria-expanded={open} onClick={() => setOpen(!open)}>
-          {open ? <X className="h-5 w-5" aria-hidden="true" /> : <Menu className="h-5 w-5" aria-hidden="true" />}
-        </Button>
+
+      {/* Mobile Header */}
+      <header className="sticky top-0 z-40 flex items-center justify-between border-b border-neutral-200 bg-white px-4 py-2.5 dark:border-neutral-800 dark:bg-neutral-900 lg:hidden">
+        <div className="flex items-center gap-2">
+          <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-blue-600 text-white">
+            <Sparkles className="h-4 w-4" />
+          </div>
+          <span className="font-display text-base font-bold text-neutral-900 dark:text-white">
+            {APP_NAME}
+          </span>
+        </div>
+        <div className="flex items-center gap-2">
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={handleToggleRole}
+            className="text-xs"
+          >
+            {user.role === 'recruiter' ? 'Recruiter' : 'Candidate'}
+          </Button>
+          <Button
+            variant="ghost"
+            aria-label={open ? 'Close menu' : 'Open menu'}
+            aria-expanded={open}
+            onClick={() => setOpen(!open)}
+          >
+            {open ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}
+          </Button>
+        </div>
       </header>
-      {open && <div className="animate-fade-up border-b border-line bg-surface p-3 lg:hidden">{nav}</div>}
-      <main id="main" tabIndex={-1} className="mx-auto w-full max-w-6xl p-4 sm:p-6 lg:p-8">{children}</main>
+
+      {open && (
+        <div className="animate-fade-up border-b border-neutral-200 bg-white p-3 dark:border-neutral-800 dark:bg-neutral-900 lg:hidden">
+          {nav}
+        </div>
+      )}
+
+      {/* Main Content Area */}
+      <main id="main" tabIndex={-1} className="mx-auto w-full max-w-7xl p-4 sm:p-6 lg:p-8">
+        {children}
+      </main>
     </div>
   );
 }
