@@ -1,141 +1,90 @@
 import type { ReactNode } from 'react';
-import { Inbox, AlertTriangle, Loader2 } from 'lucide-react';
+import { Inbox, AlertTriangle, CheckCircle2 } from 'lucide-react';
 import { Button } from './Button';
 import { cn } from '@/lib/cn';
 
-/**
- * Premium animated loading spinner (Linear-style)
- */
-export function LoadingSpinner() {
+export function EmptyState({ title, message, action, icon }: { title: string; message: string; action?: ReactNode; icon?: ReactNode }) {
   return (
-    <div className="flex items-center justify-center">
-      <Loader2 className="h-8 w-8 animate-spin text-brand-600" aria-label="Loading" />
+    <div className="flex flex-col items-center rounded-[var(--radius-md)] border border-dashed border-line bg-surface px-6 py-12 text-center animate-fade-up">
+      <div className="mb-3 text-brand-600 animate-float" aria-hidden="true">{icon ?? <Inbox className="h-10 w-10" />}</div>
+      <h3 className="text-lg font-semibold">{title}</h3>
+      <p className="mt-1 max-w-sm text-sm text-ink-muted">{message}</p>
+      {action && <div className="mt-5">{action}</div>}
+    </div>
+  );
+}
+export function ErrorState({ message = 'Something went wrong.', onRetry }: { message?: string; onRetry?: () => void }) {
+  return (
+    <div role="alert" className="flex flex-col items-center rounded-[var(--radius-md)] border border-red-200 bg-red-50 px-6 py-10 text-center animate-fade-up">
+      <AlertTriangle className="mb-3 h-9 w-9 text-danger animate-pop" aria-hidden="true" />
+      <p className="text-sm font-medium text-danger">{message}</p>
+      {onRetry && <Button variant="secondary" className="mt-4" onClick={onRetry}>Try again</Button>}
     </div>
   );
 }
 
-/**
- * Large full-screen loading state with custom animation
- */
-export function FullScreenLoading() {
+export function SuccessState({ title, message, className }: { title: string; message?: string; className?: string }) {
   return (
-    <div className="flex h-screen min-h-[400px] flex-col items-center justify-center gap-4">
-      <div className="relative">
-        {/* Outer glow ring */}
-        <div className="absolute inset-0 animate-pulse-soft rounded-full bg-brand-100 opacity-50 blur-xl" />
-        {/* Main spinner */}
-        <Loader2 className="relative h-12 w-12 animate-bounce-subtle text-brand-600" style={{ animationDuration: '3s' }} aria-label="Loading" />
+    <div role="status" className={cn('flex flex-col items-center rounded-[var(--radius-md)] border border-emerald-200 bg-emerald-50 px-6 py-10 text-center animate-fade-up', className)}>
+      <CheckCircle2 className="mb-3 h-9 w-9 text-emerald-600 animate-pop" aria-hidden="true" />
+      <h3 className="text-base font-semibold text-emerald-900">{title}</h3>
+      {message && <p className="mt-1 max-w-sm text-sm text-emerald-700">{message}</p>}
+    </div>
+  );
+}
+
+/** RecruLens signature conic spinner — no generic icon, pure CSS */
+export function LoadingSpinner({ size = 'md', label = 'Loading' }: { size?: 'sm' | 'md' | 'lg'; label?: string }) {
+  return (
+    <span role="status" aria-label={label} className="inline-flex items-center justify-center">
+      <span
+        className={cn(
+          'spinner-premium',
+          size === 'sm' && '!h-4 !w-4',
+          size === 'lg' && 'spinner-premium-lg'
+        )}
+      />
+      <span className="sr-only">{label}</span>
+    </span>
+  );
+}
+
+/** Full-region loading state with breathing halo */
+export function LoadingState({ label = 'Loading…' }: { label?: string }) {
+  return (
+    <div className="flex min-h-[240px] flex-col items-center justify-center gap-4 animate-fade-in">
+      <div className="relative flex items-center justify-center">
+        <div className="absolute h-16 w-16 rounded-full bg-brand-100 animate-breathe blur-xl" aria-hidden="true" />
+        <span className="spinner-premium spinner-premium-lg relative" aria-hidden="true" />
       </div>
-      <p className="animate-fade-in text-sm font-medium text-neutral-500">Loading...</p>
+      <p className="text-sm font-medium text-ink-muted">{label}</p>
     </div>
   );
 }
 
-export function EmptyState({ 
-  title, 
-  message, 
-  action, 
-  icon,
-  className 
-}: { 
-  title: string; 
-  message: string; 
-  action?: ReactNode; 
-  icon?: ReactNode;
-  className?: string;
-}) {
-  return (
-    <div className={cn(
-      "flex flex-col items-center rounded-[var(--radius-md)] border border-dashed border-neutral-200 bg-white px-6 py-12 text-center shadow-sm",
-      className
-    )}>
-      <div className="mb-4 scale-110 text-brand-600 animate-bounce-subtle" style={{ animationDuration: '2s' }} aria-hidden="true">
-        {icon ?? <Inbox className="h-12 w-12" />}
-      </div>
-      <h3 className="text-lg font-semibold text-neutral-900">{title}</h3>
-      <p className="mt-2 max-w-sm text-sm text-neutral-500">{message}</p>
-      {action && <div className="mt-6">{action}</div>}
-    </div>
-  );
-}
-
-export function ErrorState({ 
-  message = 'Something went wrong.', 
-  onRetry 
-}: { 
-  message?: string; 
-  onRetry?: () => void;
-}) {
-  return (
-    <div role="alert" className="flex flex-col items-center rounded-[var(--radius-lg)] border border-red-200 bg-red-50 px-6 py-10 text-center">
-      <AlertTriangle className="mb-4 h-10 w-10 text-red-600" aria-hidden="true" />
-      <p className="text-sm font-medium text-red-700">{message}</p>
-      {onRetry && (
-        <Button variant="secondary" className="mt-5" onClick={onRetry}>
-          Try again
-        </Button>
-      )}
-    </div>
-  );
-}
-
-export function SuccessState({
-  title,
-  message,
-  className
-}: {
-  title: string;
-  message: string;
-  className?: string;
-}) {
-  return (
-    <div className={cn(
-      "flex flex-col items-center rounded-[var(--radius-lg)] border border-green-200 bg-green-50 px-6 py-10 text-center",
-      className
-    )}>
-      <div className="mb-4 flex h-12 w-12 items-center justify-center rounded-full bg-green-100 animate-scale-in">
-        <svg className="h-6 w-6 text-green-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
-        </svg>
-      </div>
-      <h3 className="text-lg font-semibold text-green-900">{title}</h3>
-      <p className="mt-2 text-sm text-green-700">{message}</p>
-    </div>
-  );
-}
-
-/**
- * Skeleton loader components
- */
 export function Skeleton({ className }: { className?: string }) {
   return (
-    <div 
-      aria-hidden="true" 
-      className={cn('relative overflow-hidden rounded-[var(--radius-sm)] bg-neutral-200 animate-shimmer', className)}
-    />
+    <div aria-hidden="true" className={cn('relative overflow-hidden rounded-[var(--radius-sm)] bg-line', className)}>
+      <div className="absolute inset-0 -translate-x-full bg-gradient-to-r from-transparent via-white/60 to-transparent" style={{ animation: 'shimmer 1.4s infinite' }} />
+    </div>
   );
 }
 
 export function SkeletonText({ lines = 3, className }: { lines?: number; className?: string }) {
   return (
-    <div className={className}>
+    <div className={cn('space-y-2', className)} aria-hidden="true">
       {Array.from({ length: lines }).map((_, i) => (
-        <div key={i} className={`mb-2 rounded-[var(--radius-sm)] bg-neutral-200 ${i === lines - 1 ? 'w-2/3' : ''}`} style={{ height: i === 0 ? '20px' : '14px' }}>
-          <div 
-            aria-hidden="true" 
-            className="absolute inset-0 -translate-x-full bg-gradient-to-r from-transparent via-neutral-300/60 to-transparent"
-            style={{ animation: 'shimmer 1.4s infinite' }} 
-          />
-        </div>
+        <Skeleton key={i} className={cn('h-3.5', i === lines - 1 ? 'w-2/3' : 'w-full')} />
       ))}
     </div>
   );
 }
 
-export function SkeletonCard({ lines = 4 }: { lines?: number }) {
+export function DotsLoader({ label = 'Working' }: { label?: string }) {
   return (
-    <div className="rounded-lg border border-neutral-200 p-4">
-      <SkeletonText lines={lines} />
-    </div>
+    <span role="status" aria-label={label} className="dots-loader">
+      <span /><span /><span />
+      <span className="sr-only">{label}</span>
+    </span>
   );
 }

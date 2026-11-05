@@ -40,32 +40,40 @@ export default function JobsPage() {
   return (
     <div className="space-y-6">
       {/* Top Header */}
-      <div className="flex flex-col justify-between gap-4 sm:flex-row sm:items-center">
-        <div>
-          <h1 className="font-display text-2xl font-bold tracking-tight text-neutral-900 dark:text-white">
-            Job Openings & Vacancy Management
-          </h1>
-          <p className="text-sm text-neutral-500">
-            Publish vacancies, define required skill weights, and monitor applicant pools with AI matching.
-          </p>
-        </div>
-        <div className="flex items-center gap-2">
-          <Button onClick={() => navigate('/jobs/new')} className="gap-2">
-            <Plus className="h-4 w-4" /> Create New Vacancy
-          </Button>
+      <div className="relative overflow-hidden rounded-[var(--radius-lg)] border border-neutral-200/80 bg-white p-6 shadow-sm dark:border-neutral-800 dark:bg-neutral-900">
+        <div className="aurora-blob -right-10 -top-16 h-56 w-56 bg-brand-200/60 dark:bg-brand-900/30" />
+        <div className="aurora-blob -bottom-20 left-1/3 h-48 w-48 bg-accent-500/20 dark:bg-accent-500/10" style={{ animationDelay: '-6s' }} />
+        <div className="relative flex flex-col justify-between gap-4 sm:flex-row sm:items-center">
+          <div>
+            <p className="mb-1 inline-flex items-center gap-1.5 text-[11px] font-semibold uppercase tracking-[0.14em] text-brand-600 dark:text-brand-300">
+              <Sparkles className="h-3.5 w-3.5 animate-breathe" aria-hidden="true" />
+              Talent Acquisition Hub
+            </p>
+            <h1 className="animate-fade-up font-display text-2xl font-bold tracking-tight text-neutral-900 dark:text-white">
+              Job Openings & <span className="animate-gradient-text">Vacancy Management</span>
+            </h1>
+            <p className="mt-1 text-sm text-neutral-500">
+              Publish vacancies, define required skill weights, and monitor applicant pools with AI matching.
+            </p>
+          </div>
+          <div className="flex items-center gap-2">
+            <Button onClick={() => navigate('/jobs/new')} className="group gap-2 hover-lift">
+              <Plus className="h-4 w-4 transition-transform duration-300 group-hover:rotate-90" /> Create New Vacancy
+            </Button>
+          </div>
         </div>
       </div>
 
       {/* Filter Tabs */}
-      <div className="flex items-center gap-2 border-b border-neutral-200 pb-3 text-sm dark:border-neutral-800">
+      <div className="flex flex-wrap items-center gap-2 border-b border-neutral-200 pb-3 text-sm dark:border-neutral-800">
         <Filter className="h-4 w-4 text-neutral-400" />
         <span className="text-xs font-semibold uppercase tracking-wider text-neutral-500">Filter:</span>
         <button
           type="button"
           onClick={() => setStatusFilter('all')}
-          className={`rounded-full px-3 py-1 text-xs font-medium transition ${
+          className={`rounded-full px-3 py-1 text-xs font-medium transition-all duration-200 ${
             statusFilter === 'all'
-              ? 'bg-neutral-900 text-white dark:bg-neutral-100 dark:text-neutral-900'
+              ? 'bg-neutral-900 text-white shadow-sm dark:bg-neutral-100 dark:text-neutral-900'
               : 'text-neutral-600 hover:bg-neutral-100 dark:text-neutral-400 dark:hover:bg-neutral-800'
           }`}
         >
@@ -74,10 +82,10 @@ export default function JobsPage() {
         <button
           type="button"
           onClick={() => setStatusFilter('open')}
-          className={`rounded-full px-3 py-1 text-xs font-medium transition ${
+          className={`rounded-full px-3 py-1 text-xs font-medium transition-all duration-200 ${
             statusFilter === 'open'
-              ? 'bg-blue-600 text-white'
-              : 'text-neutral-600 hover:bg-neutral-100 dark:text-neutral-400 dark:hover:bg-neutral-800'
+              ? 'bg-brand-600 text-white shadow-sm shadow-brand-600/25'
+              : 'text-neutral-600 hover:bg-brand-50 hover:text-brand-700 dark:text-neutral-400 dark:hover:bg-brand-950/40'
           }`}
         >
           Open ({jobs.filter((j) => j.status === 'open').length})
@@ -85,9 +93,9 @@ export default function JobsPage() {
         <button
           type="button"
           onClick={() => setStatusFilter('closed')}
-          className={`rounded-full px-3 py-1 text-xs font-medium transition ${
+          className={`rounded-full px-3 py-1 text-xs font-medium transition-all duration-200 ${
             statusFilter === 'closed'
-              ? 'bg-neutral-600 text-white'
+              ? 'bg-neutral-600 text-white shadow-sm'
               : 'text-neutral-600 hover:bg-neutral-100 dark:text-neutral-400 dark:hover:bg-neutral-800'
           }`}
         >
@@ -96,7 +104,7 @@ export default function JobsPage() {
       </div>
 
       {/* Job Cards Grid */}
-      <div className="grid gap-5 md:grid-cols-2 lg:grid-cols-3">
+      <div className="stagger grid gap-5 md:grid-cols-2 lg:grid-cols-3">
         {filteredJobs.map((job) => {
           const appCount = applications.filter((a) => a.jobId === job.id).length;
           const isOpen = job.status === 'open';
@@ -104,7 +112,7 @@ export default function JobsPage() {
           return (
             <Card
               key={job.id}
-              className={`flex flex-col justify-between p-5 transition hover:shadow-md ${
+              className={`hover-lift sheen flex flex-col justify-between p-5 ${
                 !isOpen ? 'opacity-70 bg-neutral-50/70 dark:bg-neutral-900/40' : ''
               }`}
             >

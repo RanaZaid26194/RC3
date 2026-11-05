@@ -1,6 +1,7 @@
 import { AppShell } from './components/layout/AppShell';
 import { seedIfEmpty } from './lib/storage';
 import { CommandPalette } from './components/ui/CommandPalette';
+import { PageTransition } from './components/ui/Motion';
 import { NAV_ITEMS } from './app/nav';
 import { AppRoutes } from './app/routes';
 
@@ -14,7 +15,9 @@ export default function App() {
   return (
     <AppShell>
       <CommandPalette routes={NAV_ITEMS.map((n) => ({ to: n.to, label: n.label }))} />
-      <AppRoutes />
+      <PageTransition>
+        <AppRoutes />
+      </PageTransition>
     </AppShell>
   );
 }
