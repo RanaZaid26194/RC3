@@ -40,7 +40,7 @@ export default function Home() {
   return (
     <div className="space-y-8 animate-fade-in">
       {/* Hero Section */}
-      <div className="relative overflow-hidden rounded-[var(--radius-xl)] bg-gradient-to-br from-brand-600 via-brand-500 to-brand-400 p-8 shadow-lg">
+      <div className="relative overflow-hidden rounded-[var(--radius-xl)] bg-brand-700 p-8 shadow-lg">
         <div className="absolute right-[-20px] top-[-20px] h-40 w-40 opacity-10">
           <Sparkles className="h-full w-full" />
         </div>
@@ -224,7 +224,7 @@ export default function Home() {
           </div>
 
           {/* AI Feature Highlight */}
-          <div className="mt-6 rounded-[var(--radius-lg)] border border-gradient bg-gradient-to-br from-accent-50 to-accent-100 p-5 dark:from-accent-900/40 dark:to-accent-800/40">
+          <div className="mt-6 rounded-[var(--radius-lg)] border border-accent-200 bg-accent-50 p-5 dark:border-accent-800 dark:bg-accent-900/40">
             <div className="mb-2 flex items-center gap-2">
               <Sparkles className="h-4 w-4 text-accent-600" />
               <span className="text-sm font-semibold text-accent-800 dark:text-accent-200">AI-Powered Insights</span>

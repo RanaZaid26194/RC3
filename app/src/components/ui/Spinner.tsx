@@ -4,24 +4,45 @@ interface SpinnerProps {
   size?: 'sm' | 'md' | 'lg';
   className?: string;
   color?: 'brand' | 'neutral' | 'gradient';
+  variant?: 'basic' | 'premium'; // basic = ring spinner, premium = conic gradient sweep
 }
 
-export function Spinner({ size = 'md', className, color = 'brand' }: SpinnerProps) {
+export function Spinner({ 
+  size = 'md', 
+  className, 
+  color = 'brand',
+  variant = 'premium' // premium looks more sophisticated
+}: SpinnerProps) {
   const sizeClasses = {
     sm: 'h-4 w-4',
     md: 'h-8 w-8',
     lg: 'h-12 w-12',
   };
 
-  if (color === 'gradient') {
+  if (variant === 'premium') {
+    // Conic gradient spinner - looks more premium and modern
     return (
-      <div className={cn('relative', sizeClasses[size], className)}>
-        <div className="absolute inset-0 animate-spin rounded-full border-2 border-transparent border-t-brand-600 border-r-accent-500" />
-        <div className="absolute inset-1 animate-pulse rounded-full bg-gradient-to-br from-brand-500/20 to-accent-500/20" />
+      <div 
+        className={cn(
+          'relative inline-flex items-center justify-center',
+          sizeClasses[size],
+          className
+        )}
+        role="status"
+        aria-label="Loading"
+      >
+        {color === 'gradient' ? (
+          <div className="spinner-premium animate-spin-sweep" />
+        ) : color === 'brand' ? (
+          <div className="w-full h-full rounded-full animate-spin border-4 border-transparent border-t-brand-600 border-r-brand-500 dark:border-t-brand-400 dark:border-r-brand-500" />
+        ) : (
+          <div className="w-full h-full rounded-full animate-spin border-4 border-transparent border-t-neutral-800 dark:border-t-white dark:border-r-neutral-400" />
+        )}
       </div>
     );
   }
 
+  // Basic ring spinner fallback
   return (
     <div 
       className={cn(
