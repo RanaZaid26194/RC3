@@ -195,7 +195,7 @@ export default function PipelinePage() {
               {/* Cards list */}
               <div className="flex-1 space-y-3 min-h-[350px]">
                 {colApps.length === 0 ? (
-                  <div className="flex h-32 items-center justify-center rounded-lg border border-dashed border-neutral-300 text-xs text-neutral-500 dark:border-neutral-800">
+                  <div className="flex h-32 items-center justify-center rounded-lg border border-dashed border-neutral-300 text-xs text-neutral-600 dark:border-neutral-800">
                     No candidates
                   </div>
                 ) : (
