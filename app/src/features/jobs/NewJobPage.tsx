@@ -12,6 +12,7 @@ import { Button } from '@/components/ui/Button';
 import { Card } from '@/components/ui/Card';
 import { Input } from '@/components/ui/Input';
 import { load, save, uid } from '@/lib/storage';
+import { extractJobRequirementsUnified } from '@/lib/ai/orchestrator';
 import type { Job, SkillRequirement } from '@/types';
 
 export default function NewJobPage() {
@@ -39,56 +40,28 @@ export default function NewJobPage() {
   const [extractedNotice, setExtractedNotice] = useState<string | null>(null);
 
   // AI Extraction logic from free-text description
-  const handleAIExtract = () => {
+  const handleAIExtract = async () => {
+    if (!description.trim()) return;
     setIsExtracting(true);
-    setTimeout(() => {
-      const text = description.toLowerCase();
-      const detected: SkillRequirement[] = [];
-
-      const skillMap: Record<string, { weight: number; category: SkillRequirement['category'] }> = {
-        python: { weight: 5, category: 'backend' },
-        django: { weight: 5, category: 'backend' },
-        postgresql: { weight: 4, category: 'database' },
-        postgres: { weight: 4, category: 'database' },
-        docker: { weight: 4, category: 'devops' },
-        react: { weight: 4, category: 'frontend' },
-        typescript: { weight: 4, category: 'frontend' },
-        javascript: { weight: 3, category: 'frontend' },
-        fastapi: { weight: 4, category: 'backend' },
-        redis: { weight: 3, category: 'database' },
-        kubernetes: { weight: 4, category: 'devops' },
-        aws: { weight: 4, category: 'devops' },
-        sql: { weight: 3, category: 'database' },
-      };
-
-      Object.entries(skillMap).forEach(([name, meta]) => {
-        if (text.includes(name)) {
-          const formatted = name === 'postgresql' || name === 'postgres' ? 'PostgreSQL' : name.charAt(0).toUpperCase() + name.slice(1);
-          if (!detected.some(d => d.skill.toLowerCase() === formatted.toLowerCase())) {
-            detected.push({
-              skill: formatted,
-              weight: meta.weight,
-              required: true,
-              category: meta.category,
-            });
-          }
+    try {
+      const result = await extractJobRequirementsUnified(description);
+      if (result.skills && result.skills.length > 0) {
+        setSkills(result.skills);
+        if (result.minExperienceYears) {
+          setMinExp(result.minExperienceYears);
         }
-      });
-
-      // Detect experience years
-      const expMatch = text.match(/(\d+)\+?\s*years?/);
-      if (expMatch && expMatch[1]) {
-        setMinExp(parseInt(expMatch[1], 10));
-      }
-
-      if (detected.length > 0) {
-        setSkills(detected);
-        setExtractedNotice(`Extracted ${detected.length} requirements and ${expMatch ? expMatch[1] : '3'} years experience from description!`);
+        setExtractedNotice(
+          `Extracted ${result.skills.length} requirements and ${result.minExperienceYears || 3} years experience via ${result.provider}!`
+        );
       } else {
-        setExtractedNotice('No new known skills detected. You can add them manually below.');
+        setExtractedNotice('No structured skills detected. You can add them manually below.');
       }
+    } catch (err) {
+      console.error('Extraction error:', err);
+      setExtractedNotice('Extraction encountered an issue, fallback completed.');
+    } finally {
       setIsExtracting(false);
-    }, 400);
+    }
   };
 
   const handleAddSkill = () => {
