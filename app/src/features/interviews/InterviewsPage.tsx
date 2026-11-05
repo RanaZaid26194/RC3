@@ -5,7 +5,7 @@ import { Card } from '@/components/ui/Card';
 import { Input, Select } from '@/components/ui/Input';
 import { Modal } from '@/components/ui/Modal';
 import { load, save, uid } from '@/lib/storage';
-import type { CandidateProfile, Interview, InterviewQuestion, Job } from '@/types';
+import type { CandidateProfile, Interview, InterviewFeedback, InterviewQuestion, Job } from '@/types';
 
 const today = new Date().toISOString().split('T')[0];
 
@@ -43,6 +43,15 @@ export default function InterviewsPage() {
   const candidates = load<CandidateProfile[]>('candidates', []);
   const jobs = load<Job[]>('jobs', []);
   const [open, setOpen] = useState(false);
+  const [feedbackInterview, setFeedbackInterview] = useState<Interview | null>(null);
+  const [feedbackError, setFeedbackError] = useState<string | null>(null);
+  const [feedbackForm, setFeedbackForm] = useState({
+    rating: '4',
+    technicalRating: '4',
+    communicationRating: '4',
+    comments: '',
+    decision: 'Hire' as InterviewFeedback['decision'],
+  });
   const [error, setError] = useState<string | null>(null);
   const [form, setForm] = useState({
     candidateId: candidates[0]?.id || '',
@@ -102,6 +111,28 @@ export default function InterviewsPage() {
     save('interviews', updated);
     setOpen(false);
     setError(null);
+  };
+
+  const handleFeedback = () => {
+    if (!feedbackInterview || !feedbackForm.comments.trim()) {
+      setFeedbackError('Add concise feedback before completing the interview.');
+      return;
+    }
+    const feedback: InterviewFeedback = {
+      rating: Number(feedbackForm.rating),
+      technicalRating: Number(feedbackForm.technicalRating),
+      communicationRating: Number(feedbackForm.communicationRating),
+      comments: feedbackForm.comments.trim(),
+      decision: feedbackForm.decision,
+      submittedAt: new Date().toISOString(),
+    };
+    const updated = interviews.map((interview) => interview.id === feedbackInterview.id
+      ? { ...interview, status: 'completed' as const, feedback }
+      : interview);
+    setInterviews(updated);
+    save('interviews', updated);
+    setFeedbackInterview(null);
+    setFeedbackError(null);
   };
 
   return (
@@ -165,6 +196,25 @@ export default function InterviewsPage() {
                 ))}
               </ul>
             </div>
+
+            {intv.feedback ? (
+              <div className="rounded-md bg-emerald-50 p-3 text-xs text-emerald-800 dark:bg-emerald-950/40 dark:text-emerald-300">
+                <p className="font-semibold">{intv.feedback.decision} · {intv.feedback.rating}/5 overall</p>
+                <p className="mt-1 line-clamp-2">{intv.feedback.comments}</p>
+              </div>
+            ) : (
+              <Button
+                size="sm"
+                variant="outline"
+                onClick={() => {
+                  setFeedbackInterview(intv);
+                  setFeedbackError(null);
+                  setFeedbackForm({ rating: '4', technicalRating: '4', communicationRating: '4', comments: '', decision: 'Hire' });
+                }}
+              >
+                Record feedback
+              </Button>
+            )}
           </Card>
         ))}
       </div>
@@ -211,6 +261,35 @@ export default function InterviewsPage() {
             <Sparkles className="mt-0.5 h-4 w-4 shrink-0" />
             <span>Scheduling generates beginner, intermediate, and advanced questions with answer guidelines tailored to the role and the candidate's projects.</span>
           </div>
+        </div>
+      </Modal>
+
+      <Modal
+        open={feedbackInterview !== null}
+        title={`Interview feedback: ${feedbackInterview?.candidateName || ''}`}
+        onClose={() => { setFeedbackInterview(null); setFeedbackError(null); }}
+        footer={
+          <>
+            <Button variant="secondary" onClick={() => setFeedbackInterview(null)}>Cancel</Button>
+            <Button onClick={handleFeedback}>Complete interview</Button>
+          </>
+        }
+      >
+        <div className="space-y-4">
+          {feedbackError && <p role="alert" className="rounded-md bg-red-50 p-3 text-xs font-medium text-red-700">{feedbackError}</p>}
+          <div className="grid gap-4 sm:grid-cols-3">
+            <Input label="Overall rating" type="number" min="1" max="5" value={feedbackForm.rating} onChange={(event) => setFeedbackForm((current) => ({ ...current, rating: event.target.value }))} />
+            <Input label="Technical rating" type="number" min="1" max="5" value={feedbackForm.technicalRating} onChange={(event) => setFeedbackForm((current) => ({ ...current, technicalRating: event.target.value }))} />
+            <Input label="Communication rating" type="number" min="1" max="5" value={feedbackForm.communicationRating} onChange={(event) => setFeedbackForm((current) => ({ ...current, communicationRating: event.target.value }))} />
+          </div>
+          <Select label="Decision" value={feedbackForm.decision} onChange={(event) => setFeedbackForm((current) => ({ ...current, decision: event.target.value as InterviewFeedback['decision'] }))}>
+            <option>Hire</option>
+            <option>Strong Hire</option>
+            <option>Borderline</option>
+            <option>No Hire</option>
+          </Select>
+          <label className="block text-sm font-medium text-neutral-700 dark:text-neutral-300" htmlFor="feedback-comments">Feedback notes</label>
+          <textarea id="feedback-comments" rows={4} value={feedbackForm.comments} onChange={(event) => setFeedbackForm((current) => ({ ...current, comments: event.target.value }))} className="w-full rounded-md border border-neutral-300 bg-white px-3 py-2 text-sm outline-none focus:border-brand-500 dark:border-neutral-700 dark:bg-neutral-900" placeholder="Summarize evidence, strengths, and concerns" />
         </div>
       </Modal>
     </div>
