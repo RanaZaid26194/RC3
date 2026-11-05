@@ -6,6 +6,7 @@ import {
   Sparkles,
   UserCheck,
   FolderKanban,
+  FileText,
   type LucideIcon,
 } from 'lucide-react';
 
@@ -46,6 +47,12 @@ export const NAV_ITEMS: NavItem[] = [
     to: '/analytics',
     label: 'Talent Analytics',
     icon: BarChart3,
+    roles: ['recruiter'],
+  },
+  {
+    to: '/resumes',
+    label: 'Resume Intake',
+    icon: FileText,
     roles: ['recruiter'],
   },
   {
