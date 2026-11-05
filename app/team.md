@@ -80,3 +80,36 @@ All instructions, roles, file ownership, and shared data contracts are establish
 - **13:10:** Third checkpoint — Analytics, NL Search, and Polish
 - **13:30:** **FEATURE FREEZE** (Only bug fixes and styling polish)
 - **14:10:** Final submission deadline!
+
+---
+
+## 6. CURRENT STATUS & MERGE PROTOCOL (updated by Zaid)
+
+Both branches are synced with `main` as of the latest merge. **Build passes.**
+
+### Merge rules (avoid losing work)
+1. Never force-push. Never rewrite pushed history.
+2. Always `git fetch origin` before pushing; if rejected, `git merge origin/main` and resolve.
+3. Conflict in a file you own → keep yours. In your partner's file → keep theirs, re-apply your intent elsewhere.
+4. After resolving: `cd app && npm run build` must pass, then push.
+5. Keep `app/team.md` updated when ownership shifts.
+
+### Motion system (available to both — do not duplicate)
+Defined in `app/src/styles/index.css` + `app/src/components/ui/Motion.tsx`:
+- Route transition: `PageTransition` (already wired in `App.tsx`)
+- Scroll progress bar: `ScrollProgress` (already wired in `AppShell`)
+- Scroll reveal: `<Reveal delay={ms}>…</Reveal>`
+- Animated counter: `<AnimatedNumber value={n} suffix="%" />`
+- CSS classes: `stagger` (container), `hover-lift`, `sheen`, `tilt-hover`, `animate-pop`, `animate-float`, `animate-breathe`, `animate-gradient-text`, `animate-gradient-surface`, `aurora-blob`, `page-enter`
+- Loaders: `LoadingSpinner`, `LoadingState`, `DotsLoader` in `components/ui/States.tsx`
+- Reduced motion is handled globally.
+
+### UI/UX asks for Abdul Wahab
+- [ ] Adopt the `JobsPage` hero pattern (aurora + gradient title) on Analytics / Interviews / Intelligence headers.
+- [ ] Replace remaining `bg-blue-600` primary buttons with `bg-brand-600`.
+- [ ] Use `LoadingState`/`LoadingSpinner` instead of any generic spinners.
+- [ ] Keep custom SVG icons in `components/ui/CustomIcons.tsx` wired into new screens.
+
+### UI/UX asks for Zaid
+- (none pending — motion + shell nav fix complete)
+
