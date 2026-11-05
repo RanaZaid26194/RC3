@@ -41,3 +41,32 @@ export const Button = forwardRef<HTMLButtonElement, Props>(function Button(
     </button>
   );
 });
+
+export const MagicButton = forwardRef<HTMLButtonElement, Props>(function MagicButton(
+  { className, ...props },
+  ref
+) {
+  return (
+    <Button
+      ref={ref}
+      className={cn(
+        'relative overflow-hidden bg-gradient-to-r from-brand-600 via-indigo-600 to-accent-600 text-white shadow-md shadow-brand-500/25 hover:shadow-lg hover:shadow-brand-500/40 hover:-translate-y-0.5 active:translate-y-0 transition-all duration-200',
+        className
+      )}
+      {...props}
+    />
+  );
+});
+
+export const SubmitButton = forwardRef<HTMLButtonElement, Props>(function SubmitButton(
+  { className, ...props },
+  ref
+) {
+  return (
+    <Button
+      ref={ref}
+      className={cn('font-semibold', className)}
+      {...props}
+    />
+  );
+});
