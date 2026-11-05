@@ -1,16 +1,27 @@
 import { useState } from 'react';
-import { Search, Sparkles, Shield, CheckCircle } from 'lucide-react';
+import { Search, Sparkles, Shield, CheckCircle, GitMerge, AlertTriangle } from 'lucide-react';
 import { Button } from '@/components/ui/Button';
 import { Card } from '@/components/ui/Card';
 import { Input } from '@/components/ui/Input';
-import { load } from '@/lib/storage';
+import { Modal } from '@/components/ui/Modal';
+import { load, save } from '@/lib/storage';
 import type { CandidateProfile } from '@/types';
 
 export default function IntelligencePage() {
-  const candidates = load<CandidateProfile[]>('candidates', []);
+  const [candidates, setCandidates] = useState<CandidateProfile[]>(load<CandidateProfile[]>('candidates', []));
   const [query, setQuery] = useState('Python developers with REST API experience');
   const [submittedQuery, setSubmittedQuery] = useState(query);
   const [blindMode, setBlindMode] = useState(false);
+  const [mergePair, setMergePair] = useState<[CandidateProfile, CandidateProfile] | null>(null);
+
+  const duplicatePairs: [CandidateProfile, CandidateProfile][] = [];
+  candidates.forEach((candidate, index) => {
+    candidates.slice(index + 1).forEach((other) => {
+      const sameEmail = candidate.email.trim().toLowerCase() === other.email.trim().toLowerCase();
+      const sameName = candidate.name.trim().toLowerCase().replace(/\s+/g, ' ') === other.name.trim().toLowerCase().replace(/\s+/g, ' ');
+      if (sameEmail || sameName) duplicatePairs.push([candidate, other]);
+    });
+  });
 
   const matched = candidates.filter((c) => {
     const text = (c.skills.join(' ') + ' ' + c.summary + ' ' + (c.rawResumeText || '')).toLowerCase();
@@ -21,6 +32,27 @@ export default function IntelligencePage() {
   const runSearch = (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
     setSubmittedQuery(query.trim());
+  };
+
+  const mergeCandidates = (keepId: string) => {
+    if (!mergePair) return;
+    const keep = mergePair.find((candidate) => candidate.id === keepId) || mergePair[0];
+    const discard = mergePair.find((candidate) => candidate.id !== keep.id) || mergePair[1];
+    const merged: CandidateProfile = {
+      ...keep,
+      phone: keep.phone || discard.phone,
+      location: keep.location || discard.location,
+      summary: keep.summary.length >= discard.summary.length ? keep.summary : discard.summary,
+      skills: Array.from(new Set([...keep.skills, ...discard.skills])),
+      projects: [...keep.projects, ...discard.projects.filter((project) => !keep.projects.some((item) => item.name.toLowerCase() === project.name.toLowerCase()))],
+      rawResumeText: [keep.rawResumeText, discard.rawResumeText].filter(Boolean).join('\n\n') || undefined,
+      excerpts: { ...discard.excerpts, ...keep.excerpts },
+    };
+    const updated = candidates.filter((candidate) => candidate.id !== discard.id && candidate.id !== keep.id);
+    const nextCandidates = [merged, ...updated];
+    setCandidates(nextCandidates);
+    save('candidates', nextCandidates);
+    setMergePair(null);
   };
 
   return (
@@ -134,6 +166,54 @@ export default function IntelligencePage() {
           </div>
         )}
       </div>
+
+      {duplicatePairs.length > 0 && (
+        <Card className="space-y-4 border-amber-200 p-5 dark:border-amber-900/60">
+          <div className="flex items-start gap-3">
+            <AlertTriangle className="mt-0.5 h-5 w-5 shrink-0 text-amber-600" />
+            <div>
+              <h2 className="text-sm font-semibold text-neutral-900 dark:text-white">Possible duplicate candidates ({duplicatePairs.length})</h2>
+              <p className="mt-1 text-xs text-neutral-500">Review each match before merging. No profile is changed automatically.</p>
+            </div>
+          </div>
+          <div className="grid gap-3 md:grid-cols-2">
+            {duplicatePairs.map(([first, second]) => (
+              <div key={`${first.id}-${second.id}`} className="flex items-center justify-between gap-3 rounded-lg border border-neutral-200 p-3 dark:border-neutral-800">
+                <div className="min-w-0 text-xs">
+                  <p className="truncate font-semibold text-neutral-900 dark:text-white">{first.name}</p>
+                  <p className="truncate text-neutral-500">{first.email}</p>
+                  <p className="truncate text-neutral-500">and {second.name}</p>
+                </div>
+                <Button size="sm" variant="outline" className="shrink-0 gap-1.5" onClick={() => setMergePair([first, second])}>
+                  <GitMerge className="h-3.5 w-3.5" /> Review merge
+                </Button>
+              </div>
+            ))}
+          </div>
+        </Card>
+      )}
+
+      <Modal
+        open={mergePair !== null}
+        title="Review candidate merge"
+        onClose={() => setMergePair(null)}
+        footer={<Button variant="secondary" onClick={() => setMergePair(null)}>Cancel</Button>}
+      >
+        {mergePair && (
+          <div className="space-y-4">
+            <p className="text-sm text-neutral-600 dark:text-neutral-300">Choose the profile to keep. The other profile will be removed after its unique skills, projects, and resume evidence are combined.</p>
+            <div className="grid gap-3 sm:grid-cols-2">
+              {mergePair.map((candidate) => (
+                <button key={candidate.id} type="button" onClick={() => mergeCandidates(candidate.id)} className="rounded-lg border border-neutral-200 p-4 text-left hover:border-brand-500 dark:border-neutral-700">
+                  <span className="block font-semibold text-neutral-900 dark:text-white">Keep {candidate.name}</span>
+                  <span className="mt-1 block text-xs text-neutral-500">{candidate.email}</span>
+                  <span className="mt-2 block text-xs text-neutral-500">{candidate.skills.length} skills · {candidate.projects.length} projects</span>
+                </button>
+              ))}
+            </div>
+          </div>
+        )}
+      </Modal>
     </div>
   );
 }
