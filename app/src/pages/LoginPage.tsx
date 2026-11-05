@@ -42,15 +42,23 @@ export default function LoginPage() {
   };
 
   return (
-    <div className="flex min-h-screen items-center justify-center bg-neutral-50 px-4 py-12 dark:bg-neutral-950">
-      <div className="w-full max-w-md space-y-6">
+    <div className="relative flex min-h-screen items-center justify-center overflow-hidden bg-neutral-50 px-4 py-12 dark:bg-neutral-950">
+      {/* Ambient brand backdrop */}
+      <div className="pointer-events-none absolute inset-0" aria-hidden="true">
+        <div className="aurora-blob -left-24 top-[-80px] h-80 w-80 bg-brand-300/40 dark:bg-brand-800/25" />
+        <div className="aurora-blob right-[-60px] top-1/3 h-72 w-72 bg-accent-500/25 dark:bg-accent-500/10" style={{ animationDelay: '-5s' }} />
+        <div className="aurora-blob bottom-[-100px] left-1/3 h-72 w-72 bg-brand-400/25 dark:bg-brand-900/30" style={{ animationDelay: '-9s' }} />
+        <div className="absolute inset-0 bg-[radial-gradient(circle_at_50%_0%,rgba(255,255,255,0.7),transparent_60%)] dark:bg-[radial-gradient(circle_at_50%_0%,rgba(15,23,42,0.6),transparent_60%)]" />
+      </div>
+
+      <div className="relative w-full max-w-md space-y-6 animate-fade-up">
         {/* Brand Header */}
         <div className="text-center space-y-2">
-          <div className="mx-auto flex h-12 w-12 items-center justify-center rounded-xl bg-blue-600 text-white shadow-md shadow-blue-500/30">
+          <div className="mx-auto flex h-12 w-12 items-center justify-center rounded-xl bg-gradient-to-br from-brand-500 to-brand-700 text-white shadow-lg shadow-brand-600/30 animate-float">
             <Sparkles className="h-6 w-6" />
           </div>
           <h1 className="font-display text-2xl font-bold tracking-tight text-neutral-900 dark:text-white">
-            Sign In to RecruLens
+            Sign In to <span className="animate-gradient-text">RecruLens</span>
           </h1>
           <p className="text-xs text-neutral-500">
             Explainable Talent Intelligence & Semantic Candidate Matching
@@ -58,7 +66,7 @@ export default function LoginPage() {
         </div>
 
         {/* Login Card */}
-        <Card className="p-6 space-y-5 shadow-lg">
+        <Card className="sheen p-6 space-y-5 shadow-lg">
           {error && (
             <div className="flex items-center gap-2 rounded-lg border border-rose-200 bg-rose-50 p-3 text-xs text-rose-800 dark:border-rose-900 dark:bg-rose-950/50 dark:text-rose-300">
               <AlertCircle className="h-4 w-4 shrink-0" />

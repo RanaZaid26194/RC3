@@ -66,10 +66,10 @@ export function AppShell({ children }: { children: ReactNode }) {
 
   const link = ({ isActive }: { isActive: boolean }) =>
     cn(
-      'group flex min-h-11 items-center gap-3 rounded-[var(--radius-md)] px-3 text-sm font-medium transition-all duration-200 ease-out-expo relative overflow-hidden',
-      'before:absolute left-0 top-0 bottom-0 w-1 bg-brand-600 transform -translate-y-full group-hover:translate-y-0 transition-transform duration-300',
+      'group relative flex min-h-11 items-center gap-3 overflow-hidden rounded-[var(--radius-md)] px-3 text-sm font-medium transition-all duration-200 ease-out-expo',
+      'before:absolute before:left-0 before:top-1/2 before:h-0 before:w-1 before:-translate-y-1/2 before:rounded-full before:bg-brand-600 before:transition-all before:duration-300 hover:before:h-6',
       isActive
-        ? 'bg-gradient-to-r from-brand-50 to-transparent text-brand-700 font-semibold dark:from-brand-950/30 dark:text-brand-300 shadow-sm'
+        ? 'bg-gradient-to-r from-brand-50 to-transparent text-brand-700 font-semibold dark:from-brand-950/30 dark:text-brand-300 shadow-sm before:h-6'
         : 'text-neutral-600 hover:bg-neutral-100 hover:text-neutral-900 dark:text-neutral-400 dark:hover:bg-neutral-800 dark:hover:text-neutral-100'
     );
 
