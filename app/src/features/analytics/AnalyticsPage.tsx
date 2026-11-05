@@ -9,6 +9,7 @@ import {
 } from 'lucide-react';
 import { Button } from '@/components/ui/Button';
 import { Card } from '@/components/ui/Card';
+import { AnimatedNumber } from '@/components/ui/Motion';
 import { load } from '@/lib/storage';
 import type { Job, Application, CandidateProfile, Interview } from '@/types';
 
@@ -179,59 +180,69 @@ export default function AnalyticsPage() {
       </div>
 
       {/* Top Metric Cards */}
-      <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-5">
-        <Card className="p-5">
+      <div className="stagger grid gap-4 sm:grid-cols-2 lg:grid-cols-5">
+        <Card className="hover-lift p-5">
           <div className="flex items-center justify-between">
             <span className="text-xs font-medium text-neutral-500">Active Vacancies</span>
             <div className="rounded-lg bg-blue-100 p-2 text-blue-700 dark:bg-blue-900/40 dark:text-blue-300">
               <BarChart3 className="h-4 w-4" />
             </div>
           </div>
-          <div className="mt-3 text-2xl font-bold text-neutral-900 dark:text-white">{activeJobs}</div>
+          <div className="mt-3 text-2xl font-bold text-neutral-900 dark:text-white">
+            <AnimatedNumber value={activeJobs} />
+          </div>
           <span className="text-xs text-neutral-600 dark:text-neutral-400">{totalJobs} total published</span>
         </Card>
 
-        <Card className="p-5">
+        <Card className="hover-lift p-5">
           <div className="flex items-center justify-between">
             <span className="text-xs font-medium text-neutral-500">Total Applicants</span>
             <div className="rounded-lg bg-emerald-100 p-2 text-emerald-700 dark:bg-emerald-900/40 dark:text-emerald-300">
               <Users className="h-4 w-4" />
             </div>
           </div>
-          <div className="mt-3 text-2xl font-bold text-neutral-900 dark:text-white">{totalApps}</div>
+          <div className="mt-3 text-2xl font-bold text-neutral-900 dark:text-white">
+            <AnimatedNumber value={totalApps} />
+          </div>
           <span className="text-xs text-emerald-700 font-medium">In pipeline scope</span>
         </Card>
 
-        <Card className="p-5">
+        <Card className="hover-lift p-5">
           <div className="flex items-center justify-between">
             <span className="text-xs font-medium text-neutral-500">Shortlist Rate</span>
             <div className="rounded-lg bg-purple-100 p-2 text-purple-700 dark:bg-purple-900/40 dark:text-purple-300">
               <TrendingUp className="h-4 w-4" />
             </div>
           </div>
-          <div className="mt-3 text-2xl font-bold text-neutral-900 dark:text-white">{conversionRate}%</div>
+          <div className="mt-3 text-2xl font-bold text-neutral-900 dark:text-white">
+            <AnimatedNumber value={conversionRate} suffix="%" />
+          </div>
           <span className="text-xs text-neutral-600 dark:text-neutral-400">{shortlistedCount} advanced to final rounds</span>
         </Card>
 
-        <Card className="p-5">
+        <Card className="hover-lift p-5">
           <div className="flex items-center justify-between">
             <span className="text-xs font-medium text-neutral-500">Avg. Match Score</span>
             <div className="rounded-lg bg-amber-100 p-2 text-amber-700 dark:bg-amber-900/40 dark:text-amber-300">
               <Target className="h-4 w-4" />
             </div>
           </div>
-          <div className="mt-3 text-2xl font-bold text-neutral-900 dark:text-white">{avgScore}%</div>
+          <div className="mt-3 text-2xl font-bold text-neutral-900 dark:text-white">
+            <AnimatedNumber value={avgScore} suffix="%" />
+          </div>
           <span className="text-xs text-neutral-600 dark:text-neutral-400">Avg. cycle: {averageProcessingDays} days</span>
         </Card>
 
-        <Card className="p-5">
+        <Card className="hover-lift p-5">
           <div className="flex items-center justify-between">
             <span className="text-xs font-medium text-neutral-500">Pending Reviews</span>
             <div className="rounded-lg bg-orange-100 p-2 text-orange-700 dark:bg-orange-900/40 dark:text-orange-300">
               <Clock className="h-4 w-4" />
             </div>
           </div>
-          <div className="mt-3 text-2xl font-bold text-neutral-900 dark:text-white">{pendingReviewCount}</div>
+          <div className="mt-3 text-2xl font-bold text-neutral-900 dark:text-white">
+            <AnimatedNumber value={pendingReviewCount} />
+          </div>
           <span className="text-xs text-neutral-600 dark:text-neutral-400">
             {scheduledInterviews} interviews scheduled
           </span>

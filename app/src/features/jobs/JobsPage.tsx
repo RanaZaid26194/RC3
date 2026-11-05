@@ -12,6 +12,7 @@ import {
 } from 'lucide-react';
 import { Button } from '@/components/ui/Button';
 import { AnimatedCard } from '@/components/ui/Card';
+import { AnimatedNumber } from '@/components/ui/Motion';
 import { load, save } from '@/lib/storage';
 import type { Job, Application } from '@/types';
 
@@ -40,22 +41,53 @@ export default function JobsPage() {
 
   return (
     <div className="space-y-6">
-      {/* Top Header */}
-      <div className="border-l-4 border-brand-600 bg-white px-6 py-5 shadow-sm dark:bg-neutral-900">
-        <div className="flex flex-col justify-between gap-4 sm:flex-row sm:items-center">
-          <div>
-            <h1 className="font-display text-2xl font-bold tracking-tight text-neutral-900 dark:text-white">
-              Job openings and vacancy management
-            </h1>
-            <p className="mt-1 text-sm text-neutral-500">
-              Publish roles, define skill weights, and monitor applicant pools.
-            </p>
-          </div>
-          <div className="flex items-center gap-2">
-            <Button onClick={() => navigate('/jobs/new')} className="group gap-2 hover-lift">
+      {/* Workspace header */}
+      <div className="relative overflow-hidden rounded-[var(--radius-lg)] border border-line-heavy bg-white shadow-sm dark:bg-neutral-900">
+        <div className="dot-grid pointer-events-none absolute inset-0 opacity-60" aria-hidden="true" />
+        <div className="relative px-6 py-5">
+          <div className="flex flex-col justify-between gap-4 sm:flex-row sm:items-start">
+            <div>
+              <span className="text-[11px] font-bold uppercase tracking-[0.18em] text-brand-700 dark:text-brand-300">
+                Recruiter workspace · Vacancies
+              </span>
+              <h1 className="mt-1 font-display text-2xl font-bold tracking-tight text-neutral-900 dark:text-white">
+                Job openings and vacancy management
+              </h1>
+              <p className="mt-1 text-sm text-neutral-500">
+                Publish roles, define skill weights, and monitor applicant pools.
+              </p>
+            </div>
+            <Button onClick={() => navigate('/jobs/new')} className="group shrink-0 gap-2 hover-lift">
               <Plus className="h-4 w-4 transition-transform duration-300 group-hover:rotate-90" /> Create New Vacancy
             </Button>
           </div>
+
+          <dl className="mt-5 grid grid-cols-3 divide-x divide-neutral-200 border-t border-neutral-200 pt-4 dark:divide-neutral-800 dark:border-neutral-800">
+            <div className="pr-3">
+              <dt className="text-[11px] font-semibold uppercase tracking-wider text-neutral-500">Open roles</dt>
+              <dd className="mt-0.5 font-display text-xl font-bold tabular-nums text-neutral-900 dark:text-white">
+                <AnimatedNumber value={jobs.filter((j) => j.status === 'open').length} />
+              </dd>
+            </div>
+            <div className="px-3">
+              <dt className="text-[11px] font-semibold uppercase tracking-wider text-neutral-500">Applicants</dt>
+              <dd className="mt-0.5 font-display text-xl font-bold tabular-nums text-neutral-900 dark:text-white">
+                <AnimatedNumber value={applications.length} />
+              </dd>
+            </div>
+            <div className="pl-3">
+              <dt className="text-[11px] font-semibold uppercase tracking-wider text-neutral-500">New this week</dt>
+              <dd className="mt-0.5 font-display text-xl font-bold tabular-nums text-brand-700 dark:text-brand-300">
+                <AnimatedNumber
+                  value={
+                    applications.filter(
+                      (a) => Date.now() - new Date(a.appliedAt).getTime() < 7 * 86_400_000
+                    ).length
+                  }
+                />
+              </dd>
+            </div>
+          </dl>
         </div>
       </div>
 

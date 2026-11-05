@@ -223,7 +223,21 @@ h1, h2, h3, h4 { font-family: var(--font-display); letter-spacing: -0.01em; }
 }
 .aurora-blob,
 .sheen::after { display: none; }
-.hover-lift:hover { transform: none; box-shadow: var(--shadow-md); }
+.hover-lift:hover { transform: translateY(-2px); box-shadow: var(--shadow-lg); }
+
+/* Subtle dotted canvas for workspace headers */
+.dot-grid {
+  background-image: radial-gradient(circle, rgb(28 25 23 / 0.07) 1px, transparent 1px);
+  background-size: 18px 18px;
+  background-position: -1px -1px;
+}
+@media (prefers-color-scheme: dark) {
+  .dot-grid { background-image: radial-gradient(circle, rgb(255 255 255 / 0.07) 1px, transparent 1px); }
+}
+
+/* Gentle lift for nav glyphs */
+.nav-glyph { transition: transform 220ms var(--ease-out-expo); }
+.group:hover .nav-glyph, .group:focus-visible .nav-glyph { transform: translateY(-1px) scale(1.08); }
 
 /* --- Dots loader --- */
 @keyframes dot-bounce { 0%, 80%, 100% { transform: translateY(0); opacity: 0.45; } 40% { transform: translateY(-6px); opacity: 1; } }
@@ -259,6 +273,7 @@ h1, h2, h3, h4 { font-family: var(--font-display); letter-spacing: -0.01em; }
 
 /* Motion-safety: disable decorative motion for reduced-motion users */
 @media (prefers-reduced-motion: reduce) {
+  .page-enter, .animate-fade-up, .animate-fade-in-scale, .animate-pop { animation: none !important; opacity: 1; transform: none; filter: none; }
   .animate-float, .aurora-blob,
   .animate-breathe, .pulse, .animate-pulse-ring { animation: none !important; }
   .reveal-on-scroll { opacity: 1; transform: none; }

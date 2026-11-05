@@ -87,7 +87,7 @@ export function AppShell({ children }: { children: ReactNode }) {
           className={link}
           onClick={() => setOpen(false)}
         >
-          <I className="h-5 w-5 shrink-0" aria-hidden="true" />
+          <I className="nav-glyph h-5 w-5 shrink-0" aria-hidden="true" />
           <span>{label}</span>
         </NavLink>
       ))}
