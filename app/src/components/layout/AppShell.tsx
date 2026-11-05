@@ -1,10 +1,10 @@
-import { useState, type ReactNode } from 'react';
-import { NavLink, useNavigate } from 'react-router-dom';
-import { Menu, X, Sparkles, UserCheck, ShieldCheck, RefreshCw } from 'lucide-react';
+import { useState, useEffect, type ReactNode } from 'react';
+import { NavLink, useNavigate, useLocation } from 'react-router-dom';
+import { Menu, X, Sparkles, UserCheck, ShieldCheck, RefreshCw, LogOut } from 'lucide-react';
 import { cn } from '@/lib/cn';
 import { Button } from '../ui/Button';
 import { NAV_ITEMS } from '@/app/nav';
-import { getCurrentUser, switchRole } from '@/lib/auth';
+import { getCurrentUser, switchRole, logoutUser } from '@/lib/auth';
 import { resetDemoData } from '@/lib/storage';
 
 export const APP_NAME = 'RecruLens';
@@ -13,6 +13,27 @@ export function AppShell({ children }: { children: ReactNode }) {
   const [open, setOpen] = useState(false);
   const [user, setUser] = useState(getCurrentUser());
   const navigate = useNavigate();
+  const location = useLocation();
+
+  // Listen for user state changes across tabs or navigations
+  useEffect(() => {
+    setUser(getCurrentUser());
+  }, [location.pathname]);
+
+  // Auth pages render without shell sidebar
+  if (location.pathname === '/login' || location.pathname === '/register') {
+    return (
+      <main id="main" tabIndex={-1} className="min-h-screen bg-neutral-50 dark:bg-neutral-950">
+        {children}
+      </main>
+    );
+  }
+
+  // Not logged in -> redirect to login
+  if (!user) {
+    navigate('/login', { replace: true });
+    return null;
+  }
 
   const handleToggleRole = () => {
     const nextRole = user.role === 'recruiter' ? 'candidate' : 'recruiter';
@@ -23,6 +44,12 @@ export function AppShell({ children }: { children: ReactNode }) {
     } else {
       navigate('/jobs');
     }
+  };
+
+  const handleLogout = () => {
+    logoutUser();
+    setUser(null);
+    navigate('/login');
   };
 
   const handleResetData = () => {
@@ -105,6 +132,7 @@ export function AppShell({ children }: { children: ReactNode }) {
               <button
                 type="button"
                 onClick={handleToggleRole}
+                title="Quick demo switch"
                 className="text-[11px] font-semibold text-blue-600 hover:underline dark:text-blue-400"
               >
                 Switch
@@ -117,8 +145,18 @@ export function AppShell({ children }: { children: ReactNode }) {
           {nav}
         </div>
 
-        {/* Footer actions */}
-        <div className="border-t border-neutral-200 pt-3 dark:border-neutral-800">
+        {/* Footer actions with Logout and Reset */}
+        <div className="border-t border-neutral-200 pt-3 space-y-1.5 dark:border-neutral-800">
+          <Button
+            variant="ghost"
+            size="sm"
+            onClick={handleLogout}
+            className="w-full justify-start text-xs text-rose-600 hover:bg-rose-50 hover:text-rose-700 dark:hover:bg-rose-950/40"
+          >
+            <LogOut className="mr-2 h-3.5 w-3.5" />
+            Sign Out
+          </Button>
+
           <Button
             variant="ghost"
             size="sm"
@@ -143,12 +181,12 @@ export function AppShell({ children }: { children: ReactNode }) {
         </div>
         <div className="flex items-center gap-2">
           <Button
-            variant="outline"
+            variant="ghost"
             size="sm"
-            onClick={handleToggleRole}
-            className="text-xs"
+            onClick={handleLogout}
+            className="text-xs text-rose-600"
           >
-            {user.role === 'recruiter' ? 'Recruiter' : 'Candidate'}
+            <LogOut className="h-4 w-4" />
           </Button>
           <Button
             variant="ghost"
