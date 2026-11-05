@@ -5,12 +5,11 @@ import {
   Users,
   MapPin,
   DollarSign,
-  Sparkles,
   ArrowRight,
   Filter,
 } from 'lucide-react';
 import { Button } from '@/components/ui/Button';
-import { Card } from '@/components/ui/Card';
+import { AnimatedCard } from '@/components/ui/Card';
 import { load, save } from '@/lib/storage';
 import type { Job, Application } from '@/types';
 
@@ -40,20 +39,14 @@ export default function JobsPage() {
   return (
     <div className="space-y-6">
       {/* Top Header */}
-      <div className="relative overflow-hidden rounded-[var(--radius-lg)] border border-neutral-200/80 bg-white p-6 shadow-sm dark:border-neutral-800 dark:bg-neutral-900">
-        <div className="aurora-blob -right-10 -top-16 h-56 w-56 bg-brand-200/60 dark:bg-brand-900/30" />
-        <div className="aurora-blob -bottom-20 left-1/3 h-48 w-48 bg-accent-500/20 dark:bg-accent-500/10" style={{ animationDelay: '-6s' }} />
-        <div className="relative flex flex-col justify-between gap-4 sm:flex-row sm:items-center">
+      <div className="border-l-4 border-brand-600 bg-white px-6 py-5 shadow-sm dark:bg-neutral-900">
+        <div className="flex flex-col justify-between gap-4 sm:flex-row sm:items-center">
           <div>
-            <p className="mb-1 inline-flex items-center gap-1.5 text-[11px] font-semibold uppercase tracking-[0.14em] text-brand-600 dark:text-brand-300">
-              <Sparkles className="h-3.5 w-3.5 animate-breathe" aria-hidden="true" />
-              Talent Acquisition Hub
-            </p>
-            <h1 className="animate-fade-up font-display text-2xl font-bold tracking-tight text-neutral-900 dark:text-white">
-              Job Openings & <span className="animate-gradient-text">Vacancy Management</span>
+            <h1 className="font-display text-2xl font-bold tracking-tight text-neutral-900 dark:text-white">
+              Job openings and vacancy management
             </h1>
             <p className="mt-1 text-sm text-neutral-500">
-              Publish vacancies, define required skill weights, and monitor applicant pools with AI matching.
+              Publish roles, define skill weights, and monitor applicant pools.
             </p>
           </div>
           <div className="flex items-center gap-2">
@@ -65,15 +58,15 @@ export default function JobsPage() {
       </div>
 
       {/* Filter Tabs */}
-      <div className="flex flex-wrap items-center gap-2 border-b border-neutral-200 pb-3 text-sm dark:border-neutral-800">
+      <div className="mb-4 flex flex-wrap items-center gap-2 border-b border-neutral-200 pb-3 text-sm dark:border-neutral-800">
         <Filter className="h-4 w-4 text-neutral-400" />
         <span className="text-xs font-semibold uppercase tracking-wider text-neutral-500">Filter:</span>
         <button
           type="button"
           onClick={() => setStatusFilter('all')}
-          className={`rounded-full px-3 py-1 text-xs font-medium transition-all duration-200 ${
+          className={`rounded-full px-3 py-1 text-xs font-medium transition-all duration-200 ease-out-expo ${
             statusFilter === 'all'
-              ? 'bg-neutral-900 text-white shadow-sm dark:bg-neutral-100 dark:text-neutral-900'
+              ? 'bg-brand-700 text-white shadow-md shadow-brand-600/25'
               : 'text-neutral-600 hover:bg-neutral-100 dark:text-neutral-400 dark:hover:bg-neutral-800'
           }`}
         >
@@ -82,7 +75,7 @@ export default function JobsPage() {
         <button
           type="button"
           onClick={() => setStatusFilter('open')}
-          className={`rounded-full px-3 py-1 text-xs font-medium transition-all duration-200 ${
+          className={`rounded-full px-3 py-1 text-xs font-medium transition-all duration-200 ease-out-expo ${
             statusFilter === 'open'
               ? 'bg-brand-600 text-white shadow-sm shadow-brand-600/25'
               : 'text-neutral-600 hover:bg-brand-50 hover:text-brand-700 dark:text-neutral-400 dark:hover:bg-brand-950/40'
@@ -93,7 +86,7 @@ export default function JobsPage() {
         <button
           type="button"
           onClick={() => setStatusFilter('closed')}
-          className={`rounded-full px-3 py-1 text-xs font-medium transition-all duration-200 ${
+          className={`rounded-full px-3 py-1 text-xs font-medium transition-all duration-200 ease-out-expo ${
             statusFilter === 'closed'
               ? 'bg-neutral-600 text-white shadow-sm'
               : 'text-neutral-600 hover:bg-neutral-100 dark:text-neutral-400 dark:hover:bg-neutral-800'
@@ -104,15 +97,17 @@ export default function JobsPage() {
       </div>
 
       {/* Job Cards Grid */}
-      <div className="stagger grid gap-5 md:grid-cols-2 lg:grid-cols-3">
-        {filteredJobs.map((job) => {
+      <div className="grid gap-5 md:grid-cols-2 lg:grid-cols-3">
+        {filteredJobs.map((job, index) => {
           const appCount = applications.filter((a) => a.jobId === job.id).length;
           const isOpen = job.status === 'open';
+          const delay = index * 80;
 
           return (
-            <Card
+            <AnimatedCard
               key={job.id}
-              className={`hover-lift sheen flex flex-col justify-between p-5 ${
+              delay={delay}
+              className={`flex flex-col justify-between p-5 transition-shadow hover:shadow-md ${
                 !isOpen ? 'opacity-70 bg-neutral-50/70 dark:bg-neutral-900/40' : ''
               }`}
             >
@@ -195,12 +190,11 @@ export default function JobsPage() {
                   onClick={() => navigate(`/pipeline?jobId=${job.id}`)}
                   className="w-full justify-center gap-1 text-xs"
                 >
-                  <Sparkles className="h-3.5 w-3.5 text-blue-600" />
                   View Candidates & Scores
                   <ArrowRight className="h-3.5 w-3.5" />
                 </Button>
               </div>
-            </Card>
+            </AnimatedCard>
           );
         })}
       </div>

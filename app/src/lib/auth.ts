@@ -143,6 +143,26 @@ export function switchRole(role: UserRole): User {
   return sessionUser;
 }
 
+export function findUserByEmail(email: string): StoredUser | undefined {
+  const users = getStoredUsers();
+  const normalized = email.trim().toLowerCase();
+  return users.find((u) => u.email.toLowerCase() === normalized);
+}
+
+export function resetPassword(email: string, newPassword: string): void {
+  if (newPassword.length < 6) {
+    throw new Error('New password must be at least 6 characters long.');
+  }
+  const users = getStoredUsers();
+  const normalized = email.trim().toLowerCase();
+  const user = users.find((u) => u.email.toLowerCase() === normalized);
+  if (!user) {
+    throw new Error('No user account found matching that email.');
+  }
+  user.passwordHash = hashPassword(newPassword);
+  save(USERS_KEY, users);
+}
+
 export function logoutUser(): void {
   setCurrentUser(null);
 }

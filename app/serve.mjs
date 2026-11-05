@@ -31,7 +31,17 @@ const server = http.createServer((req, res) => {
     }
     const stream = fs.createReadStream(file);
     stream.on('error', () => { if (!res.headersSent) res.writeHead(500); res.end(); });
-    res.writeHead(200, { 'Content-Type': types[path.extname(file)] || 'application/octet-stream' });
+    res.writeHead(200, {
+      'Content-Type': types[path.extname(file)] || 'application/octet-stream',
+      'Content-Security-Policy': "default-src 'self'; script-src 'self' 'unsafe-inline' https://va.vercel-scripts.com; style-src 'self' 'unsafe-inline'; font-src 'self' data:; img-src 'self' data: blob: https://images.unsplash.com; connect-src 'self' https://generativelanguage.googleapis.com https://vitals.vercel-insights.com; object-src 'none'; base-uri 'self'; form-action 'self'; frame-ancestors 'none';",
+      'Referrer-Policy': 'strict-origin-when-cross-origin',
+      'Permissions-Policy': 'camera=(), microphone=(), geolocation=(), browsing-topics=()',
+      'X-Content-Type-Options': 'nosniff',
+      'X-Frame-Options': 'DENY',
+      'X-XSS-Protection': '1; mode=block',
+      'Cross-Origin-Opener-Policy': 'same-origin',
+      'Cross-Origin-Resource-Policy': 'same-origin'
+    });
     stream.pipe(res);
   } catch {
     if (!res.headersSent) res.writeHead(500);

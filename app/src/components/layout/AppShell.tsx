@@ -1,5 +1,5 @@
 import { useState, useEffect, type ReactNode } from 'react';
-import { NavLink, useNavigate, useLocation } from 'react-router-dom';
+import { NavLink, useNavigate, useLocation, Navigate } from 'react-router-dom';
 import { Menu, X, UserCheck, ShieldCheck, RefreshCw, LogOut } from 'lucide-react';
 import { cn } from '@/lib/cn';
 import { Button } from '../ui/Button';
@@ -34,8 +34,7 @@ export function AppShell({ children }: { children: ReactNode }) {
 
   // Not logged in -> redirect to login
   if (!user) {
-    navigate('/login', { replace: true });
-    return null;
+    return <Navigate to="/login" replace />;
   }
 
   const handleSwitchAccount = (targetUser: StoredUser) => {
@@ -69,7 +68,7 @@ export function AppShell({ children }: { children: ReactNode }) {
       'group relative flex min-h-11 items-center gap-3 overflow-hidden rounded-[var(--radius-md)] px-3 text-sm font-medium transition-all duration-200 ease-out-expo',
       'before:absolute before:left-0 before:top-1/2 before:h-0 before:w-1 before:-translate-y-1/2 before:rounded-full before:bg-brand-600 before:transition-all before:duration-300 hover:before:h-6',
       isActive
-        ? 'bg-gradient-to-r from-brand-50 to-transparent text-brand-700 font-semibold dark:from-brand-950/30 dark:text-brand-300 shadow-sm before:h-6'
+  ? 'bg-brand-50 text-brand-800 font-semibold dark:bg-brand-950/30 dark:text-brand-300 shadow-sm before:h-6'
         : 'text-neutral-600 hover:bg-neutral-100 hover:text-neutral-900 dark:text-neutral-400 dark:hover:bg-neutral-800 dark:hover:text-neutral-100'
     );
 

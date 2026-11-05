@@ -250,7 +250,7 @@ export default function AnalyticsPage() {
                   </div>
                   <div className="h-2.5 w-full rounded-full bg-neutral-100 dark:bg-neutral-800">
                     <div
-                      className="h-2.5 rounded-full bg-gradient-to-r from-blue-600 to-indigo-600 transition-all duration-500"
+                      className="h-2.5 rounded-full bg-brand-600 transition-all duration-500"
                       style={{ width: `${Math.max(stagePct, stage.count > 0 ? 4 : 0)}%` }}
                     />
                   </div>
