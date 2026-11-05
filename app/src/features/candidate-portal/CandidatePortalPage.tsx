@@ -22,7 +22,11 @@ export default function CandidatePortalPage() {
 
   const pipelineStages = ['Submitted', 'Parsed', 'AI Assessment Available', 'Recruiter Review', 'Shortlisted', 'Interview', 'Selected'] as const;
 
-  const myProfile = candidates.find((c) => c.email.toLowerCase() === user.email.toLowerCase()) || candidates[0];
+  // Only link a resume profile that belongs to the signed-in account; never fall back
+  // to another candidate's profile (that leaked the wrong name into the greeting).
+  const myProfile =
+    candidates.find((c) => c.email.toLowerCase() === user.email.toLowerCase()) ??
+    (user.id === DEFAULT_CANDIDATE.id ? candidates[0] : undefined);
 
   const myApplications = applications.filter(
     (a) => a.candidateEmail.toLowerCase() === user.email.toLowerCase() || a.candidateId === myProfile?.id
@@ -101,7 +105,7 @@ export default function CandidatePortalPage() {
               Candidate Workspace
             </span>
             <h1 className="mt-2 font-display text-2xl font-bold tracking-tight text-neutral-900 dark:text-white">
-              Welcome back, {myProfile?.name || user.name}
+              Welcome back, {user.name}
             </h1>
             <p className="mt-1 text-sm text-neutral-600 dark:text-neutral-300">
               Browse vacancies, upload resume documents, and track explainable AI screening progress in real time.
