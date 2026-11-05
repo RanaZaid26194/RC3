@@ -80,6 +80,7 @@ export default function ResumeUploadPage() {
             <input
               type="file"
               accept=".pdf,.doc,.docx"
+              aria-label="Upload resume"
               onChange={handleFileUpload}
               className="hidden"
               id="resume-upload"
