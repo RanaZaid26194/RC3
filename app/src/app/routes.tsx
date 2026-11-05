@@ -1,6 +1,7 @@
 import { Route, Routes, Navigate } from 'react-router-dom';
 import JobsPage from '@/features/jobs/JobsPage';
 import NewJobPage from '@/features/jobs/NewJobPage';
+import PipelinePage from '@/features/pipeline/PipelinePage';
 import CandidateReviewPage from '@/features/matching/CandidateReviewPage';
 import InterviewsPage from '@/features/interviews/InterviewsPage';
 import AnalyticsPage from '@/features/analytics/AnalyticsPage';
@@ -15,7 +16,7 @@ export function AppRoutes() {
       <Route path="/" element={<Navigate to="/jobs" replace />} />
       <Route path="/jobs" element={<JobsPage />} />
       <Route path="/jobs/new" element={<NewJobPage />} />
-      <Route path="/pipeline" element={<CandidateReviewPage />} />
+      <Route path="/pipeline" element={<PipelinePage />} />
       <Route path="/candidates" element={<CandidateReviewPage />} />
       <Route path="/interviews" element={<InterviewsPage />} />
       <Route path="/analytics" element={<AnalyticsPage />} />
