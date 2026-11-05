@@ -1,11 +1,108 @@
-import { Calendar, Plus, Clock, Video } from 'lucide-react';
+import { useState } from 'react';
+import { Calendar, Plus, Clock, Video, Sparkles } from 'lucide-react';
 import { Button } from '@/components/ui/Button';
 import { Card } from '@/components/ui/Card';
-import { load } from '@/lib/storage';
-import type { Interview } from '@/types';
+import { Input, Select } from '@/components/ui/Input';
+import { Modal } from '@/components/ui/Modal';
+import { load, save, uid } from '@/lib/storage';
+import type { CandidateProfile, Interview, InterviewQuestion, Job } from '@/types';
+
+const today = new Date().toISOString().split('T')[0];
+
+function buildQuestions(job: Job | undefined, candidate: CandidateProfile | undefined): InterviewQuestion[] {
+  const role = job?.title || 'this role';
+  const project = candidate?.projects[0];
+  return [
+    {
+      id: uid('question'),
+      text: `What would you prioritize when designing a reliable solution for ${role}?`,
+      difficulty: 'beginner',
+      category: 'Role fundamentals',
+      expectedAnswerGuidelines: 'Look for clear prioritization, measurable outcomes, trade-offs, and an understanding of the users or systems involved.',
+    },
+    {
+      id: uid('question'),
+      text: `Walk us through the most important technical decision in ${project?.name || 'a recent project'}.`,
+      difficulty: 'intermediate',
+      category: 'Project experience',
+      expectedAnswerGuidelines: 'The candidate should explain context, alternatives considered, implementation details, and what they would improve now.',
+      projectContext: project?.description,
+    },
+    {
+      id: uid('question'),
+      text: `How would you scale and monitor a production system built for ${role}?`,
+      difficulty: 'advanced',
+      category: 'Systems thinking',
+      expectedAnswerGuidelines: 'Expect discussion of bottlenecks, observability, failure modes, capacity planning, and a safe rollout strategy.',
+    },
+  ];
+}
 
 export default function InterviewsPage() {
-  const interviews = load<Interview[]>('interviews', []);
+  const [interviews, setInterviews] = useState<Interview[]>(load<Interview[]>('interviews', []));
+  const candidates = load<CandidateProfile[]>('candidates', []);
+  const jobs = load<Job[]>('jobs', []);
+  const [open, setOpen] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+  const [form, setForm] = useState({
+    candidateId: candidates[0]?.id || '',
+    jobId: jobs[0]?.id || '',
+    date: today,
+    time: '10:00',
+    duration: '45',
+    interviewer: 'David Vance (Principal Architect)',
+    interviewType: 'Technical' as Interview['interviewType'],
+  });
+
+  const selectedCandidate = candidates.find((candidate) => candidate.id === form.candidateId);
+  const selectedJob = jobs.find((job) => job.id === form.jobId);
+
+  const updateForm = (field: keyof typeof form, value: string) => {
+    setForm((current) => ({ ...current, [field]: value }));
+    setError(null);
+  };
+
+  const handleSchedule = () => {
+    if (!form.candidateId || !form.jobId || !form.date || !form.time || !form.interviewer.trim()) {
+      setError('Choose a candidate, role, date, time, and interviewer before scheduling.');
+      return;
+    }
+    if (form.date < today) {
+      setError('Interview dates cannot be in the past.');
+      return;
+    }
+    const conflict = interviews.some((interview) =>
+      interview.status === 'scheduled' &&
+      interview.interviewer.toLowerCase() === form.interviewer.trim().toLowerCase() &&
+      interview.scheduledDate === form.date &&
+      interview.scheduledTime === form.time
+    );
+    if (conflict) {
+      setError('This interviewer already has a scheduled interview at that time. Choose another slot.');
+      return;
+    }
+
+    const nextInterview: Interview = {
+      id: uid('int'),
+      applicationId: '',
+      candidateId: form.candidateId,
+      candidateName: selectedCandidate?.name || 'Candidate',
+      jobId: form.jobId,
+      jobTitle: selectedJob?.title || 'Interview',
+      scheduledDate: form.date,
+      scheduledTime: form.time,
+      durationMinutes: Number(form.duration),
+      interviewer: form.interviewer.trim(),
+      interviewType: form.interviewType,
+      status: 'scheduled',
+      questions: buildQuestions(selectedJob, selectedCandidate),
+    };
+    const updated = [nextInterview, ...interviews];
+    setInterviews(updated);
+    save('interviews', updated);
+    setOpen(false);
+    setError(null);
+  };
 
   return (
     <div className="space-y-6">
@@ -18,10 +115,16 @@ export default function InterviewsPage() {
             Schedule candidate interviews, avoid calendar conflicts, and review AI-generated role questions.
           </p>
         </div>
-        <Button className="gap-2">
+        <Button className="gap-2" onClick={() => setOpen(true)}>
           <Plus className="h-4 w-4" /> Schedule Interview
         </Button>
       </div>
+
+      {interviews.length === 0 && (
+        <Card className="p-8 text-center text-sm text-neutral-500">
+          No interviews scheduled yet. Create one to generate a tailored question set.
+        </Card>
+      )}
 
       <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
         {interviews.map((intv) => (
@@ -65,6 +168,51 @@ export default function InterviewsPage() {
           </Card>
         ))}
       </div>
+
+      <Modal
+        open={open}
+        title="Schedule interview"
+        onClose={() => { setOpen(false); setError(null); }}
+        footer={
+          <>
+            <Button variant="secondary" onClick={() => setOpen(false)}>Cancel</Button>
+            <Button onClick={handleSchedule}>Schedule interview</Button>
+          </>
+        }
+      >
+        <div className="space-y-4">
+          {error && <p role="alert" className="rounded-md bg-red-50 p-3 text-xs font-medium text-red-700">{error}</p>}
+          <div className="grid gap-4 sm:grid-cols-2">
+            <Select label="Candidate" value={form.candidateId} onChange={(event) => updateForm('candidateId', event.target.value)}>
+              <option value="">Select candidate</option>
+              {candidates.map((candidate) => <option key={candidate.id} value={candidate.id}>{candidate.name}</option>)}
+            </Select>
+            <Select label="Role" value={form.jobId} onChange={(event) => updateForm('jobId', event.target.value)}>
+              <option value="">Select role</option>
+              {jobs.map((job) => <option key={job.id} value={job.id}>{job.title}</option>)}
+            </Select>
+            <Input label="Date" type="date" min={today} value={form.date} onChange={(event) => updateForm('date', event.target.value)} />
+            <Input label="Time" type="time" value={form.time} onChange={(event) => updateForm('time', event.target.value)} />
+            <Select label="Duration" value={form.duration} onChange={(event) => updateForm('duration', event.target.value)}>
+              <option value="30">30 minutes</option>
+              <option value="45">45 minutes</option>
+              <option value="60">60 minutes</option>
+              <option value="90">90 minutes</option>
+            </Select>
+            <Select label="Interview type" value={form.interviewType} onChange={(event) => updateForm('interviewType', event.target.value)}>
+              <option>Technical</option>
+              <option>Behavioral</option>
+              <option>System Design</option>
+              <option>Cultural Fit</option>
+            </Select>
+          </div>
+          <Input label="Interviewer" value={form.interviewer} onChange={(event) => updateForm('interviewer', event.target.value)} />
+          <div className="flex items-start gap-2 rounded-md bg-blue-50 p-3 text-xs text-blue-800">
+            <Sparkles className="mt-0.5 h-4 w-4 shrink-0" />
+            <span>Scheduling generates beginner, intermediate, and advanced questions with answer guidelines tailored to the role and the candidate's projects.</span>
+          </div>
+        </div>
+      </Modal>
     </div>
   );
 }
