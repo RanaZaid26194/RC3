@@ -1,7 +1,9 @@
 import { useState } from 'react';
-import { CheckCircle2, ArrowRight, FileText } from 'lucide-react';
+import { CheckCircle2, ArrowRight, FileText, Upload } from 'lucide-react';
 import { Button } from '@/components/ui/Button';
 import { Card } from '@/components/ui/Card';
+import { Modal } from '@/components/ui/Modal';
+import { ResumeUploader } from '@/features/resumes/ResumeUploader';
 import { load, save, uid } from '@/lib/storage';
 import { getCurrentUser } from '@/lib/auth';
 import type { Job, Application, CandidateProfile } from '@/types';
@@ -10,11 +12,13 @@ export default function CandidatePortalPage() {
   const user = getCurrentUser();
   const jobs = load<Job[]>('jobs', []).filter((j) => j.status === 'open');
   const [applications, setApplications] = useState<Application[]>(load<Application[]>('applications', []));
-  const candidates = load<CandidateProfile[]>('candidates', []);
-  const myProfile = candidates.find((c) => c.email.toLowerCase() === user.email.toLowerCase()) || candidates[0];
-
+  const [candidates, setCandidates] = useState<CandidateProfile[]>(load<CandidateProfile[]>('candidates', []));
   const [activeTab, setActiveTab] = useState<'jobs' | 'applications'>('jobs');
   const [feedbackMsg, setFeedbackMsg] = useState<string | null>(null);
+  const [uploadModalOpen, setUploadModalOpen] = useState(false);
+  const [targetJobForUpload, setTargetJobForUpload] = useState<Job | null>(null);
+
+  const myProfile = candidates.find((c) => c.email.toLowerCase() === user.email.toLowerCase()) || candidates[0];
 
   const myApplications = applications.filter(
     (a) => a.candidateEmail.toLowerCase() === user.email.toLowerCase() || a.candidateId === myProfile?.id
@@ -57,8 +61,23 @@ export default function CandidatePortalPage() {
     setActiveTab('applications');
   };
 
+  const handleResumeParsed = (newProfile: CandidateProfile) => {
+    const updatedCandidates = [newProfile, ...candidates.filter(c => c.id !== newProfile.id)];
+    setCandidates(updatedCandidates);
+    save('candidates', updatedCandidates);
+    setUploadModalOpen(false);
+
+    if (targetJobForUpload) {
+      handleApply(targetJobForUpload);
+      setTargetJobForUpload(null);
+    } else {
+      setFeedbackMsg('Resume successfully parsed and candidate profile updated!');
+    }
+  };
+
   return (
     <div className="space-y-6">
+      {/* Hero Welcome */}
       <div className="rounded-xl border border-blue-200 bg-gradient-to-r from-blue-50 to-indigo-50 p-6 dark:border-blue-900/50 dark:from-blue-950/20 dark:to-indigo-950/20">
         <div className="flex flex-col justify-between gap-4 md:flex-row md:items-center">
           <div>
@@ -69,14 +88,26 @@ export default function CandidatePortalPage() {
               Welcome back, {myProfile?.name || user.name}
             </h1>
             <p className="mt-1 text-sm text-neutral-600 dark:text-neutral-300">
-              Browse vacancies, track your applications in real-time, and view explainable AI screening progress.
+              Browse vacancies, upload resume documents, and track explainable AI screening progress in real time.
             </p>
           </div>
-          <div className="flex items-center gap-2">
+          <div className="flex flex-wrap items-center gap-2">
+            <Button
+              size="sm"
+              variant="outline"
+              onClick={() => {
+                setTargetJobForUpload(null);
+                setUploadModalOpen(true);
+              }}
+              className="gap-1.5 text-xs"
+            >
+              <Upload className="h-3.5 w-3.5" /> Upload Resume
+            </Button>
             <Button
               variant={activeTab === 'jobs' ? 'primary' : 'outline'}
               size="sm"
               onClick={() => setActiveTab('jobs')}
+              className="text-xs"
             >
               Browse Openings ({jobs.length})
             </Button>
@@ -84,6 +115,7 @@ export default function CandidatePortalPage() {
               variant={activeTab === 'applications' ? 'primary' : 'outline'}
               size="sm"
               onClick={() => setActiveTab('applications')}
+              className="text-xs"
             >
               My Applications ({myApplications.length})
             </Button>
@@ -98,6 +130,7 @@ export default function CandidatePortalPage() {
         </div>
       )}
 
+      {/* Tabs View */}
       {activeTab === 'jobs' ? (
         <div className="space-y-4">
           <div className="flex items-center justify-between">
@@ -151,13 +184,15 @@ export default function CandidatePortalPage() {
                         <CheckCircle2 className="h-4 w-4" /> Applied
                       </span>
                     ) : (
-                      <Button
-                        size="sm"
-                        onClick={() => handleApply(job)}
-                        className="gap-1.5"
-                      >
-                        Apply with Profile <ArrowRight className="h-3.5 w-3.5" />
-                      </Button>
+                      <div className="flex items-center gap-2">
+                        <Button
+                          size="sm"
+                          onClick={() => handleApply(job)}
+                          className="gap-1 text-xs"
+                        >
+                          1-Click Apply <ArrowRight className="h-3 w-3" />
+                        </Button>
+                      </div>
                     )}
                   </div>
                 </Card>
@@ -224,6 +259,20 @@ export default function CandidatePortalPage() {
             </div>
           )}
         </div>
+      )}
+
+      {/* Resume Upload Modal */}
+      {uploadModalOpen && (
+        <Modal
+          open={uploadModalOpen}
+          onClose={() => setUploadModalOpen(false)}
+          title="Upload & Parse Resume"
+        >
+          <ResumeUploader
+            onParsed={handleResumeParsed}
+            onCancel={() => setUploadModalOpen(false)}
+          />
+        </Modal>
       )}
     </div>
   );

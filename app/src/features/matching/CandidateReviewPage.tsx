@@ -13,6 +13,7 @@ import { Button } from '@/components/ui/Button';
 import { Card } from '@/components/ui/Card';
 import { Input } from '@/components/ui/Input';
 import { Modal } from '@/components/ui/Modal';
+import { CandidateComparisonModal } from '@/features/intelligence/CandidateComparisonModal';
 import { load, save } from '@/lib/storage';
 import { calculateCandidateMatch } from '@/lib/ai/matcher';
 import type { Job, Application, CandidateProfile } from '@/types';
@@ -32,6 +33,7 @@ export default function CandidateReviewPage() {
   const [overrideScore, setOverrideScore] = useState<number | ''>('');
   const [overrideReason, setOverrideReason] = useState('');
   const [recruiterNote, setRecruiterNote] = useState('');
+  const [compareModalOpen, setCompareModalOpen] = useState(false);
 
   const activeJob = jobs.find((j) => j.id === selectedJobId) || jobs[0];
 
@@ -164,6 +166,14 @@ export default function CandidateReviewPage() {
         </div>
 
         <div className="flex items-center gap-2">
+          <Button
+            size="sm"
+            variant="outline"
+            onClick={() => setCompareModalOpen(true)}
+            className="text-xs"
+          >
+            Compare Side-by-Side
+          </Button>
           <span className="text-xs font-semibold uppercase tracking-wider text-neutral-500">Vacancy:</span>
           <select
             value={selectedJobId}
@@ -485,6 +495,15 @@ export default function CandidateReviewPage() {
             </div>
           </div>
         </Modal>
+      )}
+
+      {activeJob && (
+        <CandidateComparisonModal
+          open={compareModalOpen}
+          onClose={() => setCompareModalOpen(false)}
+          job={activeJob}
+          candidates={candidates}
+        />
       )}
     </div>
   );
