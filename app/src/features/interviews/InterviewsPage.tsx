@@ -3,7 +3,6 @@ import {
   Calendar,
   Plus,
   Video,
-  Sparkles,
   AlertTriangle,
   CheckCircle,
   XCircle,
@@ -18,11 +17,14 @@ import {
   RefreshCw,
   Save,
 } from 'lucide-react';
+import { QuestionTiers } from '@/components/ui/CustomIcons';
 import { Button } from '@/components/ui/Button';
 import { Card } from '@/components/ui/Card';
 import { Input } from '@/components/ui/Input';
 import { Modal } from '@/components/ui/Modal';
 import { load, save, uid } from '@/lib/storage';
+import { getCurrentUser } from '@/lib/auth';
+import { calculateCandidateMatch } from '@/lib/ai/matcher';
 import { generateInterviewQuestionsUnified } from '@/lib/ai/orchestrator';
 import type { Interview, InterviewQuestion, CandidateProfile, Job, Application } from '@/types';
 
@@ -210,13 +212,45 @@ export default function InterviewsPage() {
             },
           ];
 
-    const matchingApp = applications.find(
+    let matchingApp = applications.find(
       (a) => a.candidateId === candidate.id && a.jobId === job.id
     );
 
+    // Interviews must point at a real application so the final decision can update it.
+    if (!matchingApp) {
+      const match = calculateCandidateMatch(job, candidate);
+      matchingApp = {
+        id: uid('app'),
+        jobId: job.id,
+        candidateId: candidate.id,
+        candidateName: candidate.name,
+        candidateEmail: candidate.email,
+        status: 'Interview',
+        appliedAt: new Date().toISOString(),
+        updatedAt: new Date().toISOString(),
+        matchScore: match.totalScore,
+        scoreBreakdown: match,
+        notes: [],
+        auditTrail: [
+          {
+            id: uid('aud'),
+            applicationId: '',
+            fromStatus: 'Submitted',
+            toStatus: 'Interview',
+            changedBy: getCurrentUser()?.name ?? 'Recruiter',
+            timestamp: new Date().toISOString(),
+            note: 'Application opened from interview scheduling',
+          },
+        ],
+      };
+      matchingApp.auditTrail[0].applicationId = matchingApp.id;
+      const latestApplications = load<Application[]>('applications', []);
+      save('applications', [matchingApp, ...latestApplications]);
+    }
+
     const newInterview: Interview = {
       id: uid('int'),
-      applicationId: matchingApp?.id || uid('app'),
+      applicationId: matchingApp.id,
       candidateId: candidate.id,
       candidateName: candidate.name,
       jobId: job.id,
@@ -268,6 +302,41 @@ export default function InterviewsPage() {
 
     setInterviews(updated);
     save('interviews', updated);
+
+    const nextStatus =
+      feedbackDecision === 'Hire' || feedbackDecision === 'Strong Hire'
+        ? ('Selected' as const)
+        : feedbackDecision === 'No Hire'
+          ? ('Rejected' as const)
+          : null;
+
+    if (nextStatus) {
+      const actor = getCurrentUser()?.name ?? 'Interview Panel';
+      const storedApplications = load<Application[]>('applications', []);
+      const syncedApplications = storedApplications.map((app) =>
+        app.id === feedbackInterview.applicationId && app.status !== nextStatus
+          ? {
+              ...app,
+              status: nextStatus,
+              updatedAt: new Date().toISOString(),
+              auditTrail: [
+                ...app.auditTrail,
+                {
+                  id: uid('aud'),
+                  applicationId: app.id,
+                  fromStatus: app.status,
+                  toStatus: nextStatus,
+                  changedBy: actor,
+                  timestamp: new Date().toISOString(),
+                  note: `Interview outcome recorded: ${feedbackDecision} (${feedbackRating}/5 overall)`,
+                },
+              ],
+            }
+          : app
+      );
+      save('applications', syncedApplications);
+    }
+
     setFeedbackInterview(null);
     setFeedbackComments('');
   };
@@ -690,14 +759,14 @@ export default function InterviewsPage() {
                 disabled={isGeneratingQuestions}
                 className="gap-1.5 text-xs border-blue-200 bg-blue-50 text-blue-700 hover:bg-blue-100 dark:border-blue-800 dark:bg-blue-950/60 dark:text-blue-300"
               >
-                <Sparkles className="h-3.5 w-3.5 text-blue-600" />
+                <QuestionTiers className="h-3.5 w-3.5 text-blue-600" />
                 {isGeneratingQuestions ? 'Generating...' : 'Generate 3-Tier Questions'}
               </Button>
             </div>
 
             {generatedProvider && (
-              <div className="text-[11px] text-emerald-600 font-medium">
-                ✨ Successfully generated via {generatedProvider}
+              <div className="flex items-center gap-1.5 text-[11px] font-medium text-emerald-600">
+                <CheckCircle className="h-3.5 w-3.5" /> Successfully generated via {generatedProvider}
               </div>
             )}
 

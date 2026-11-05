@@ -7,6 +7,7 @@ import {
   DollarSign,
   ArrowRight,
   Filter,
+  Pencil,
 } from 'lucide-react';
 import { Button } from '@/components/ui/Button';
 import { AnimatedCard } from '@/components/ui/Card';
@@ -175,13 +176,23 @@ export default function JobsPage() {
                     <Users className="h-4 w-4 text-blue-600" />
                     <strong>{appCount}</strong> candidate{appCount !== 1 ? 's' : ''} applied
                   </span>
-                  <button
-                    type="button"
-                    onClick={() => handleToggleJobStatus(job.id)}
-                    className="text-[11px] text-neutral-500 hover:text-neutral-800 dark:hover:text-neutral-200 underline"
-                  >
-                    {isOpen ? 'Close vacancy' : 'Reopen vacancy'}
-                  </button>
+                  <span className="flex items-center gap-2">
+                    <button
+                      type="button"
+                      onClick={() => navigate(`/jobs/${job.id}/edit`)}
+                      aria-label={`Edit ${job.title}`}
+                      className="inline-flex items-center gap-1 text-[11px] font-medium text-neutral-500 hover:text-neutral-900 dark:hover:text-neutral-200"
+                    >
+                      <Pencil className="h-3 w-3" /> Edit
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => handleToggleJobStatus(job.id)}
+                      className="text-[11px] text-neutral-500 hover:text-neutral-800 dark:hover:text-neutral-200 underline"
+                    >
+                      {isOpen ? 'Close vacancy' : 'Reopen vacancy'}
+                    </button>
+                  </span>
                 </div>
 
                 <Button

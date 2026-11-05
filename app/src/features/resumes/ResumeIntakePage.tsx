@@ -1,6 +1,7 @@
 import { useMemo, useState } from 'react';
-import { Upload, CheckCircle2, Users, Sparkles, ShieldCheck } from 'lucide-react';
+import { Upload, CheckCircle2, Users, ShieldCheck } from 'lucide-react';
 import { Card } from '@/components/ui/Card';
+import { ExtractionEvidence } from '@/components/ui/CustomIcons';
 import { load, save } from '@/lib/storage';
 import { ResumeUploader } from './ResumeUploader';
 import type { CandidateProfile } from '@/types';
@@ -66,7 +67,7 @@ export default function ResumeIntakePage() {
 
         <Card className="h-fit space-y-4 p-6">
           <h2 className="flex items-center gap-2 font-semibold text-neutral-900 dark:text-white">
-            <Sparkles className="h-5 w-5 text-brand-600" /> What gets extracted
+            <ExtractionEvidence className="h-5 w-5 text-brand-600" /> What gets extracted
           </h2>
           <ul className="space-y-2.5 text-xs text-neutral-600 dark:text-neutral-400">
             {[
@@ -103,7 +104,7 @@ export default function ResumeIntakePage() {
                 className="flex flex-col gap-2 border-b border-neutral-200 pb-3 last:border-0 dark:border-neutral-800 sm:flex-row sm:items-center sm:justify-between"
               >
                 <div className="flex min-w-0 items-center gap-3">
-                  <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-gradient-to-br from-brand-500 to-accent-500 font-semibold text-white">
+                  <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-brand-600 font-semibold text-white">
                     {candidate.name.charAt(0)}
                   </div>
                   <div className="min-w-0">

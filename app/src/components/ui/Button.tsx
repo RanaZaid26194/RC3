@@ -1,5 +1,4 @@
 import { forwardRef, type ButtonHTMLAttributes } from 'react';
-import { Loader2 } from 'lucide-react';
 import { cn } from '@/lib/cn';
 
 type Variant = 'primary' | 'secondary' | 'ghost' | 'danger' | 'outline';
@@ -36,7 +35,7 @@ export const Button = forwardRef<HTMLButtonElement, Props>(function Button(
       )}
       {...rest}
     >
-      {loading && <Loader2 className="h-4 w-4 animate-spin" aria-hidden="true" />}
+      {loading && <span className="h-4 w-4 shrink-0 animate-spin rounded-full border-2 border-current/30 border-t-current" aria-hidden="true" />}
       {children}
     </button>
   );
@@ -50,7 +49,7 @@ export const MagicButton = forwardRef<HTMLButtonElement, Props>(function MagicBu
     <Button
       ref={ref}
       className={cn(
-        'relative overflow-hidden bg-gradient-to-r from-brand-600 via-indigo-600 to-accent-600 text-white shadow-md shadow-brand-500/25 hover:shadow-lg hover:shadow-brand-500/40 hover:-translate-y-0.5 active:translate-y-0 transition-all duration-200',
+        'relative overflow-hidden bg-brand-600 text-white shadow-md shadow-brand-600/20 hover:bg-brand-700 hover:shadow-lg hover:shadow-brand-600/25 hover:-translate-y-0.5 active:translate-y-0 transition-all duration-200',
         className
       )}
       {...props}

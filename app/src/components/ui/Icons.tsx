@@ -13,7 +13,6 @@ import {
   CheckCircle, 
   Clock, 
   XCircle,
-  Sparkles,
   TrendingUp,
   Filter,
   Star,
@@ -59,6 +58,7 @@ import {
   RotateCcw,
   Command
 } from 'lucide-react';
+import { ExtractionEvidence } from './CustomIcons';
 
 // Standard reusable icons
 export const IconBriefcase = Briefcase;
@@ -70,7 +70,6 @@ export const IconCalendar = Calendar;
 export const IconCheckCircle = CheckCircle;
 export const IconClock = Clock;
 export const IconXCircle = XCircle;
-export const IconSparkles = Sparkles;
 export const IconTrendingUp = TrendingUp;
 export const IconFilter = Filter;
 export const IconStar = Star;
@@ -124,8 +123,7 @@ export const IconCommand = Command;
 export function JobActiveBadge() {
   return (
     <div className="relative flex items-center gap-1.5">
-      <span className="flex h-2 w-2 rounded-full bg-brand-600 animate-pulse" />
-      <Sparkles className="h-3 w-3 text-brand-600" />
+      <span className="flex h-2 w-2 rounded-full bg-brand-600" />
     </div>
   );
 }
@@ -140,7 +138,7 @@ export function ApplicationStatus({ status }: { status: string }) {
     case 'parsed':
       return <FileText className="h-4 w-4 text-brand-600" />;
     case 'ai-assessment':
-      return <Sparkles className="h-4 w-4 text-accent-600" />;
+      return <ExtractionEvidence className="h-4 w-4 text-accent-600" />;
     case 'review':
       return <Users className="h-4 w-4 text-warning-600" />;
     case 'shortlisted':
@@ -219,9 +217,9 @@ export function MetricIcon({ type }: { type: 'active-jobs' | 'applications' | 's
  */
 export function AIEnhancedIcon() {
   return (
-    <div className="inline-flex items-center gap-1 rounded-full bg-gradient-to-r from-accent-100 to-accent-200 px-2 py-0.5 text-[10px] font-medium text-accent-800 dark:from-accent-900/40 dark:to-accent-800/40 dark:text-accent-300 border border-accent-200/50 dark:border-accent-700/50">
-      <Sparkles className="h-3 w-3" />
-      AI-Powered
+    <div className="inline-flex items-center gap-1 rounded-full bg-accent-100 px-2 py-0.5 text-[10px] font-medium text-accent-800 dark:bg-accent-900/40 dark:text-accent-300 border border-accent-200/50 dark:border-accent-700/50">
+      <ExtractionEvidence className="h-3 w-3" />
+      Evidence-Assisted
     </div>
   );
 }

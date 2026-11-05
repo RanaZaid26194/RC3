@@ -3,13 +3,13 @@ import {
   Upload,
   CheckCircle2,
   AlertCircle,
-  Sparkles,
   Plus,
   X,
 } from 'lucide-react';
 import { Button } from '@/components/ui/Button';
 import { Card } from '@/components/ui/Card';
 import { Input } from '@/components/ui/Input';
+import { Spinner } from '@/components/ui/Spinner';
 import { uid } from '@/lib/storage';
 import { extractResumeText } from '@/lib/resumeText';
 import type { CandidateProfile, ParsedProject } from '@/types';
@@ -237,7 +237,7 @@ export function ResumeUploader({ onParsed, onCancel, submitLabel = 'Save & Apply
 
       {isParsing && (
         <div className="flex items-center justify-center gap-3 p-6 text-sm font-medium text-blue-600 dark:text-blue-400">
-          <Sparkles className="h-5 w-5 animate-spin" />
+          <Spinner size="sm" color="brand" />
           <span>Parsing resume document & normalizing skill entities...</span>
         </div>
       )}

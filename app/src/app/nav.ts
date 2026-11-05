@@ -1,10 +1,9 @@
 import React from 'react';
 import {
   Briefcase,
-  Users,
   type LucideIcon,
 } from 'lucide-react';
-import { InterviewCalendar, AnalyticsChart, ResumeDocument, IntelligenceSpark, PortalUser, PipelineKanban } from '@/components/ui/CustomIcons';
+import { InterviewCalendar, AnalyticsChart, ResumeDocument, SemanticQuery, PortalUser, PipelineKanban, TalentMatch } from '@/components/ui/CustomIcons';
 
 export interface NavItem {
   to: string;
@@ -30,7 +29,7 @@ export const NAV_ITEMS: NavItem[] = [
   {
     to: '/candidates',
     label: 'Candidate Review',
-    icon: Users,
+    icon: TalentMatch,
     roles: ['recruiter'],
   },
   {
@@ -54,7 +53,7 @@ export const NAV_ITEMS: NavItem[] = [
   {
     to: '/intelligence',
     label: 'Talent Intelligence',
-    icon: IntelligenceSpark,
+    icon: SemanticQuery,
     roles: ['recruiter'],
   },
   {

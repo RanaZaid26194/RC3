@@ -5,6 +5,7 @@ import {
   TrendingUp,
   Download,
   Target,
+  Clock,
 } from 'lucide-react';
 import { Button } from '@/components/ui/Button';
 import { Card } from '@/components/ui/Card';
@@ -30,6 +31,12 @@ export default function AnalyticsPage() {
     (a) => a.status === 'Shortlisted' || a.status === 'Interview' || a.status === 'Selected'
   ).length;
   const conversionRate = totalApps > 0 ? Math.round((shortlistedCount / totalApps) * 100) : 0;
+  const pendingReviewCount = filteredApps.filter(
+    (a) => a.status === 'AI Assessment Available' || a.status === 'Recruiter Review'
+  ).length;
+  const scheduledInterviews = interviews.filter(
+    (i) => i.status === 'scheduled' && (selectedJobId === 'all' || i.jobId === selectedJobId)
+  ).length;
 
   // Average Match Score
   const scores = filteredApps.map((a) => a.matchScore || 0).filter((s) => s > 0);
@@ -117,6 +124,8 @@ export default function AnalyticsPage() {
         totalApplicants: totalApps,
         shortlistRate: `${conversionRate}%`,
         averageMatchScore: avgScore,
+        pendingReviews: pendingReviewCount,
+        scheduledInterviews,
         completedInterviews: interviews.filter((i) => i.status === 'completed').length,
       },
       funnelStages,
@@ -170,7 +179,7 @@ export default function AnalyticsPage() {
       </div>
 
       {/* Top Metric Cards */}
-      <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+      <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-5">
         <Card className="p-5">
           <div className="flex items-center justify-between">
             <span className="text-xs font-medium text-neutral-500">Active Vacancies</span>
@@ -213,6 +222,19 @@ export default function AnalyticsPage() {
           </div>
           <div className="mt-3 text-2xl font-bold text-neutral-900 dark:text-white">{avgScore}%</div>
           <span className="text-xs text-neutral-600 dark:text-neutral-400">Avg. cycle: {averageProcessingDays} days</span>
+        </Card>
+
+        <Card className="p-5">
+          <div className="flex items-center justify-between">
+            <span className="text-xs font-medium text-neutral-500">Pending Reviews</span>
+            <div className="rounded-lg bg-orange-100 p-2 text-orange-700 dark:bg-orange-900/40 dark:text-orange-300">
+              <Clock className="h-4 w-4" />
+            </div>
+          </div>
+          <div className="mt-3 text-2xl font-bold text-neutral-900 dark:text-white">{pendingReviewCount}</div>
+          <span className="text-xs text-neutral-600 dark:text-neutral-400">
+            {scheduledInterviews} interviews scheduled
+          </span>
         </Card>
       </div>
 

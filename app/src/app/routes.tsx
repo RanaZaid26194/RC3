@@ -46,6 +46,14 @@ export function AppRoutes() {
         }
       />
       <Route
+        path="/jobs/:id/edit"
+        element={
+          <ProtectedRoute allowedRoles={['recruiter']}>
+            <NewJobPage />
+          </ProtectedRoute>
+        }
+      />
+      <Route
         path="/pipeline"
         element={
           <ProtectedRoute allowedRoles={['recruiter']}>

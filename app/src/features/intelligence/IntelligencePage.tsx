@@ -1,7 +1,6 @@
 import { useState } from 'react';
 import {
   Search,
-  Sparkles,
   Shield,
   CheckCircle,
   GitCompare,
@@ -12,6 +11,7 @@ import {
   Layers,
   SlidersHorizontal,
 } from 'lucide-react';
+import { SemanticQuery } from '@/components/ui/CustomIcons';
 import { Button } from '@/components/ui/Button';
 import { Card } from '@/components/ui/Card';
 import { Input } from '@/components/ui/Input';
@@ -235,7 +235,7 @@ export default function IntelligencePage() {
             />
           </div>
           <Button className="gap-2">
-            <Sparkles className="h-4 w-4" /> Run Search
+            <SemanticQuery className="h-4 w-4" /> Run Search
           </Button>
         </form>
 

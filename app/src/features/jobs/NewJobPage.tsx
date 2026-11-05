@@ -1,13 +1,12 @@
 import { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useParams } from 'react-router-dom';
 import {
-  Sparkles,
   Plus,
   Trash2,
   CheckCircle,
   ArrowLeft,
-  Wand2,
 } from 'lucide-react';
+import { ExtractionEvidence } from '@/components/ui/CustomIcons';
 import { Button } from '@/components/ui/Button';
 import { Card } from '@/components/ui/Card';
 import { Input } from '@/components/ui/Input';
@@ -17,27 +16,55 @@ import type { Job, SkillRequirement } from '@/types';
 
 export default function NewJobPage() {
   const navigate = useNavigate();
-  const [title, setTitle] = useState('');
-  const [department, setDepartment] = useState('Engineering');
-  const [location, setLocation] = useState('Remote');
-  const [salary, setSalary] = useState('$115,000 - $145,000');
-  const [description, setDescription] = useState(
-    'We are looking for a Senior Backend Developer proficient in Python and Django to lead our microservices architecture. Candidates must have solid experience with PostgreSQL database optimization and containerizing services with Docker. 3+ years experience required.'
+  const { id } = useParams<{ id: string }>();
+  const [existing] = useState<Job | undefined>(() =>
+    id ? load<Job[]>('jobs', []).find((job) => job.id === id) : undefined
   );
-  const [minExp, setMinExp] = useState(3);
-  const [qualification] = useState("Bachelor's in Computer Science or equivalent");
 
-  const [skills, setSkills] = useState<SkillRequirement[]>([
-    { skill: 'Python', weight: 5, required: true, category: 'backend' },
-    { skill: 'Django', weight: 5, required: true, category: 'backend' },
-    { skill: 'PostgreSQL', weight: 4, required: true, category: 'database' },
-    { skill: 'Docker', weight: 4, required: true, category: 'devops' },
-  ]);
+  const [title, setTitle] = useState(existing?.title ?? '');
+  const [department, setDepartment] = useState(existing?.department ?? 'Engineering');
+  const [location, setLocation] = useState(existing?.location ?? 'Remote');
+  const [jobType, setJobType] = useState<Job['type']>(existing?.type ?? 'Full-time');
+  const [salary, setSalary] = useState(existing?.salary ?? '$115,000 - $145,000');
+  const [description, setDescription] = useState(
+    existing?.description ??
+      'We are looking for a Senior Backend Developer proficient in Python and Django to lead our microservices architecture. Candidates must have solid experience with PostgreSQL database optimization and containerizing services with Docker. 3+ years experience required.'
+  );
+  const [minExp, setMinExp] = useState(existing?.minExperienceYears ?? 3);
+  const [qualification, setQualification] = useState(
+    existing?.qualification ?? "Bachelor's in Computer Science or equivalent"
+  );
+  const [preferredSkillsText, setPreferredSkillsText] = useState(
+    (existing?.preferredSkills ?? ['REST APIs', 'Git', 'Agile']).join(', ')
+  );
+
+  const [skills, setSkills] = useState<SkillRequirement[]>(
+    existing?.requiredSkills ?? [
+      { skill: 'Python', weight: 5, required: true, category: 'backend' },
+      { skill: 'Django', weight: 5, required: true, category: 'backend' },
+      { skill: 'PostgreSQL', weight: 4, required: true, category: 'database' },
+      { skill: 'Docker', weight: 4, required: true, category: 'devops' },
+    ]
+  );
 
   const [newSkillName, setNewSkillName] = useState('');
   const [newSkillWeight, setNewSkillWeight] = useState(4);
   const [isExtracting, setIsExtracting] = useState(false);
   const [extractedNotice, setExtractedNotice] = useState<string | null>(null);
+
+  if (id && !existing) {
+    return (
+      <div className="mx-auto max-w-lg space-y-4 py-16 text-center">
+        <h1 className="font-display text-2xl font-bold text-neutral-900 dark:text-white">
+          Vacancy not found
+        </h1>
+        <p className="text-sm text-neutral-500">
+          This vacancy may have been removed. Return to the jobs list to continue.
+        </p>
+        <Button onClick={() => navigate('/jobs')}>Back to Jobs</Button>
+      </div>
+    );
+  }
 
   // AI Extraction logic from free-text description
   const handleAIExtract = async () => {
@@ -49,6 +76,9 @@ export default function NewJobPage() {
         setSkills(result.skills);
         if (result.minExperienceYears) {
           setMinExp(result.minExperienceYears);
+        }
+        if (result.qualification) {
+          setQualification(result.qualification);
         }
         setExtractedNotice(
           `Extracted ${result.skills.length} requirements and ${result.minExperienceYears || 3} years experience via ${result.provider}!`
@@ -86,25 +116,32 @@ export default function NewJobPage() {
     e.preventDefault();
     if (!title.trim()) return;
 
-    const newJob: Job = {
-      id: uid('job'),
+    const preferredSkills = preferredSkillsText
+      .split(',')
+      .map((skill) => skill.trim())
+      .filter(Boolean);
+
+    const job: Job = {
+      id: existing?.id ?? uid('job'),
       title: title.trim(),
-      department,
-      location,
-      type: 'Full-time',
-      salary,
-      description,
-      status: 'open',
+      department: department.trim(),
+      location: location.trim(),
+      type: jobType,
+      salary: salary.trim(),
+      description: description.trim(),
+      status: existing?.status ?? 'open',
       requiredSkills: skills,
-      preferredSkills: ['REST APIs', 'Git', 'Agile'],
+      preferredSkills,
       minExperienceYears: minExp,
-      qualification,
-      createdAt: new Date().toISOString(),
+      qualification: qualification.trim(),
+      createdAt: existing?.createdAt ?? new Date().toISOString(),
       updatedAt: new Date().toISOString(),
     };
 
     const existingJobs = load<Job[]>('jobs', []);
-    const updated = [newJob, ...existingJobs];
+    const updated = existing
+      ? existingJobs.map((item) => (item.id === existing.id ? job : item))
+      : [job, ...existingJobs];
     save('jobs', updated);
     navigate('/jobs');
   };
@@ -120,10 +157,12 @@ export default function NewJobPage() {
       <div className="flex items-center justify-between">
         <div>
           <h1 className="font-display text-2xl font-bold tracking-tight text-neutral-900 dark:text-white">
-            Create New Vacancy
+            {existing ? 'Edit Vacancy' : 'Create New Vacancy'}
           </h1>
           <p className="text-sm text-neutral-500">
-            Define role parameters, paste job description for AI requirement extraction, and configure skill importance.
+            {existing
+              ? 'Update the role parameters, requirements, and scoring weights. Changes apply to new evaluations immediately.'
+              : 'Define role parameters, paste job description for AI requirement extraction, and configure skill importance.'}
           </p>
         </div>
       </div>
@@ -171,6 +210,55 @@ export default function NewJobPage() {
                 placeholder="e.g. $110,000 - $140,000"
               />
             </div>
+
+            <div>
+              <label
+                htmlFor="job-type"
+                className="mb-1 block text-sm font-medium text-neutral-700 dark:text-neutral-300"
+              >
+                Employment Type
+              </label>
+              <select
+                id="job-type"
+                value={jobType}
+                onChange={(e) => setJobType(e.target.value as Job['type'])}
+                className="h-11 w-full rounded-lg border border-neutral-300 bg-white px-3 text-sm text-neutral-900 focus:border-brand-500 focus:outline-none dark:border-neutral-700 dark:bg-neutral-900 dark:text-white"
+              >
+                <option value="Full-time">Full-time</option>
+                <option value="Part-time">Part-time</option>
+                <option value="Contract">Contract</option>
+                <option value="Internship">Internship</option>
+              </select>
+            </div>
+
+            <div>
+              <Input
+                label="Minimum Experience (years)"
+                type="number"
+                min={0}
+                max={30}
+                value={minExp}
+                onChange={(e) => setMinExp(Math.max(0, parseInt(e.target.value, 10) || 0))}
+              />
+            </div>
+
+            <div className="sm:col-span-2">
+              <Input
+                label="Qualification"
+                value={qualification}
+                onChange={(e) => setQualification(e.target.value)}
+                placeholder="e.g. Bachelor's in Computer Science or equivalent"
+              />
+            </div>
+
+            <div className="sm:col-span-2">
+              <Input
+                label="Preferred Skills (comma-separated)"
+                value={preferredSkillsText}
+                onChange={(e) => setPreferredSkillsText(e.target.value)}
+                placeholder="e.g. REST APIs, Git, Agile"
+              />
+            </div>
           </div>
         </Card>
 
@@ -192,7 +280,7 @@ export default function NewJobPage() {
               disabled={isExtracting}
               className="gap-2 bg-blue-50 text-blue-700 dark:bg-blue-950/40 dark:text-blue-300 border-blue-200 dark:border-blue-800"
             >
-              <Wand2 className="h-4 w-4" />
+              <ExtractionEvidence className="h-4 w-4" />
               {isExtracting ? 'Analyzing...' : 'Extract Requirements with AI'}
             </Button>
           </div>
@@ -209,7 +297,7 @@ export default function NewJobPage() {
 
           {extractedNotice && (
             <div className="flex items-center gap-2 rounded-lg bg-blue-50 p-3 text-xs font-medium text-blue-800 dark:bg-blue-950/40 dark:text-blue-300 border border-blue-200 dark:border-blue-800">
-              <Sparkles className="h-4 w-4 text-blue-600" />
+              <ExtractionEvidence className="h-4 w-4 text-blue-600" />
               {extractedNotice}
             </div>
           )}
@@ -298,7 +386,7 @@ export default function NewJobPage() {
             Cancel
           </Button>
           <Button type="submit" className="gap-2">
-            <CheckCircle className="h-4 w-4" /> Publish Vacancy
+            <CheckCircle className="h-4 w-4" /> {existing ? 'Save Changes' : 'Publish Vacancy'}
           </Button>
         </div>
       </form>
