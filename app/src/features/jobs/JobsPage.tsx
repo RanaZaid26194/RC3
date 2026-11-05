@@ -10,7 +10,7 @@ import {
   Filter,
 } from 'lucide-react';
 import { Button } from '@/components/ui/Button';
-import { Card } from '@/components/ui/Card';
+import { AnimatedCard } from '@/components/ui/Card';
 import { load, save } from '@/lib/storage';
 import type { Job, Application } from '@/types';
 
@@ -57,15 +57,15 @@ export default function JobsPage() {
       </div>
 
       {/* Filter Tabs */}
-      <div className="flex items-center gap-2 border-b border-neutral-200 pb-3 text-sm dark:border-neutral-800">
+      <div className="mb-4 flex items-center gap-2 border-b border-neutral-200 pb-3 text-sm dark:border-neutral-800 animate-fade-up">
         <Filter className="h-4 w-4 text-neutral-400" />
         <span className="text-xs font-semibold uppercase tracking-wider text-neutral-500">Filter:</span>
         <button
           type="button"
           onClick={() => setStatusFilter('all')}
-          className={`rounded-full px-3 py-1 text-xs font-medium transition ${
+          className={`rounded-full px-3 py-1 text-xs font-medium transition-all duration-200 ease-out-expo ${
             statusFilter === 'all'
-              ? 'bg-neutral-900 text-white dark:bg-neutral-100 dark:text-neutral-900'
+              ? 'bg-brand-700 text-white shadow-md shadow-brand-600/25'
               : 'text-neutral-600 hover:bg-neutral-100 dark:text-neutral-400 dark:hover:bg-neutral-800'
           }`}
         >
@@ -74,9 +74,9 @@ export default function JobsPage() {
         <button
           type="button"
           onClick={() => setStatusFilter('open')}
-          className={`rounded-full px-3 py-1 text-xs font-medium transition ${
+          className={`rounded-full px-3 py-1 text-xs font-medium transition-all duration-200 ease-out-expo ${
             statusFilter === 'open'
-              ? 'bg-blue-600 text-white'
+              ? 'bg-blue-600 text-white shadow-md shadow-blue-500/25'
               : 'text-neutral-600 hover:bg-neutral-100 dark:text-neutral-400 dark:hover:bg-neutral-800'
           }`}
         >
@@ -85,9 +85,9 @@ export default function JobsPage() {
         <button
           type="button"
           onClick={() => setStatusFilter('closed')}
-          className={`rounded-full px-3 py-1 text-xs font-medium transition ${
+          className={`rounded-full px-3 py-1 text-xs font-medium transition-all duration-200 ease-out-expo ${
             statusFilter === 'closed'
-              ? 'bg-neutral-600 text-white'
+              ? 'bg-neutral-600 text-white shadow-md shadow-neutral-500/25'
               : 'text-neutral-600 hover:bg-neutral-100 dark:text-neutral-400 dark:hover:bg-neutral-800'
           }`}
         >
@@ -97,14 +97,16 @@ export default function JobsPage() {
 
       {/* Job Cards Grid */}
       <div className="grid gap-5 md:grid-cols-2 lg:grid-cols-3">
-        {filteredJobs.map((job) => {
+        {filteredJobs.map((job, index) => {
           const appCount = applications.filter((a) => a.jobId === job.id).length;
           const isOpen = job.status === 'open';
+          const delay = index * 80;
 
           return (
-            <Card
+            <AnimatedCard
               key={job.id}
-              className={`flex flex-col justify-between p-5 transition hover:shadow-md ${
+              delay={delay}
+              className={`group flex flex-col justify-between p-5 transition hover:shadow-xl ${
                 !isOpen ? 'opacity-70 bg-neutral-50/70 dark:bg-neutral-900/40' : ''
               }`}
             >
@@ -192,7 +194,7 @@ export default function JobsPage() {
                   <ArrowRight className="h-3.5 w-3.5" />
                 </Button>
               </div>
-            </Card>
+            </AnimatedCard>
           );
         })}
       </div>

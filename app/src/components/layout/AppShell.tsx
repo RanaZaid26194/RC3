@@ -66,7 +66,7 @@ export function AppShell({ children }: { children: ReactNode }) {
       'group flex min-h-11 items-center gap-3 rounded-[var(--radius-md)] px-3 text-sm font-medium transition-all duration-200 ease-out-expo relative overflow-hidden',
       'before:absolute left-0 top-0 bottom-0 w-1 bg-brand-600 transform -translate-y-full group-hover:translate-y-0 transition-transform duration-300',
       isActive
-        ? 'bg-gradient-to-r from-brand-50 to-transparent text-brand-700 font-semibold dark:from-brand-950/30 dark:text-brand-300 shadow-sm'
+        ? 'bg-brand-50 text-brand-800 font-semibold dark:bg-brand-950/40 dark:text-brand-300 shadow-sm'
         : 'text-neutral-600 hover:bg-neutral-100 hover:text-neutral-900 dark:text-neutral-400 dark:hover:bg-neutral-800 dark:hover:text-neutral-100'
     );
 
