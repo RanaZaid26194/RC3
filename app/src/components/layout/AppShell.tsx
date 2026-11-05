@@ -1,4 +1,4 @@
-import { useState, useEffect, type ReactNode } from 'react';
+import { useState, type ReactNode } from 'react';
 import { NavLink, useNavigate, useLocation, Navigate } from 'react-router-dom';
 import { Menu, X, UserCheck, ShieldCheck, RefreshCw, LogOut } from 'lucide-react';
 import { cn } from '@/lib/cn';
@@ -14,14 +14,12 @@ export const APP_NAME = 'RecruLens';
 export function AppShell({ children }: { children: ReactNode }) {
   const [open, setOpen] = useState(false);
   const [showAccountModal, setShowAccountModal] = useState(false);
-  const [user, setUser] = useState(getCurrentUser());
   const navigate = useNavigate();
   const location = useLocation();
 
-  // Listen for user state changes across tabs or navigations
-  useEffect(() => {
-    setUser(getCurrentUser());
-  }, [location.pathname]);
+  // Read the session during render so a login immediately after sign-out is not
+  // bounced back by a stale state value before effects run.
+  const user = getCurrentUser();
 
   // Public auth and legal pages render without shell sidebar
   if (
@@ -44,7 +42,6 @@ export function AppShell({ children }: { children: ReactNode }) {
 
   const handleSwitchAccount = (targetUser: StoredUser) => {
     const updated = switchAccount(targetUser.id);
-    setUser(updated);
     setShowAccountModal(false);
     if (updated.role === 'candidate') {
       navigate('/portal');
@@ -55,7 +52,6 @@ export function AppShell({ children }: { children: ReactNode }) {
 
   const handleLogout = () => {
     logoutUser();
-    setUser(null);
     navigate('/login');
   };
 
