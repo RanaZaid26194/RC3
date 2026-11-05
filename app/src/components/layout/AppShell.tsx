@@ -183,6 +183,7 @@ export function AppShell({ children }: { children: ReactNode }) {
           <Button
             variant="ghost"
             size="sm"
+            aria-label="Sign out"
             onClick={handleLogout}
             className="text-xs text-rose-600"
           >

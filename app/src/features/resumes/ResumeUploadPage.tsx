@@ -89,7 +89,7 @@ export default function ResumeUploadPage() {
               <p className="text-sm text-neutral-600 dark:text-neutral-400">
                 Click to upload or drag & drop a resume (PDF, DOC, DOCX)
               </p>
-              <p className="text-xs text-neutral-400 mt-1">Max file size: 5MB</p>
+              <p className="text-xs text-neutral-500 mt-1">Max file size: 5MB</p>
             </label>
           </div>
 

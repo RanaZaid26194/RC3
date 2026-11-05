@@ -183,7 +183,7 @@ export default function CandidatePortalPage() {
                       {job.salary}
                     </span>
                     {hasApplied ? (
-                      <span className="flex items-center gap-1 text-xs font-medium text-emerald-600">
+                      <span className="flex items-center gap-1 text-xs font-medium text-emerald-700">
                         <CheckCircle2 className="h-4 w-4" /> Applied
                       </span>
                     ) : (
