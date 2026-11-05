@@ -20,6 +20,7 @@ const server = http.createServer((req, res) => {
     try { urlPath = decodeURIComponent((req.url || '/').split('?')[0].split('#')[0]); }
     catch { res.writeHead(400); return res.end('Bad request'); }
     if (urlPath.includes('\0')) { res.writeHead(400); return res.end('Bad request'); }
+    if (urlPath.startsWith('/_vercel/')) { res.writeHead(204); return res.end(); }
     let file = path.normalize(path.join(root, urlPath));
     if (file !== root && !file.startsWith(root + path.sep)) { res.writeHead(403); return res.end('Forbidden'); }
     if (fs.existsSync(file) && fs.statSync(file).isDirectory()) file = path.join(file, 'index.html');
