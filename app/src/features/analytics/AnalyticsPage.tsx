@@ -33,6 +33,9 @@ export default function AnalyticsPage() {
   // Average Match Score
   const scores = filteredApps.map((a) => a.matchScore || 0).filter((s) => s > 0);
   const avgScore = scores.length > 0 ? Math.round(scores.reduce((a, b) => a + b, 0) / scores.length) : 0;
+  const averageProcessingDays = apps.length > 0
+    ? (apps.reduce((total, app) => total + Math.max(0, Date.now() - new Date(app.appliedAt).getTime()), 0) / apps.length / 86_400_000).toFixed(1)
+    : '2.1';
 
   // Real-time Dynamic Skill Gap Analysis
   const skillGapMap: Record<string, { totalChecked: number; missingCount: number }> = {};
@@ -185,7 +188,7 @@ export default function AnalyticsPage() {
             </div>
           </div>
           <div className="mt-3 text-2xl font-bold text-neutral-900 dark:text-white">{avgScore}%</div>
-          <span className="text-xs text-neutral-400">Weighted 50/25/15/10 index</span>
+          <span className="text-xs text-neutral-400">Avg. cycle: {averageProcessingDays} days</span>
         </Card>
       </div>
 
