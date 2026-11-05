@@ -35,7 +35,6 @@ export default function LoginPage() {
   const [isForgotOpen, setIsForgotOpen] = useState(false);
   const [forgotEmail, setForgotEmail] = useState('');
   const [forgotStep, setForgotStep] = useState<'request' | 'reset' | 'success'>('request');
-  const [forgotCode, setForgotCode] = useState('');
   const [newPassword, setNewPassword] = useState('');
   const [confirmNewPassword, setConfirmNewPassword] = useState('');
   const [forgotError, setForgotError] = useState<string | null>(null);
@@ -93,9 +92,7 @@ export default function LoginPage() {
       if (!user) {
         throw new Error('No registered account was found with that email address.');
       }
-      // Generate a simulated verification code for the user
-      const code = Math.floor(100000 + Math.random() * 900000).toString();
-      setForgotCode(code);
+      // Offline build: there is no mail service, so the account is verified locally.
       setForgotStep('reset');
     } catch (err) {
       setForgotError(err instanceof Error ? err.message : 'Failed to look up account.');
@@ -301,7 +298,7 @@ export default function LoginPage() {
                       Reset Password
                     </h3>
                     <p className="text-xs text-neutral-500 dark:text-neutral-400">
-                      Enter your account email to receive a secure recovery verification code.
+                      Enter your registered email. This offline build has no mail service, so the account is verified right here in your browser.
                     </p>
                   </div>
                 </div>
@@ -332,7 +329,7 @@ export default function LoginPage() {
                     Cancel
                   </Button>
                   <Button type="submit" size="sm" loading={forgotLoading} className="gap-1.5">
-                    Send Verification Code <ArrowRight className="h-3.5 w-3.5" />
+                    Verify Account <ArrowRight className="h-3.5 w-3.5" />
                   </Button>
                 </div>
               </form>
@@ -349,7 +346,7 @@ export default function LoginPage() {
                       Set New Password
                     </h3>
                     <p className="text-xs text-neutral-500 dark:text-neutral-400">
-                      Code verified: <span className="font-mono font-semibold text-brand-600">RL-{forgotCode}</span>. Choose a strong new password.
+                      Account verified locally: <span className="font-semibold text-brand-600 dark:text-brand-400">{forgotEmail.trim().toLowerCase()}</span>. Choose a strong new password.
                     </p>
                   </div>
                 </div>

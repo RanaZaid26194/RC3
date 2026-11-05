@@ -1,5 +1,5 @@
-import { useState } from 'react';
-import { RotateCcw, CheckCircle2, AlertCircle, ShieldCheck, Zap } from 'lucide-react';
+import { useRef, useState } from 'react';
+import { RotateCcw, CheckCircle2, AlertCircle, ShieldCheck, Zap, Download, Upload } from 'lucide-react';
 import { Card } from '@/components/ui/Card';
 import { ExtractionEvidence } from '@/components/ui/CustomIcons';
 import { Spinner } from '@/components/ui/Spinner';
@@ -8,6 +8,7 @@ import { Input } from '@/components/ui/Input';
 import { ConfirmDialog } from '@/components/ui/Modal';
 import { useToast } from '@/components/ui/Toast';
 import { resetDemoData } from '@/lib/storage';
+import { exportAccounts, importAccounts, getStoredUsers } from '@/lib/auth';
 import {
   getGeminiApiKey,
   setGeminiApiKey,
@@ -28,6 +29,33 @@ import {
 export default function Settings() {
   const [confirm, setConfirm] = useState(false);
   const toast = useToast();
+  const accountFileRef = useRef<HTMLInputElement>(null);
+  const accountCount = getStoredUsers().length;
+
+  const handleExportAccounts = () => {
+    const blob = new Blob([exportAccounts()], { type: 'application/json' });
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement('a');
+    link.href = url;
+    link.download = 'recrulens-accounts.json';
+    document.body.appendChild(link);
+    link.click();
+    link.remove();
+    URL.revokeObjectURL(url);
+    toast.success('Account backup downloaded');
+  };
+
+  const handleImportAccounts = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    e.target.value = '';
+    if (!file) return;
+    try {
+      const result = importAccounts(await file.text());
+      toast.success(`Accounts restored: ${result.added} added, ${result.updated} updated`);
+    } catch (err) {
+      toast.error(err instanceof Error ? err.message : 'Account import failed');
+    }
+  };
 
   // Gemini state
   const [geminiKey, setLocalGeminiKey] = useState(getGeminiApiKey());
@@ -356,6 +384,41 @@ export default function Settings() {
             <span>{geminiMessage}</span>
           </div>
         )}
+      </Card>
+
+      {/* Account portability: accounts are localStorage-only, so a backup is how they move devices */}
+      <Card className="p-6 space-y-4">
+        <div className="flex flex-wrap items-start justify-between gap-3">
+          <div>
+            <h2 className="text-base font-semibold text-neutral-900 dark:text-white">Accounts &amp; Sign-in Backup</h2>
+            <p className="text-xs text-neutral-500">
+              {accountCount} account{accountCount === 1 ? '' : 's'} saved in this browser. Accounts are device-local, so
+              download a backup to sign in on another machine or after clearing browser data.
+            </p>
+          </div>
+          <div className="flex items-center gap-2">
+            <Button size="sm" variant="outline" onClick={handleExportAccounts}>
+              <Download className="h-4 w-4" aria-hidden="true" />
+              Export Accounts
+            </Button>
+            <Button size="sm" variant="secondary" onClick={() => accountFileRef.current?.click()}>
+              <Upload className="h-4 w-4" aria-hidden="true" />
+              Restore Backup
+            </Button>
+            <input
+              ref={accountFileRef}
+              type="file"
+              accept="application/json,.json"
+              className="sr-only"
+              onChange={handleImportAccounts}
+              aria-label="Choose account backup file"
+            />
+          </div>
+        </div>
+        <p className="text-[11px] text-neutral-500 dark:text-neutral-400">
+          The backup contains salted password hashes, not plain text. Keep it private. Restoring merges accounts by
+          email, so an imported password replaces the local one.
+        </p>
       </Card>
 
       {/* Demo Data Management */}

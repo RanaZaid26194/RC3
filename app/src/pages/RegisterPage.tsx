@@ -357,9 +357,14 @@ export default function RegisterPage() {
         </Card>
 
         {/* Security assurance */}
-        <div className="flex items-center justify-center gap-2 text-[11px] text-neutral-400 dark:text-neutral-500">
-          <Shield className="h-3.5 w-3.5" />
-          <span>Zero-knowledge client hashing • Instant workspace activation</span>
+        <div className="flex flex-col items-center justify-center gap-1.5 text-[11px] text-neutral-400 dark:text-neutral-500">
+          <div className="flex items-center gap-2">
+            <Shield className="h-3.5 w-3.5" />
+            <span>Salted password hashing • Account saved in this browser</span>
+          </div>
+          <span className="text-center text-[10px]">
+            You can sign in again on this device. Export an account backup from Settings to use another machine.
+          </span>
         </div>
       </div>
     </div>

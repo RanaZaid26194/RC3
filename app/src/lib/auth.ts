@@ -88,7 +88,9 @@ export function registerUser(name: string, email: string, role: UserRole, passwo
   };
 
   users.push(newUser);
-  save(USERS_KEY, users);
+  if (!save(USERS_KEY, users)) {
+    throw new Error('Could not save the account in this browser (storage unavailable). Export a backup or allow site storage and try again.');
+  }
 
   const sessionUser: User = {
     id: newUser.id,
@@ -163,4 +165,78 @@ export function resetPassword(email: string, newPassword: string): void {
 
 export function logoutUser(): void {
   setCurrentUser(null);
+}
+
+export interface AccountBackup {
+  exportedAt: string;
+  accounts: StoredUser[];
+}
+
+/** Accounts are browser-local. This JSON file is how they move to another machine. */
+export function exportAccounts(): string {
+  const backup: AccountBackup = {
+    exportedAt: new Date().toISOString(),
+    accounts: getStoredUsers(),
+  };
+  return JSON.stringify(backup, null, 2);
+}
+
+function isValidStoredUser(value: unknown): value is StoredUser {
+  if (!value || typeof value !== 'object') return false;
+  const u = value as Record<string, unknown>;
+  return (
+    typeof u.id === 'string' &&
+    typeof u.name === 'string' &&
+    typeof u.email === 'string' &&
+    u.email.includes('@') &&
+    (u.role === 'recruiter' || u.role === 'candidate') &&
+    typeof u.passwordHash === 'string' &&
+    u.passwordHash.length > 0
+  );
+}
+
+export function importAccounts(raw: string): { added: number; updated: number; total: number } {
+  let parsed: unknown;
+  try {
+    parsed = JSON.parse(raw);
+  } catch {
+    throw new Error('That file is not valid JSON.');
+  }
+
+  const candidateList = Array.isArray(parsed)
+    ? parsed
+    : parsed && typeof parsed === 'object' && Array.isArray((parsed as AccountBackup).accounts)
+    ? (parsed as AccountBackup).accounts
+    : null;
+  if (!candidateList) throw new Error('No account list found in that file.');
+
+  const incoming = candidateList.filter(isValidStoredUser);
+  if (incoming.length === 0) throw new Error('No valid accounts found in that file.');
+
+  const users = getStoredUsers();
+  let added = 0;
+  let updated = 0;
+
+  incoming.forEach((account) => {
+    const normalizedEmail = account.email.trim().toLowerCase();
+    const existing = users.find((u) => u.email.toLowerCase() === normalizedEmail);
+    const clean: StoredUser = {
+      ...account,
+      email: normalizedEmail,
+      name: account.name.trim(),
+    };
+    if (existing) {
+      Object.assign(existing, clean);
+      updated += 1;
+    } else {
+      users.push(clean);
+      added += 1;
+    }
+  });
+
+  if (!save(USERS_KEY, users)) {
+    throw new Error('Could not write accounts to this browser storage.');
+  }
+
+  return { added, updated, total: users.length };
 }

@@ -36,7 +36,10 @@ export function seedIfEmpty() {
 }
 
 export function resetDemoData() {
-  Object.keys(localStorage).filter((k) => k.startsWith(NS)).forEach((k) => localStorage.removeItem(k));
+  // Accounts live in this browser only, so demo reset must never delete them.
+  Object.keys(localStorage)
+    .filter((k) => k.startsWith(NS) && !k.startsWith(NS + 'auth:'))
+    .forEach((k) => localStorage.removeItem(k));
   seeds.forEach((s) => save(s.key, s.data));
   save('__seeded', true);
 }
