@@ -26,7 +26,6 @@ export const DEFAULT_RECRUITER: StoredUser = {
   email: 'recruiter@recrulens.ai',
   role: 'recruiter',
   passwordHash: hashPassword('password123'),
-  avatar: 'https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=120&auto=format&fit=crop&q=80',
 };
 
 export const DEFAULT_CANDIDATE: StoredUser = {
@@ -35,7 +34,6 @@ export const DEFAULT_CANDIDATE: StoredUser = {
   email: 'alex.rivera@example.com',
   role: 'candidate',
   passwordHash: hashPassword('password123'),
-  avatar: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=120&auto=format&fit=crop&q=80',
 };
 
 export function getStoredUsers(): StoredUser[] {

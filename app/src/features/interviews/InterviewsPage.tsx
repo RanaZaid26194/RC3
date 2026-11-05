@@ -13,6 +13,10 @@ import {
   Check,
   ChevronDown,
   ChevronUp,
+  Pencil,
+  Trash2,
+  RefreshCw,
+  Save,
 } from 'lucide-react';
 import { Button } from '@/components/ui/Button';
 import { Card } from '@/components/ui/Card';
@@ -55,6 +59,9 @@ export default function InterviewsPage() {
   const [modalQuestions, setModalQuestions] = useState<InterviewQuestion[]>([]);
   const [isGeneratingQuestions, setIsGeneratingQuestions] = useState(false);
   const [generatedProvider, setGeneratedProvider] = useState<string | null>(null);
+  const [editingQuestionId, setEditingQuestionId] = useState<string | null>(null);
+  const [editingQuestionText, setEditingQuestionText] = useState('');
+  const [regeneratingQuestionId, setRegeneratingQuestionId] = useState<string | null>(null);
 
   // Feedback Modal State
   const [feedbackInterview, setFeedbackInterview] = useState<Interview | null>(null);
@@ -122,12 +129,63 @@ export default function InterviewsPage() {
     }
   };
 
+  const handleStartEditQuestion = (question: InterviewQuestion) => {
+    setEditingQuestionId(question.id);
+    setEditingQuestionText(question.text);
+  };
+
+  const handleSaveQuestionEdit = (questionId: string) => {
+    const trimmed = editingQuestionText.trim();
+    if (!trimmed) return;
+    setModalQuestions((current) =>
+      current.map((q) => (q.id === questionId ? { ...q, text: trimmed } : q))
+    );
+    setEditingQuestionId(null);
+    setEditingQuestionText('');
+  };
+
+  const handleRemoveQuestion = (questionId: string) => {
+    setModalQuestions((current) => current.filter((q) => q.id !== questionId));
+    if (editingQuestionId === questionId) setEditingQuestionId(null);
+  };
+
+  const handleRegenerateQuestion = async (questionId: string) => {
+    const candidate = candidates.find((c) => c.id === activeCandidateId);
+    const job = jobs.find((j) => j.id === activeJobId);
+    if (!candidate || !job) return;
+
+    setRegeneratingQuestionId(questionId);
+    try {
+      const projectNames = candidate.projects?.map((p) => p.name) || [];
+      const res = await generateInterviewQuestionsUnified(job.title, candidate.name, projectNames);
+      setModalQuestions((current) => {
+        const existing = current.find((q) => q.id === questionId);
+        const usedTexts = new Set(current.filter((q) => q.id !== questionId).map((q) => q.text));
+        const pool = res.questions.filter((q) => !usedTexts.has(q.text));
+        const replacement =
+          pool.find((q) => q.difficulty === existing?.difficulty) ||
+          pool[0] ||
+          res.questions[0];
+        if (!replacement) return current;
+        return current.map((q) =>
+          q.id === questionId ? { ...replacement, id: questionId } : q
+        );
+      });
+      setGeneratedProvider(res.provider);
+    } catch (err) {
+      console.error('Failed to regenerate question:', err);
+    } finally {
+      setRegeneratingQuestionId(null);
+    }
+  };
+
   // Open Schedule Modal pre-populated
   const handleOpenSchedule = (candidateId?: string, jobId?: string) => {
     if (candidateId) setSelectedCandidateId(candidateId);
     if (jobId) setSelectedJobId(jobId);
     setModalQuestions([]);
     setGeneratedProvider(null);
+    setEditingQuestionId(null);
     setIsScheduleOpen(true);
   };
 
@@ -650,12 +708,74 @@ export default function InterviewsPage() {
                     key={q.id || idx}
                     className="rounded-lg border border-neutral-200 bg-white p-2.5 text-xs dark:border-neutral-700 dark:bg-neutral-800"
                   >
-                    <div className="flex items-center justify-between">
+                    <div className="flex items-center justify-between gap-2">
                       <span className="font-semibold uppercase tracking-wider text-[10px] text-blue-600 dark:text-blue-400">
                         {q.difficulty} • {q.category}
                       </span>
+                      <div className="flex items-center gap-0.5">
+                        {editingQuestionId === q.id ? (
+                          <>
+                            <button
+                              type="button"
+                              onClick={() => handleSaveQuestionEdit(q.id)}
+                              aria-label="Save question"
+                              className="rounded p-1.5 text-emerald-600 transition hover:bg-emerald-50 dark:hover:bg-emerald-950/40"
+                            >
+                              <Save className="h-3.5 w-3.5" />
+                            </button>
+                            <button
+                              type="button"
+                              onClick={() => setEditingQuestionId(null)}
+                              aria-label="Cancel editing question"
+                              className="rounded p-1.5 text-neutral-500 transition hover:bg-neutral-100 dark:hover:bg-neutral-700"
+                            >
+                              <XCircle className="h-3.5 w-3.5" />
+                            </button>
+                          </>
+                        ) : (
+                          <>
+                            <button
+                              type="button"
+                              onClick={() => handleStartEditQuestion(q)}
+                              aria-label="Edit question"
+                              className="rounded p-1.5 text-neutral-500 transition hover:bg-neutral-100 dark:hover:bg-neutral-700"
+                            >
+                              <Pencil className="h-3.5 w-3.5" />
+                            </button>
+                            <button
+                              type="button"
+                              onClick={() => void handleRegenerateQuestion(q.id)}
+                              aria-label="Regenerate question"
+                              disabled={regeneratingQuestionId === q.id}
+                              className="rounded p-1.5 text-neutral-500 transition hover:bg-neutral-100 disabled:opacity-50 dark:hover:bg-neutral-700"
+                            >
+                              <RefreshCw
+                                className={`h-3.5 w-3.5 ${regeneratingQuestionId === q.id ? 'animate-spin' : ''}`}
+                              />
+                            </button>
+                            <button
+                              type="button"
+                              onClick={() => handleRemoveQuestion(q.id)}
+                              aria-label="Remove question"
+                              className="rounded p-1.5 text-neutral-500 transition hover:bg-red-50 hover:text-red-600 dark:hover:bg-red-950/40"
+                            >
+                              <Trash2 className="h-3.5 w-3.5" />
+                            </button>
+                          </>
+                        )}
+                      </div>
                     </div>
-                    <p className="mt-1 font-medium text-neutral-800 dark:text-neutral-200">{q.text}</p>
+                    {editingQuestionId === q.id ? (
+                      <textarea
+                        value={editingQuestionText}
+                        onChange={(e) => setEditingQuestionText(e.target.value)}
+                        aria-label="Question text"
+                        rows={2}
+                        className="mt-1 w-full rounded-md border border-blue-300 bg-white p-2 text-xs focus:border-blue-500 focus:outline-none dark:border-blue-700 dark:bg-neutral-900 dark:text-white"
+                      />
+                    ) : (
+                      <p className="mt-1 font-medium text-neutral-800 dark:text-neutral-200">{q.text}</p>
+                    )}
                     {q.expectedAnswerGuidelines && (
                       <p className="mt-1 text-[11px] text-neutral-500">
                         <span className="font-semibold">Rubric:</span> {q.expectedAnswerGuidelines}
