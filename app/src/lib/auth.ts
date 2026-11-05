@@ -38,8 +38,23 @@ export const DEFAULT_CANDIDATE: StoredUser = {
   avatar: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=120&auto=format&fit=crop&q=80',
 };
 
-function getStoredUsers(): StoredUser[] {
+export function getStoredUsers(): StoredUser[] {
   return load<StoredUser[]>(USERS_KEY, [DEFAULT_RECRUITER, DEFAULT_CANDIDATE]);
+}
+
+export function switchAccount(targetUserId: string): User {
+  const users = getStoredUsers();
+  const target = users.find((u) => u.id === targetUserId);
+  if (!target) throw new Error('Account not found');
+  const sessionUser: User = {
+    id: target.id,
+    name: target.name,
+    email: target.email,
+    role: target.role,
+    avatar: target.avatar,
+  };
+  setCurrentUser(sessionUser);
+  return sessionUser;
 }
 
 export function getCurrentUser(): User | null {

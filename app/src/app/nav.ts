@@ -1,19 +1,15 @@
+import React from 'react';
 import {
   Briefcase,
   Users,
-  Calendar,
-  BarChart3,
-  Sparkles,
-  UserCheck,
-  FolderKanban,
-  FileText,
   type LucideIcon,
 } from 'lucide-react';
+import { InterviewCalendar, AnalyticsChart, ResumeDocument, IntelligenceSpark, PortalUser, PipelineKanban } from '@/components/ui/CustomIcons';
 
 export interface NavItem {
   to: string;
   label: string;
-  icon: LucideIcon;
+  icon: LucideIcon | React.ComponentType<{ className?: string }>;
   roles: ('recruiter' | 'candidate')[];
   badge?: string;
 }
@@ -28,7 +24,7 @@ export const NAV_ITEMS: NavItem[] = [
   {
     to: '/pipeline',
     label: 'Pipeline & Matching',
-    icon: FolderKanban,
+    icon: PipelineKanban,
     roles: ['recruiter'],
   },
   {
@@ -40,31 +36,31 @@ export const NAV_ITEMS: NavItem[] = [
   {
     to: '/interviews',
     label: 'Interviews & Questions',
-    icon: Calendar,
+    icon: InterviewCalendar,
     roles: ['recruiter'],
   },
   {
     to: '/analytics',
     label: 'Talent Analytics',
-    icon: BarChart3,
+    icon: AnalyticsChart,
     roles: ['recruiter'],
   },
   {
     to: '/resumes',
     label: 'Resume Intake',
-    icon: FileText,
+    icon: ResumeDocument,
     roles: ['recruiter'],
   },
   {
     to: '/intelligence',
     label: 'Talent Intelligence',
-    icon: Sparkles,
+    icon: IntelligenceSpark,
     roles: ['recruiter'],
   },
   {
     to: '/portal',
     label: 'Candidate Portal',
-    icon: UserCheck,
+    icon: PortalUser,
     roles: ['candidate', 'recruiter'],
   },
 ];

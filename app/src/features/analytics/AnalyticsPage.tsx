@@ -167,7 +167,7 @@ export default function AnalyticsPage() {
             </div>
           </div>
           <div className="mt-3 text-2xl font-bold text-neutral-900 dark:text-white">{totalApps}</div>
-          <span className="text-xs text-emerald-600 font-medium">In pipeline scope</span>
+          <span className="text-xs text-emerald-700 font-medium">In pipeline scope</span>
         </Card>
 
         <Card className="p-5">
