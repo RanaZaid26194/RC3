@@ -6,6 +6,7 @@ import { Modal } from '@/components/ui/Modal';
 import { ResumeUploader } from '@/features/resumes/ResumeUploader';
 import { load, save, uid } from '@/lib/storage';
 import { getCurrentUser, DEFAULT_CANDIDATE } from '@/lib/auth';
+import { calculateCandidateMatch } from '@/lib/ai/matcher';
 import type { Job, Application, CandidateProfile } from '@/types';
 
 export default function CandidatePortalPage() {
@@ -34,15 +35,18 @@ export default function CandidatePortalPage() {
       return;
     }
 
+    const match = myProfile ? calculateCandidateMatch(job, myProfile) : undefined;
     const newApp: Application = {
       id: uid('app'),
       jobId: job.id,
       candidateId: myProfile?.id || uid('cand'),
       candidateName: myProfile?.name || user.name,
-      candidateEmail: user.email,
+      candidateEmail: myProfile?.email || user.email,
       status: 'Submitted',
       appliedAt: new Date().toISOString(),
       updatedAt: new Date().toISOString(),
+      matchScore: match?.totalScore,
+      scoreBreakdown: match,
       notes: [],
       auditTrail: [
         {

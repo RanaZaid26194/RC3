@@ -113,3 +113,22 @@ Defined in `app/src/styles/index.css` + `app/src/components/ui/Motion.tsx`:
 ### UI/UX asks for Zaid
 - (none pending — motion + shell nav fix complete)
 
+---
+
+## 7. HARDENING PASS (Zaid — latest)
+
+Pull `main` before touching any of these files; they were fixed against real judge flows:
+
+- `lib/resumeText.ts` (**new**): dependency-free PDF (FlateDecode + Tj/TJ) and DOCX (ZIP + `word/document.xml`) text extraction, fully offline.
+- `features/resumes/ResumeUploader.tsx`: real parsing (no mock profiles, no fabricated emails/phones), skill alias normalization, location + education cleanup, drag-and-drop, keyboard activation, 5 MB/format validation, "no readable text" error for scanned PDFs.
+- `features/resumes/ResumeIntakePage.tsx` (**new**) + route `/resumes`: uploader now saves parsed candidates to the candidate pool and persists. Old `ResumeUploadPage.tsx` mock was deleted; `ResumesPage.tsx` is unused legacy (safe to remove later).
+- `features/candidate-portal/CandidatePortalPage.tsx`: 1-Click Apply now stores `matchScore` + `scoreBreakdown` and uses the profile email (was leaving pipeline cards unscored).
+- `features/pipeline/PipelinePage.tsx`: cards compute a live score/breakdown when an application has no stored one instead of showing a fake `75%`; shows "Unscored" only when impossible.
+- `features/interviews/InterviewsPage.tsx`: fixed modal candidate/job state initialising empty (Generate Questions / Confirm Schedule were dead buttons on fresh mounts); active-id fallback now used. Overlap-based conflict detection retained.
+- `features/analytics/AnalyticsPage.tsx`: funnel is now monotonic by stage rank (was 60% → 80% drops); completed interviews count toward the funnel; export button reports "Report Downloaded".
+- `features/intelligence/IntelligencePage.tsx`: merge now repoints applications from the discarded profile to the kept one.
+- `features/intelligence/CandidateComparisonModal.tsx`: prefers stored per-application breakdowns so comparisons match pipeline/analytics scores.
+
+Verification: `scripts/smoke.mjs` extended to 15 journeys (job AI extract, resume TXT intake, pipeline advance + audit, review shortlist, overlap conflict, portal apply scoring, export download, NL search + blind mode, 375px overflow). Latest run 15/15 PASS. `node scripts/audit.mjs` → **0 critical / 0 high / 0 medium** (lows are dense-dashboard 11px labels).
+
+

@@ -11,7 +11,8 @@ import { Card } from '@/components/ui/Card';
 import { Modal } from '@/components/ui/Modal';
 import { Input } from '@/components/ui/Input';
 import { load, save } from '@/lib/storage';
-import type { Job, Application, PipelineStatus, AuditLogEntry } from '@/types';
+import { calculateCandidateMatch } from '@/lib/ai/matcher';
+import type { Job, Application, CandidateProfile, PipelineStatus, AuditLogEntry } from '@/types';
 
 const PIPELINE_COLUMNS: { status: PipelineStatus; label: string; color: string }[] = [
   { status: 'Submitted', label: '1. Submitted', color: 'border-neutral-300' },
@@ -29,6 +30,7 @@ export default function PipelinePage() {
   const filterJobId = searchParams.get('jobId') || '';
 
   const jobs = load<Job[]>('jobs', []);
+  const candidates = load<CandidateProfile[]>('candidates', []);
   const [applications, setApplications] = useState<Application[]>(load<Application[]>('applications', []));
   const [selectedJobId, setSelectedJobId] = useState<string>(filterJobId || (jobs[0]?.id ?? ''));
 
@@ -200,7 +202,15 @@ export default function PipelinePage() {
                   </div>
                 ) : (
                   colApps.map((app) => {
-                    const score = app.recruiterOverrideScore ?? app.matchScore ?? 75;
+                    const job = jobs.find((j) => j.id === app.jobId);
+                    const candidate =
+                      candidates.find((c) => c.id === app.candidateId) ??
+                      candidates.find((c) => c.email.toLowerCase() === app.candidateEmail.toLowerCase());
+                    const liveMatch = !app.scoreBreakdown && job && candidate
+                      ? calculateCandidateMatch(job, candidate)
+                      : undefined;
+                    const breakdown = app.scoreBreakdown ?? liveMatch;
+                    const score = app.recruiterOverrideScore ?? app.matchScore ?? liveMatch?.totalScore;
                     const next = getNextStage(app.status);
 
                     return (
@@ -217,18 +227,20 @@ export default function PipelinePage() {
                           </div>
                           <span
                             className={`rounded-full px-2 py-0.5 text-[11px] font-black ${
-                              score >= 85
-                                ? 'bg-emerald-100 text-emerald-800 dark:bg-emerald-950/60 dark:text-emerald-300'
-                                : 'bg-blue-100 text-blue-800 dark:bg-blue-950/60 dark:text-blue-300'
+                              score === undefined
+                                ? 'bg-neutral-100 text-neutral-600 dark:bg-neutral-800 dark:text-neutral-400'
+                                : score >= 85
+                                  ? 'bg-emerald-100 text-emerald-800 dark:bg-emerald-950/60 dark:text-emerald-300'
+                                  : 'bg-blue-100 text-blue-800 dark:bg-blue-950/60 dark:text-blue-300'
                             }`}
                           >
-                            {score}%
+                            {score !== undefined ? `${score}%` : 'Unscored'}
                           </span>
                         </div>
 
-                        {app.scoreBreakdown?.matchedSkills && app.scoreBreakdown.matchedSkills.length > 0 && (
+                        {breakdown?.matchedSkills && breakdown.matchedSkills.length > 0 && (
                           <div className="flex flex-wrap gap-1">
-                            {app.scoreBreakdown.matchedSkills.slice(0, 3).map((item) => (
+                            {breakdown.matchedSkills.slice(0, 3).map((item) => (
                               <span
                                 key={item.skill}
                                 className="rounded bg-neutral-100 px-1.5 py-0.5 text-[10px] text-neutral-600 dark:bg-neutral-800 dark:text-neutral-400"

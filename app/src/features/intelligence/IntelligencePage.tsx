@@ -17,8 +17,39 @@ import { Card } from '@/components/ui/Card';
 import { Input } from '@/components/ui/Input';
 import { Modal } from '@/components/ui/Modal';
 import { load, save } from '@/lib/storage';
+import { SKILL_SYNONYMS } from '@/lib/ai/matcher';
 import { CandidateComparisonModal } from './CandidateComparisonModal';
-import type { CandidateProfile, Job } from '@/types';
+import type { CandidateProfile, Job, Application } from '@/types';
+
+const QUERY_STOP_WORDS = new Set([
+  'with', 'and', 'for', 'the', 'a', 'an', 'of', 'in', 'on', 'using', 'who', 'has', 'have', 'are', 'is', 'to',
+  'senior', 'junior', 'engineer', 'engineers', 'developer', 'developers', 'experience', 'years', 'strong', 'plus', 'or',
+]);
+
+// Resolve a query word to a canonical skill so "containerization" finds "Docker".
+const canonicalSkill = (term: string): string | null => {
+  if (SKILL_SYNONYMS[term]) return term;
+  return Object.keys(SKILL_SYNONYMS).find((skill) => SKILL_SYNONYMS[skill].includes(term)) || null;
+};
+
+const termVariants = (term: string): string[] => {
+  const canonical = canonicalSkill(term);
+  const variants = new Set<string>([term]);
+  if (canonical) {
+    variants.add(canonical);
+    SKILL_SYNONYMS[canonical].forEach((synonym) => {
+      // Skip synonyms that are themselves a different primary skill (e.g. django -> python).
+      if (!SKILL_SYNONYMS[synonym] || synonym === canonical) variants.add(synonym);
+    });
+  }
+  return [...variants];
+};
+
+const matchesTerm = (text: string, term: string) =>
+  termVariants(term).some((variant) => {
+    const escaped = variant.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+    return new RegExp(`(^|[^a-z0-9+#.])${escaped}([^a-z0-9+#.]|$)`, 'i').test(text);
+  });
 
 export default function IntelligencePage() {
   const [candidates, setCandidates] = useState<CandidateProfile[]>(() => load<CandidateProfile[]>('candidates', []));
@@ -37,33 +68,44 @@ export default function IntelligencePage() {
 
   const targetJob = jobs.find((j) => j.id === targetJobId) || jobs[0];
 
-  // Semantic query matching
-  const matched = candidates.filter((c) => {
-    // Experience Filter
-    if (selectedExpFilter === 'junior' && c.experienceYears > 2) return false;
-    if (selectedExpFilter === 'mid' && (c.experienceYears < 2 || c.experienceYears > 4)) return false;
-    if (selectedExpFilter === 'senior' && c.experienceYears < 4) return false;
+  // Semantic query matching — rank candidates by how many query concepts they satisfy
+  const searchTerms = submittedQuery.trim()
+    ? submittedQuery
+        .toLowerCase()
+        .replace(/[()]/g, ' ')
+        .split(/\s+/)
+        .filter((word) => word.length > 1 && !QUERY_STOP_WORDS.has(word))
+    : [];
 
-    if (!submittedQuery.trim()) return true;
+  const scoredCandidates = candidates
+    .map((candidate) => {
+      const text = (
+        candidate.skills.join(' ') +
+        ' ' +
+        candidate.summary +
+        ' ' +
+        (candidate.rawResumeText || '') +
+        ' ' +
+        candidate.projects.map((project) => project.name + ' ' + project.description).join(' ')
+      ).toLowerCase();
+      const hits = searchTerms.filter((term) => matchesTerm(text, term)).length;
+      return {
+        candidate,
+        hits,
+        score: searchTerms.length > 0 ? Math.round((hits / searchTerms.length) * 100) : 100,
+      };
+    })
+    .filter(({ candidate, hits }) => {
+      if (selectedExpFilter === 'junior' && candidate.experienceYears > 2) return false;
+      if (selectedExpFilter === 'mid' && (candidate.experienceYears < 2 || candidate.experienceYears > 4)) return false;
+      if (selectedExpFilter === 'senior' && candidate.experienceYears < 4) return false;
+      if (searchTerms.length === 0) return true;
+      return hits > 0 && hits / searchTerms.length >= 0.5;
+    })
+    .sort((a, b) => b.score - a.score || b.candidate.experienceYears - a.candidate.experienceYears);
 
-    const text = (
-      c.skills.join(' ') +
-      ' ' +
-      c.summary +
-      ' ' +
-      (c.rawResumeText || '') +
-      ' ' +
-      c.projects.map((p) => p.name + ' ' + p.description).join(' ')
-    ).toLowerCase();
-
-    const qWords = submittedQuery
-      .toLowerCase()
-      .split(' ')
-      .filter((w) => w.length > 2 && !['with', 'and', 'for', 'the', 'developer', 'developers', 'experience'].includes(w));
-
-    if (qWords.length === 0) return true;
-    return qWords.some((w) => text.includes(w));
-  });
+  const matched = scoredCandidates.map(({ candidate }) => candidate);
+  const scoreById = Object.fromEntries(scoredCandidates.map(({ candidate, score }) => [candidate.id, score]));
 
   const toggleCompareCandidate = (id: string) => {
     if (selectedCandidatesForCompare.includes(id)) {
@@ -106,6 +148,16 @@ export default function IntelligencePage() {
     const nextCandidates = [merged, ...candidates.filter((candidate) => candidate.id !== discard.id && candidate.id !== keep.id)];
     setCandidates(nextCandidates);
     save('candidates', nextCandidates);
+
+    const apps = load<Application[]>('applications', []);
+    save(
+      'applications',
+      apps.map((app) => (
+        app.candidateId === discard.id
+          ? { ...app, candidateId: merged.id, candidateName: merged.name, candidateEmail: merged.email }
+          : app
+      )),
+    );
     setMergePair(null);
   };
 
@@ -194,7 +246,10 @@ export default function IntelligencePage() {
               <button
                 key={suggestion}
                 type="button"
-                onClick={() => setQuery(suggestion)}
+                onClick={() => {
+                  setQuery(suggestion);
+                  setSubmittedQuery(suggestion);
+                }}
                 className="rounded-md bg-neutral-100 px-2.5 py-1 text-neutral-700 hover:bg-neutral-200 dark:bg-neutral-800 dark:text-neutral-300 transition"
               >
                 "{suggestion}"
@@ -309,7 +364,8 @@ export default function IntelligencePage() {
 
                 <div className="border-t border-neutral-100 pt-3 flex items-center justify-between text-xs dark:border-neutral-800">
                   <span className="text-[11px] font-medium text-emerald-700 dark:text-emerald-400 flex items-center gap-1">
-                    <CheckCircle className="h-3 w-3" /> Semantic Match
+                    <CheckCircle className="h-3 w-3" />
+                    {searchTerms.length === 0 ? 'Semantic match' : `${scoreById[cand.id]}% concept match`}
                   </span>
                   <span className="text-[11px] text-neutral-600 dark:text-neutral-400">
                     ID: {cand.id}

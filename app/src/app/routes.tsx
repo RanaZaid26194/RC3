@@ -7,7 +7,7 @@ import InterviewsPage from '@/features/interviews/InterviewsPage';
 import AnalyticsPage from '@/features/analytics/AnalyticsPage';
 import IntelligencePage from '@/features/intelligence/IntelligencePage';
 import CandidatePortalPage from '@/features/candidate-portal/CandidatePortalPage';
-import ResumeUploadPage from '@/features/resumes/ResumeUploadPage';
+import ResumeIntakePage from '@/features/resumes/ResumeIntakePage';
 import Settings from '@/pages/Settings';
 import NotFound from '@/pages/NotFound';
 import LoginPage from '@/pages/LoginPage';
@@ -89,7 +89,7 @@ export function AppRoutes() {
         path="/resumes"
         element={
           <ProtectedRoute allowedRoles={['recruiter']}>
-            <ResumeUploadPage />
+            <ResumeIntakePage />
           </ProtectedRoute>
         }
       />
