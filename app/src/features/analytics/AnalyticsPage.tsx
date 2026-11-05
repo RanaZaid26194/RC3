@@ -115,7 +115,7 @@ export default function AnalyticsPage() {
   };
 
   return (
-    <div className="space-y-6">
+    <div className="w-full min-w-0 space-y-6">
       {/* Page Header */}
       <div className="flex flex-col justify-between gap-4 sm:flex-row sm:items-center">
         <div>
@@ -128,7 +128,7 @@ export default function AnalyticsPage() {
         </div>
         <div className="flex items-center gap-3">
           <select
-            aria-label="Filter analytics by vacancy"
+            aria-label="Filter Analytics by Vacancy"
             value={selectedJobId}
             onChange={(e) => setSelectedJobId(e.target.value)}
             className="rounded-lg border border-neutral-300 bg-white px-3 py-1.5 text-xs font-medium text-neutral-700 dark:border-neutral-700 dark:bg-neutral-900 dark:text-neutral-200"
@@ -156,7 +156,7 @@ export default function AnalyticsPage() {
             </div>
           </div>
           <div className="mt-3 text-2xl font-bold text-neutral-900 dark:text-white">{activeJobs}</div>
-          <span className="text-xs text-neutral-500">{totalJobs} total published</span>
+          <span className="text-xs text-neutral-600 dark:text-neutral-400">{totalJobs} total published</span>
         </Card>
 
         <Card className="p-5">
@@ -167,7 +167,7 @@ export default function AnalyticsPage() {
             </div>
           </div>
           <div className="mt-3 text-2xl font-bold text-neutral-900 dark:text-white">{totalApps}</div>
-          <span className="text-xs text-emerald-700 font-medium">In pipeline scope</span>
+          <span className="text-xs text-emerald-600 font-medium">In pipeline scope</span>
         </Card>
 
         <Card className="p-5">
@@ -178,7 +178,7 @@ export default function AnalyticsPage() {
             </div>
           </div>
           <div className="mt-3 text-2xl font-bold text-neutral-900 dark:text-white">{conversionRate}%</div>
-          <span className="text-xs text-neutral-500">{shortlistedCount} advanced to final rounds</span>
+          <span className="text-xs text-neutral-600 dark:text-neutral-400">{shortlistedCount} advanced to final rounds</span>
         </Card>
 
         <Card className="p-5">
@@ -189,7 +189,7 @@ export default function AnalyticsPage() {
             </div>
           </div>
           <div className="mt-3 text-2xl font-bold text-neutral-900 dark:text-white">{avgScore}%</div>
-          <span className="text-xs text-neutral-500">Avg. cycle: {averageProcessingDays} days</span>
+          <span className="text-xs text-neutral-600 dark:text-neutral-400">Avg. cycle: {averageProcessingDays} days</span>
         </Card>
       </div>
 

@@ -154,7 +154,7 @@ export default function CandidateReviewPage() {
   };
 
   return (
-    <div className="space-y-6">
+    <div className="w-full min-w-0 space-y-6">
       <div className="flex flex-col justify-between gap-4 sm:flex-row sm:items-center">
         <div>
           <h1 className="font-display text-2xl font-bold tracking-tight text-neutral-900 dark:text-white">
@@ -165,7 +165,7 @@ export default function CandidateReviewPage() {
           </p>
         </div>
 
-        <div className="flex items-center gap-2">
+        <div className="flex flex-wrap items-center gap-2">
           <Button
             size="sm"
             variant="outline"
@@ -174,9 +174,12 @@ export default function CandidateReviewPage() {
           >
             Compare Side-by-Side
           </Button>
-          <span className="text-xs font-semibold uppercase tracking-wider text-neutral-500">Vacancy:</span>
+          <label htmlFor="matching-vacancy-select" className="text-xs font-semibold uppercase tracking-wider text-neutral-500">
+            Vacancy:
+          </label>
           <select
-            aria-label="Select vacancy for candidate review"
+            id="matching-vacancy-select"
+            aria-label="Filter Vacancy"
             value={selectedJobId}
             onChange={(e) => setSelectedJobId(e.target.value)}
             className="rounded-lg border border-neutral-300 bg-white px-3 py-2 text-xs font-medium dark:border-neutral-700 dark:bg-neutral-900 dark:text-white"
@@ -268,7 +271,7 @@ export default function CandidateReviewPage() {
                     </p>
 
                     <div className="flex flex-wrap items-center gap-1.5 pt-1 text-xs">
-                      <span className="text-[11px] font-semibold text-neutral-500">Skills Evidence:</span>
+                      <span className="text-[11px] font-semibold text-neutral-600 dark:text-neutral-400">Skills Evidence:</span>
                       {breakdown?.matchedSkills.map((m) => (
                         <span
                           key={m.skill}
@@ -304,20 +307,20 @@ export default function CandidateReviewPage() {
                   <div className="flex flex-col items-end gap-3 shrink-0">
                     <div className="text-right">
                       <div className="flex items-center justify-end gap-1.5">
-                        <span className="text-[11px] font-semibold uppercase text-neutral-500">Job Relevance:</span>
+                        <span className="text-[11px] font-semibold uppercase text-neutral-600 dark:text-neutral-400">Job Relevance:</span>
                         <span
                           className={`text-2xl font-black ${
                             isTopMatch
                               ? 'text-emerald-700 dark:text-emerald-400'
                               : isMediumMatch
-                              ? 'text-blue-600 dark:text-blue-400'
-                              : 'text-neutral-500'
+                              ? 'text-blue-700 dark:text-blue-400'
+                              : 'text-neutral-600'
                           }`}
                         >
                           {score}%
                         </span>
                       </div>
-                      <span className="text-[10px] text-neutral-500">
+                      <span className="text-[10px] text-neutral-600 dark:text-neutral-400">
                         Skills (50%) + Exp (25%) + Proj (15%) + Edu (10%)
                       </span>
                     </div>
@@ -381,32 +384,32 @@ export default function CandidateReviewPage() {
                 <span className="text-xs font-bold uppercase tracking-wider text-neutral-600 dark:text-neutral-300">
                   Weighted Score Components (Total: {selectedApp.matchScore ?? 0}/100)
                 </span>
-                <span className="flex items-center gap-1 text-[11px] font-semibold text-emerald-700">
+                <span className="flex items-center gap-1 text-[11px] font-semibold text-emerald-600">
                   <Shield className="h-3.5 w-3.5" /> Bias Safeguards Passed
                 </span>
               </div>
 
               <div className="grid grid-cols-2 gap-3 sm:grid-cols-4 text-xs">
                 <div className="rounded bg-white p-2.5 shadow-sm dark:bg-neutral-900">
-                  <span className="text-neutral-500">Skills (50% max)</span>
+                  <span className="text-neutral-600 dark:text-neutral-400">Skills (50% max)</span>
                   <div className="text-lg font-bold text-neutral-900 dark:text-white">
                     {selectedApp.scoreBreakdown?.skillsScore ?? 45} / 50
                   </div>
                 </div>
                 <div className="rounded bg-white p-2.5 shadow-sm dark:bg-neutral-900">
-                  <span className="text-neutral-500">Experience (25% max)</span>
+                  <span className="text-neutral-600 dark:text-neutral-400">Experience (25% max)</span>
                   <div className="text-lg font-bold text-neutral-900 dark:text-white">
                     {selectedApp.scoreBreakdown?.experienceScore ?? 23} / 25
                   </div>
                 </div>
                 <div className="rounded bg-white p-2.5 shadow-sm dark:bg-neutral-900">
-                  <span className="text-neutral-500">Projects (15% max)</span>
+                  <span className="text-neutral-600 dark:text-neutral-400">Projects (15% max)</span>
                   <div className="text-lg font-bold text-neutral-900 dark:text-white">
                     {selectedApp.scoreBreakdown?.projectScore ?? 13} / 15
                   </div>
                 </div>
                 <div className="rounded bg-white p-2.5 shadow-sm dark:bg-neutral-900">
-                  <span className="text-neutral-500">Degree (10% max)</span>
+                  <span className="text-neutral-600 dark:text-neutral-400">Degree (10% max)</span>
                   <div className="text-lg font-bold text-neutral-900 dark:text-white">
                     {selectedApp.scoreBreakdown?.qualificationScore ?? 8} / 10
                   </div>

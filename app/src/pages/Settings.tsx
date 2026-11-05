@@ -209,8 +209,8 @@ export default function Settings() {
         </div>
 
         <div className="flex items-center justify-between pt-1">
-          <p className="text-[11px] text-neutral-400">
-            Keys can also be configured in <code className="text-neutral-500 font-mono">app/.env</code>.
+          <p className="text-[11px] text-neutral-600 dark:text-neutral-400">
+            Keys can also be configured in <code className="text-neutral-700 dark:text-neutral-300 font-mono">app/.env</code>.
           </p>
           <div className="flex items-center gap-2">
             <Button size="sm" onClick={handleSaveGroq} className="text-xs">
@@ -315,7 +315,7 @@ export default function Settings() {
         </div>
 
         <div className="flex items-center justify-between pt-1">
-          <p className="text-[11px] text-neutral-400">
+          <p className="text-[11px] text-neutral-600 dark:text-neutral-400">
             Stored locally in browser. If not provided or offline, RecruLens uses embedded semantic scoring heuristics.
           </p>
           <div className="flex items-center gap-2">

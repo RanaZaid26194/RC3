@@ -175,6 +175,7 @@ Education: Bachelor of Science in Computer Science.`;
           <input
             type="file"
             ref={fileInputRef}
+            aria-label="Upload resume document"
             onChange={handleFileSelect}
             accept=".pdf,.txt,.docx"
             className="hidden"

@@ -141,7 +141,14 @@ export default function ResumesPage() {
             <h2 className="font-semibold text-neutral-900 dark:text-white">Add a resume</h2>
             <p className="mt-1 text-xs text-neutral-500">PDF, TXT, or Markdown up to 5 MB. Parsing stays in this browser.</p>
           </div>
-          <input ref={inputRef} className="sr-only" type="file" accept=".pdf,.txt,.md,application/pdf,text/plain,text/markdown" onChange={(event) => void handleFile(event.target.files?.[0])} />
+          <input
+            ref={inputRef}
+            aria-label="Upload resume file"
+            className="sr-only"
+            type="file"
+            accept=".pdf,.txt,.md,application/pdf,text/plain,text/markdown"
+            onChange={(event) => void handleFile(event.target.files?.[0])}
+          />
           <Button type="button" onClick={() => inputRef.current?.click()} loading={isParsing} className="gap-2"><Upload className="h-4 w-4" /> Choose resume</Button>
           {selectedFile && <p className="text-xs text-neutral-500">Selected: {selectedFile}</p>}
         </div>
