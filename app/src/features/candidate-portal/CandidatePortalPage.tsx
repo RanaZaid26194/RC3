@@ -5,11 +5,11 @@ import { Card } from '@/components/ui/Card';
 import { Modal } from '@/components/ui/Modal';
 import { ResumeUploader } from '@/features/resumes/ResumeUploader';
 import { load, save, uid } from '@/lib/storage';
-import { getCurrentUser } from '@/lib/auth';
+import { getCurrentUser, DEFAULT_CANDIDATE } from '@/lib/auth';
 import type { Job, Application, CandidateProfile } from '@/types';
 
 export default function CandidatePortalPage() {
-  const user = getCurrentUser();
+  const user = getCurrentUser() || DEFAULT_CANDIDATE;
   const jobs = load<Job[]>('jobs', []).filter((j) => j.status === 'open');
   const [applications, setApplications] = useState<Application[]>(load<Application[]>('applications', []));
   const [candidates, setCandidates] = useState<CandidateProfile[]>(load<CandidateProfile[]>('candidates', []));
