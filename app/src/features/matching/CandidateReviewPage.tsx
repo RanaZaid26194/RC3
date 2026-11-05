@@ -176,6 +176,7 @@ export default function CandidateReviewPage() {
           </Button>
           <span className="text-xs font-semibold uppercase tracking-wider text-neutral-500">Vacancy:</span>
           <select
+            aria-label="Select vacancy for candidate review"
             value={selectedJobId}
             onChange={(e) => setSelectedJobId(e.target.value)}
             className="rounded-lg border border-neutral-300 bg-white px-3 py-2 text-xs font-medium dark:border-neutral-700 dark:bg-neutral-900 dark:text-white"

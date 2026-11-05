@@ -158,6 +158,7 @@ export default function PipelinePage() {
         <div className="flex items-center gap-3">
           <span className="text-xs font-semibold uppercase tracking-wider text-neutral-500">Filter Role:</span>
           <select
+            aria-label="Filter pipeline by role"
             value={selectedJobId}
             onChange={(e) => setSelectedJobId(e.target.value)}
             className="rounded-lg border border-neutral-300 bg-white px-3 py-2 text-xs font-medium dark:border-neutral-700 dark:bg-neutral-900 dark:text-white"

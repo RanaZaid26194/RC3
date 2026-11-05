@@ -244,6 +244,7 @@ export default function InterviewsPage() {
         <div className="relative w-full sm:w-72">
           <Search className="absolute left-3 top-2.5 h-4 w-4 text-neutral-400" />
           <Input
+            aria-label="Search interviews"
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
             placeholder="Search candidate, role, or interviewer..."
