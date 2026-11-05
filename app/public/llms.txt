@@ -1,0 +1,30 @@
+# RecruLens — Explainable Talent Intelligence & Semantic Candidate Matching
+
+> RecruLens is an enterprise AI recruitment intelligence platform designed to eliminate keyword-only filtering and replace black-box scoring with mathematically explainable, evidence-backed matching (50% skills, 25% experience, 15% projects, 10% qualifications).
+
+## System Information
+- Canonical URL: https://recrulens.vercel.app
+- Stack: Vite, React 18, TypeScript, Tailwind CSS v4, Lucide Icons, Fontsource (Inter & Fraunces)
+- AI Engine: Hybrid Orchestrator prioritizing Groq LPU (llama-3.3-70b-versatile) for sub-second inference, Google Gemini (gemini-3.6-flash) for reasoning, and deterministic local NLP for 100% offline fallback.
+- Primary Features:
+  - Explainable Candidate Matching: Transparent scoring formula with verified resume quotes and missing vs confirmed absent skill flags.
+  - Interactive 7-Stage Pipeline Kanban: Submitted -> Parsed -> AI Assessed -> Recruiter Review -> Shortlisted -> Interview -> Selected.
+  - Calendar Conflict Detection: Real-time schedule overlap detection for technical interviewers.
+  - 3-Tier Technical Question Kit: Beginner, Intermediate, and Advanced questions anchored to verified candidate projects with grading rubrics.
+  - Applicant Skill Deficit Diagnostics: Dynamic aggregate gap analysis across active candidate pools.
+  - Blind Evaluation Mode: 1-click demographic trait masking (name, photo, location, age) to ensure bias-free talent review.
+  - Multi-Candidate Side-by-Side Comparison: Direct comparison matrix across skills, experience, and learning recommendations.
+  - Candidate Self-Service Portal: Vacancy browsing, 1-click application submission, and live status tracking.
+
+## Core Application Routes
+- /#/jobs: Active vacancies and requirement weightings
+- /#/jobs/new: Job creation with 1-click AI requirement extractor
+- /#/pipeline: 7-stage interactive hiring Kanban and audit trail
+- /#/candidates: Ranked candidate matching with explainable score drawer
+- /#/interviews: Interview schedule calendar with collision warnings and AI question kits
+- /#/analytics: Talent conversion funnel, average cycle duration, and skill deficits
+- /#/resumes: Offline PDF resume intake and entity parser
+- /#/intelligence: Natural language semantic search and side-by-side comparison
+- /#/portal: Candidate application portal and live progression tracker
+- /#/login: Role-based authentication (Recruiter vs Candidate)
+- /#/settings: API key management (Groq / Gemini) and demo data reset
