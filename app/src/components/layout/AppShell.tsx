@@ -1,5 +1,5 @@
 import { useState, useEffect, type ReactNode } from 'react';
-import { NavLink, useNavigate, useLocation, Navigate } from 'react-router-dom';
+import { NavLink, useNavigate, useLocation } from 'react-router-dom';
 import { Menu, X, UserCheck, ShieldCheck, RefreshCw, LogOut } from 'lucide-react';
 import { cn } from '@/lib/cn';
 import { Button } from '../ui/Button';
@@ -15,6 +15,7 @@ export function AppShell({ children }: { children: ReactNode }) {
   const [open, setOpen] = useState(false);
   const [showAccountModal, setShowAccountModal] = useState(false);
   const [user, setUser] = useState(getCurrentUser());
+  const activeUser = user ?? getCurrentUser();
   const navigate = useNavigate();
   const location = useLocation();
 
@@ -22,6 +23,12 @@ export function AppShell({ children }: { children: ReactNode }) {
   useEffect(() => {
     setUser(getCurrentUser());
   }, [location.pathname]);
+
+  useEffect(() => {
+    if (!activeUser && location.pathname !== '/login' && location.pathname !== '/register') {
+      navigate('/login', { replace: true });
+    }
+  }, [activeUser, location.pathname, navigate]);
 
   // Auth pages render without shell sidebar
   if (location.pathname === '/login' || location.pathname === '/register') {
@@ -33,8 +40,8 @@ export function AppShell({ children }: { children: ReactNode }) {
   }
 
   // Not logged in -> redirect to login
-  if (!user) {
-    return <Navigate to="/login" replace />;
+  if (!activeUser) {
+    return null;
   }
 
   const handleSwitchAccount = (targetUser: StoredUser) => {
@@ -61,7 +68,7 @@ export function AppShell({ children }: { children: ReactNode }) {
     }
   };
 
-  const visibleNav = NAV_ITEMS.filter((item) => item.roles.includes(user.role));
+  const visibleNav = NAV_ITEMS.filter((item) => item.roles.includes(activeUser.role));
 
   const link = ({ isActive }: { isActive: boolean }) =>
     cn(
@@ -130,11 +137,11 @@ export function AppShell({ children }: { children: ReactNode }) {
           <div className="mb-4 rounded-xl border border-neutral-200 bg-neutral-50/80 p-3 dark:border-neutral-800 dark:bg-neutral-800/60">
             <div className="flex items-center justify-between">
               <span className={`inline-flex items-center gap-1.5 rounded-full px-2 py-0.5 text-[10px] font-bold uppercase tracking-wider ${
-                user.role === 'recruiter'
+                activeUser.role === 'recruiter'
                   ? 'bg-blue-100 text-blue-700 dark:bg-blue-950/60 dark:text-blue-300'
                   : 'bg-emerald-100 text-emerald-700 dark:bg-emerald-950/60 dark:text-emerald-300'
               }`}>
-                {user.role === 'recruiter' ? (
+                {activeUser.role === 'recruiter' ? (
                   <>
                     <ShieldCheck className="h-3 w-3" /> Recruiter
                   </>
@@ -153,8 +160,8 @@ export function AppShell({ children }: { children: ReactNode }) {
               </button>
             </div>
             <div className="mt-2">
-              <p className="text-xs font-semibold text-neutral-900 dark:text-white truncate">{user.name}</p>
-              <p className="text-[11px] text-neutral-500 truncate">{user.email}</p>
+              <p className="text-xs font-semibold text-neutral-900 dark:text-white truncate">{activeUser.name}</p>
+              <p className="text-[11px] text-neutral-500 truncate">{activeUser.email}</p>
             </div>
           </div>
 
@@ -247,7 +254,7 @@ export function AppShell({ children }: { children: ReactNode }) {
 
             <div className="space-y-2">
               {getStoredUsers().map((acc) => {
-                const isCurrent = acc.email === user.email;
+                const isCurrent = acc.email === activeUser.email;
                 return (
                   <div
                     key={acc.id}
