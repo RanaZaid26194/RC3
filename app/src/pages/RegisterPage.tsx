@@ -95,28 +95,14 @@ export default function RegisterPage() {
 
   return (
     <div className="relative flex min-h-screen items-center justify-center overflow-hidden bg-neutral-50 px-4 py-12 dark:bg-neutral-950">
-      {/* Ambient brand backdrop */}
-      <div className="pointer-events-none absolute inset-0" aria-hidden="true">
-        <div className="aurora-blob -left-24 top-[-80px] h-80 w-80 bg-brand-300/40 dark:bg-brand-800/25" />
-        <div
-          className="aurora-blob right-[-60px] top-1/3 h-72 w-72 bg-accent-500/25 dark:bg-accent-500/10"
-          style={{ animationDelay: '-5s' }}
-        />
-        <div
-          className="aurora-blob bottom-[-100px] left-1/3 h-72 w-72 bg-brand-400/25 dark:bg-brand-900/30"
-          style={{ animationDelay: '-9s' }}
-        />
-        <div className="absolute inset-0 bg-[radial-gradient(circle_at_50%_0%,rgba(255,255,255,0.7),transparent_60%)] dark:bg-[radial-gradient(circle_at_50%_0%,rgba(15,23,42,0.6),transparent_60%)]" />
-      </div>
-
       <div className="relative w-full max-w-lg space-y-6 animate-fade-up">
         {/* Brand Header */}
         <div className="text-center space-y-2">
-          <div className="mx-auto flex h-12 w-12 items-center justify-center rounded-xl bg-gradient-to-br from-brand-500 to-brand-700 text-white shadow-lg shadow-brand-600/30 animate-float">
+          <div className="mx-auto flex h-12 w-12 items-center justify-center rounded-xl bg-brand-700 text-white shadow-md">
             <Sparkles className="h-6 w-6" />
           </div>
           <h1 className="font-display text-2xl font-bold tracking-tight text-neutral-900 dark:text-white">
-            Create your <span className="animate-gradient-text">RecruLens</span> account
+            Create your <span className="text-brand-700 dark:text-brand-300">RecruLens</span> account
           </h1>
           <p className="text-xs text-neutral-500 dark:text-neutral-400">
             Join thousands of talent teams and candidates on the explainable hiring platform

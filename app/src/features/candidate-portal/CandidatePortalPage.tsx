@@ -81,7 +81,7 @@ export default function CandidatePortalPage() {
   return (
     <div className="space-y-6">
       {/* Hero Welcome */}
-      <div className="rounded-xl border border-blue-200 bg-gradient-to-r from-blue-50 to-indigo-50 p-6 dark:border-blue-900/50 dark:from-blue-950/20 dark:to-indigo-950/20">
+      <div className="rounded-xl border border-brand-200 bg-brand-50 p-6 dark:border-brand-900/50 dark:bg-brand-950/20">
         <div className="flex flex-col justify-between gap-4 md:flex-row md:items-center">
           <div>
             <span className="inline-block rounded-full bg-blue-100 px-3 py-1 text-xs font-semibold text-blue-800 dark:bg-blue-900/60 dark:text-blue-200">

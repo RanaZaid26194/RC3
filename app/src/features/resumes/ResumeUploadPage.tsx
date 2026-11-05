@@ -194,7 +194,7 @@ export default function ResumeUploadPage() {
                 className="flex items-center justify-between border-b border-neutral-200 pb-3 dark:border-neutral-800 last:border-0"
               >
                 <div className="flex items-center gap-3">
-                  <div className="h-10 w-10 rounded-full bg-gradient-to-br from-blue-500 to-purple-500 flex items-center justify-center text-white font-semibold">
+                  <div className="h-10 w-10 rounded-full bg-brand-600 flex items-center justify-center text-white font-semibold">
                     {candidate.name.charAt(0)}
                   </div>
                   <div>
