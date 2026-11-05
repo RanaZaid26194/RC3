@@ -1,6 +1,6 @@
 import { useState, useEffect, type ReactNode } from 'react';
 import { NavLink, useNavigate, useLocation } from 'react-router-dom';
-import { Menu, X, Sparkles, UserCheck, ShieldCheck, RefreshCw, LogOut } from 'lucide-react';
+import { Menu, X, UserCheck, ShieldCheck, RefreshCw, LogOut } from 'lucide-react';
 import { cn } from '@/lib/cn';
 import { Button } from '../ui/Button';
 import { NAV_ITEMS } from '@/app/nav';
@@ -101,9 +101,15 @@ export function AppShell({ children }: { children: ReactNode }) {
           {/* Logo & Brand */}
           <div className="mb-6 flex items-center justify-between px-2 pt-2">
             <div className="flex items-center gap-2.5">
-              <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-blue-600 text-white shadow-sm shadow-blue-500/30">
-                <Sparkles className="h-5 w-5" aria-hidden="true" />
-              </div>
+              <img
+                src="/logo.png"
+                alt="RecruLens Logo"
+                className="h-9 w-9 rounded-lg object-contain shadow-xs border border-neutral-200 dark:border-neutral-700 bg-white dark:bg-neutral-800 p-0.5"
+                onError={(e) => {
+                  // Fallback if image fails to load
+                  (e.target as HTMLElement).style.display = 'none';
+                }}
+              />
               <div>
                 <span className="font-display text-lg font-bold tracking-tight text-neutral-900 dark:text-white">
                   {APP_NAME}
@@ -172,9 +178,11 @@ export function AppShell({ children }: { children: ReactNode }) {
       {/* Mobile Header */}
       <header className="sticky top-0 z-40 flex items-center justify-between border-b border-neutral-200 bg-white px-4 py-2.5 dark:border-neutral-800 dark:bg-neutral-900 lg:hidden">
         <div className="flex items-center gap-2">
-          <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-blue-600 text-white">
-            <Sparkles className="h-4 w-4" />
-          </div>
+          <img
+            src="/logo.png"
+            alt="RecruLens Logo"
+            className="h-8 w-8 rounded-lg object-contain bg-white dark:bg-neutral-800 p-0.5 border border-neutral-200 dark:border-neutral-700"
+          />
           <span className="font-display text-base font-bold text-neutral-900 dark:text-white">
             {APP_NAME}
           </span>
