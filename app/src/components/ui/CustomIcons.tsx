@@ -10,8 +10,8 @@ export function RecruLensLogo(props: ComponentProps<'svg'>) {
     <svg viewBox="0 0 32 32" fill="none" {...props} aria-hidden="true">
       <defs>
         <linearGradient id="lens-gradient" x1="0%" y1="0%" x2="100%" y2="100%">
-          <stop offset="0%" stopColor="#6366f1" />
-          <stop offset="100%" stopColor="#8b5cf6" />
+          <stop offset="0%" stopColor="#047857" />
+          <stop offset="100%" stopColor="#10b981" />
         </linearGradient>
       </defs>
       <circle cx="16" cy="16" r="14" stroke="url(#lens-gradient)" strokeWidth="2" fill="none" />
@@ -27,8 +27,8 @@ export function TalentMatch({ className }: { className?: string }) {
     <svg viewBox="0 0 24 24" fill="none" className={className} aria-hidden="true">
       <defs>
         <linearGradient id="match-icon" x1="0%" y1="0%" x2="100%" y2="100%">
-          <stop offset="0%" stopColor="#6366f1" />
-          <stop offset="100%" stopColor="#8b5cf6" />
+          <stop offset="0%" stopColor="#047857" />
+          <stop offset="100%" stopColor="#10b981" />
         </linearGradient>
       </defs>
       <path
@@ -46,11 +46,11 @@ export function TalentMatch({ className }: { className?: string }) {
 export function InterviewCalendar({ className }: { className?: string }) {
   return (
     <svg viewBox="0 0 24 24" fill="none" className={className} aria-hidden="true">
-      <rect x="3" y="4" width="18" height="18" rx="2" stroke="#6366f1" strokeWidth="2" />
-      <path d="M3 8h18" stroke="#6366f1" strokeWidth="2" strokeLinecap="round" />
-      <rect x="7" y="11" width="3" height="6" rx="1" fill="#6366f1" opacity="0.1" />
-      <path d="M8.5 11v6" stroke="#6366f1" strokeWidth="1.5" strokeLinecap="round" />
-      <circle cx="16.5" cy="14" r="2" fill="#0ea5e9" />
+      <rect x="3" y="4" width="18" height="18" rx="2" stroke="#047857" strokeWidth="2" />
+      <path d="M3 8h18" stroke="#047857" strokeWidth="2" strokeLinecap="round" />
+      <rect x="7" y="11" width="3" height="6" rx="1" fill="#047857" opacity="0.1" />
+      <path d="M8.5 11v6" stroke="#047857" strokeWidth="1.5" strokeLinecap="round" />
+      <circle cx="16.5" cy="14" r="2" fill="#f59e0b" />
     </svg>
   );
 }
