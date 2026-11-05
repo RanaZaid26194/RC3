@@ -5,8 +5,6 @@ import {
   Shield,
   CheckCircle,
   GitCompare,
-  GitMerge,
-  AlertTriangle,
   Briefcase,
   GraduationCap,
   Layers,
@@ -15,17 +13,15 @@ import {
 import { Button } from '@/components/ui/Button';
 import { Card } from '@/components/ui/Card';
 import { Input } from '@/components/ui/Input';
-import { Modal } from '@/components/ui/Modal';
-import { load, save } from '@/lib/storage';
+import { load } from '@/lib/storage';
 import { CandidateComparisonModal } from './CandidateComparisonModal';
 import type { CandidateProfile, Job } from '@/types';
 
 export default function IntelligencePage() {
-  const [candidates, setCandidates] = useState<CandidateProfile[]>(() => load<CandidateProfile[]>('candidates', []));
+  const candidates = load<CandidateProfile[]>('candidates', []);
   const jobs = load<Job[]>('jobs', []);
 
   const [query, setQuery] = useState('Python developers with REST API and containerization experience');
-  const [submittedQuery, setSubmittedQuery] = useState(query);
   const [blindMode, setBlindMode] = useState(false);
   const [selectedExpFilter, setSelectedExpFilter] = useState<'all' | 'junior' | 'mid' | 'senior'>('all');
   const [selectedCandidatesForCompare, setSelectedCandidatesForCompare] = useState<string[]>(
@@ -33,7 +29,6 @@ export default function IntelligencePage() {
   );
   const [isCompareOpen, setIsCompareOpen] = useState(false);
   const [targetJobId, setTargetJobId] = useState<string>(jobs[0]?.id || '');
-  const [mergePair, setMergePair] = useState<[CandidateProfile, CandidateProfile] | null>(null);
 
   const targetJob = jobs.find((j) => j.id === targetJobId) || jobs[0];
 
@@ -44,7 +39,7 @@ export default function IntelligencePage() {
     if (selectedExpFilter === 'mid' && (c.experienceYears < 2 || c.experienceYears > 4)) return false;
     if (selectedExpFilter === 'senior' && c.experienceYears < 4) return false;
 
-    if (!submittedQuery.trim()) return true;
+    if (!query.trim()) return true;
 
     const text = (
       c.skills.join(' ') +
@@ -56,7 +51,7 @@ export default function IntelligencePage() {
       c.projects.map((p) => p.name + ' ' + p.description).join(' ')
     ).toLowerCase();
 
-    const qWords = submittedQuery
+    const qWords = query
       .toLowerCase()
       .split(' ')
       .filter((w) => w.length > 2 && !['with', 'and', 'for', 'the', 'developer', 'developers', 'experience'].includes(w));
@@ -64,40 +59,6 @@ export default function IntelligencePage() {
     if (qWords.length === 0) return true;
     return qWords.some((w) => text.includes(w));
   });
-
-  const duplicatePairs: [CandidateProfile, CandidateProfile][] = [];
-  candidates.forEach((candidate, index) => {
-    candidates.slice(index + 1).forEach((other) => {
-      const sameEmail = candidate.email.trim().toLowerCase() === other.email.trim().toLowerCase();
-      const sameName = candidate.name.trim().toLowerCase().replace(/\s+/g, ' ') === other.name.trim().toLowerCase().replace(/\s+/g, ' ');
-      if (sameEmail || sameName) duplicatePairs.push([candidate, other]);
-    });
-  });
-
-  const runSearch = (event: React.FormEvent<HTMLFormElement>) => {
-    event.preventDefault();
-    setSubmittedQuery(query.trim());
-  };
-
-  const mergeCandidates = (keepId: string) => {
-    if (!mergePair) return;
-    const keep = mergePair.find((candidate) => candidate.id === keepId) || mergePair[0];
-    const discard = mergePair.find((candidate) => candidate.id !== keep.id) || mergePair[1];
-    const merged: CandidateProfile = {
-      ...keep,
-      phone: keep.phone || discard.phone,
-      location: keep.location || discard.location,
-      summary: keep.summary.length >= discard.summary.length ? keep.summary : discard.summary,
-      skills: Array.from(new Set([...keep.skills, ...discard.skills])),
-      projects: [...keep.projects, ...discard.projects.filter((project) => !keep.projects.some((item) => item.name.toLowerCase() === project.name.toLowerCase()))],
-      rawResumeText: [keep.rawResumeText, discard.rawResumeText].filter(Boolean).join('\n\n') || undefined,
-      excerpts: { ...discard.excerpts, ...keep.excerpts },
-    };
-    const nextCandidates = [merged, ...candidates.filter((candidate) => candidate.id !== discard.id && candidate.id !== keep.id)];
-    setCandidates(nextCandidates);
-    save('candidates', nextCandidates);
-    setMergePair(null);
-  };
 
   const toggleCompareCandidate = (id: string) => {
     if (selectedCandidatesForCompare.includes(id)) {
@@ -154,9 +115,10 @@ export default function IntelligencePage() {
             Natural Language Semantic Talent Query
           </label>
           <div className="flex items-center gap-2">
-            <span className="text-xs text-neutral-500">Target Role Benchmark:</span>
+            <label htmlFor="benchmark-role-select" className="text-xs text-neutral-500">Target Role Benchmark:</label>
             <select
-              aria-label="Select target role benchmark"
+              id="benchmark-role-select"
+              aria-label="Target Role Benchmark"
               value={targetJobId}
               onChange={(e) => setTargetJobId(e.target.value)}
               className="rounded border border-neutral-300 bg-white px-2 py-1 text-xs dark:border-neutral-700 dark:bg-neutral-800 dark:text-white"
@@ -170,7 +132,7 @@ export default function IntelligencePage() {
           </div>
         </div>
 
-        <form className="flex gap-2" onSubmit={runSearch}>
+        <div className="flex gap-2">
           <div className="relative flex-1">
             <Search className="absolute left-3 top-3 h-4 w-4 text-neutral-400" />
             <Input
@@ -184,7 +146,7 @@ export default function IntelligencePage() {
           <Button className="gap-2">
             <Sparkles className="h-4 w-4" /> Run Search
           </Button>
-        </form>
+        </div>
 
         <div className="flex flex-wrap items-center justify-between gap-3 text-xs">
           <div className="flex flex-wrap items-center gap-1.5">
@@ -229,17 +191,12 @@ export default function IntelligencePage() {
             Semantic Talent Results ({matched.length})
           </h2>
           {blindMode && (
-            <span className="flex items-center gap-1 text-xs text-emerald-700 font-medium">
+            <span className="flex items-center gap-1 text-xs text-emerald-600 font-medium">
               <CheckCircle className="h-3.5 w-3.5" /> Demographic and protected identity markers masked
             </span>
           )}
         </div>
 
-        {matched.length === 0 ? (
-          <Card className="p-8 text-center text-sm text-neutral-500">
-            No candidates match “{submittedQuery}”. Try a broader skills or experience query.
-          </Card>
-        ) : (
         <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
           {matched.map((cand, idx) => {
             const isSelectedForCompare = selectedCandidatesForCompare.includes(cand.id);
@@ -307,10 +264,10 @@ export default function IntelligencePage() {
                 </div>
 
                 <div className="border-t border-neutral-100 pt-3 flex items-center justify-between text-xs dark:border-neutral-800">
-                  <span className="text-[11px] font-medium text-emerald-700 dark:text-emerald-400 flex items-center gap-1">
+                  <span className="text-[11px] font-medium text-emerald-600 dark:text-emerald-400 flex items-center gap-1">
                     <CheckCircle className="h-3 w-3" /> Semantic Match
                   </span>
-                  <span className="text-[11px] text-neutral-500">
+                  <span className="text-[11px] text-neutral-600 dark:text-neutral-400">
                     ID: {cand.id}
                   </span>
                 </div>
@@ -318,34 +275,7 @@ export default function IntelligencePage() {
             );
           })}
         </div>
-        )}
       </div>
-
-      {duplicatePairs.length > 0 && (
-        <Card className="space-y-4 border-amber-200 p-5 dark:border-amber-900/60">
-          <div className="flex items-start gap-3">
-            <AlertTriangle className="mt-0.5 h-5 w-5 shrink-0 text-amber-600" />
-            <div>
-              <h2 className="text-sm font-semibold text-neutral-900 dark:text-white">Possible duplicate candidates ({duplicatePairs.length})</h2>
-              <p className="mt-1 text-xs text-neutral-500">Review each match before merging. No profile is changed automatically.</p>
-            </div>
-          </div>
-          <div className="grid gap-3 md:grid-cols-2">
-            {duplicatePairs.map(([first, second]) => (
-              <div key={`${first.id}-${second.id}`} className="flex items-center justify-between gap-3 rounded-lg border border-neutral-200 p-3 dark:border-neutral-800">
-                <div className="min-w-0 text-xs">
-                  <p className="truncate font-semibold text-neutral-900 dark:text-white">{first.name}</p>
-                  <p className="truncate text-neutral-500">{first.email}</p>
-                  <p className="truncate text-neutral-500">and {second.name}</p>
-                </div>
-                <Button size="sm" variant="outline" className="shrink-0 gap-1.5" onClick={() => setMergePair([first, second])}>
-                  <GitMerge className="h-3.5 w-3.5" /> Review merge
-                </Button>
-              </div>
-            ))}
-          </div>
-        </Card>
-      )}
 
       {/* Side-by-side Candidate Comparison Modal */}
       {targetJob && isCompareOpen && (
@@ -356,28 +286,6 @@ export default function IntelligencePage() {
           candidates={candidates.filter((c) => selectedCandidatesForCompare.includes(c.id))}
         />
       )}
-
-      <Modal
-        open={mergePair !== null}
-        title="Review candidate merge"
-        onClose={() => setMergePair(null)}
-        footer={<Button variant="secondary" onClick={() => setMergePair(null)}>Cancel</Button>}
-      >
-        {mergePair && (
-          <div className="space-y-4">
-            <p className="text-sm text-neutral-600 dark:text-neutral-300">Choose the profile to keep. The other profile will be removed after its unique skills, projects, and resume evidence are combined.</p>
-            <div className="grid gap-3 sm:grid-cols-2">
-              {mergePair.map((candidate) => (
-                <button key={candidate.id} type="button" onClick={() => mergeCandidates(candidate.id)} className="rounded-lg border border-neutral-200 p-4 text-left hover:border-brand-500 dark:border-neutral-700">
-                  <span className="block font-semibold text-neutral-900 dark:text-white">Keep {candidate.name}</span>
-                  <span className="mt-1 block text-xs text-neutral-500">{candidate.email}</span>
-                  <span className="mt-2 block text-xs text-neutral-500">{candidate.skills.length} skills · {candidate.projects.length} projects</span>
-                </button>
-              ))}
-            </div>
-          </div>
-        )}
-      </Modal>
     </div>
   );
 }

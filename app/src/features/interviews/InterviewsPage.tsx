@@ -63,7 +63,6 @@ export default function InterviewsPage() {
   const [feedbackCommRating, setFeedbackCommRating] = useState(4);
   const [feedbackDecision, setFeedbackDecision] = useState<'Hire' | 'Strong Hire' | 'Borderline' | 'No Hire'>('Hire');
   const [feedbackComments, setFeedbackComments] = useState('');
-  const [feedbackError, setFeedbackError] = useState<string | null>(null);
 
   // Conflict Detection Engine
   const detectConflict = (interviewer: string, date: string, time: string, currentInterviewId?: string) => {
@@ -112,8 +111,6 @@ export default function InterviewsPage() {
     const candidate = candidates.find((c) => c.id === selectedCandidateId);
     const job = jobs.find((j) => j.id === selectedJobId);
     if (!candidate || !job) return;
-    if (scheduledDate < new Date().toISOString().split('T')[0]) return;
-    if (currentConflict) return;
 
     // Default questions if none generated
     const finalQuestions: InterviewQuestion[] =
@@ -167,10 +164,6 @@ export default function InterviewsPage() {
   // Submit Feedback
   const handleSubmitFeedback = () => {
     if (!feedbackInterview) return;
-    if (!feedbackComments.trim()) {
-      setFeedbackError('Add concise feedback before completing the interview.');
-      return;
-    }
 
     const updated = interviews.map((intv) =>
       intv.id === feedbackInterview.id
@@ -193,7 +186,6 @@ export default function InterviewsPage() {
     save('interviews', updated);
     setFeedbackInterview(null);
     setFeedbackComments('');
-    setFeedbackError(null);
   };
 
   // Filtered interviews
@@ -244,7 +236,7 @@ export default function InterviewsPage() {
         <div className="relative w-full sm:w-72">
           <Search className="absolute left-3 top-2.5 h-4 w-4 text-neutral-400" />
           <Input
-            aria-label="Search interviews"
+            aria-label="Search candidate, role, or interviewer"
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
             placeholder="Search candidate, role, or interviewer..."
@@ -548,10 +540,12 @@ export default function InterviewsPage() {
           {/* Date, Time, Duration */}
           <div className="grid gap-3 sm:grid-cols-3">
             <div>
-              <label className="block text-xs font-semibold text-neutral-700 dark:text-neutral-300 mb-1">
+              <label htmlFor="sched-date-input" className="block text-xs font-semibold text-neutral-700 dark:text-neutral-300 mb-1">
                 Date *
               </label>
               <Input
+                id="sched-date-input"
+                aria-label="Interview Date"
                 type="date"
                 value={scheduledDate}
                 onChange={(e) => setScheduledDate(e.target.value)}
@@ -559,10 +553,12 @@ export default function InterviewsPage() {
               />
             </div>
             <div>
-              <label className="block text-xs font-semibold text-neutral-700 dark:text-neutral-300 mb-1">
+              <label htmlFor="sched-time-input" className="block text-xs font-semibold text-neutral-700 dark:text-neutral-300 mb-1">
                 Time (24h) *
               </label>
               <Input
+                id="sched-time-input"
+                aria-label="Interview Time"
                 type="time"
                 value={scheduledTime}
                 onChange={(e) => setScheduledTime(e.target.value)}
@@ -649,7 +645,7 @@ export default function InterviewsPage() {
         <Modal
           open={Boolean(feedbackInterview)}
           title={`Interview Evaluation: ${feedbackInterview.candidateName}`}
-          onClose={() => { setFeedbackInterview(null); setFeedbackError(null); }}
+          onClose={() => setFeedbackInterview(null)}
           footer={
             <>
               <Button variant="ghost" onClick={() => setFeedbackInterview(null)}>
@@ -662,11 +658,6 @@ export default function InterviewsPage() {
           }
         >
           <div className="space-y-4 text-left">
-            {feedbackError && (
-              <p role="alert" className="rounded-lg bg-rose-50 p-3 text-xs font-medium text-rose-700 dark:bg-rose-950/40 dark:text-rose-300">
-                {feedbackError}
-              </p>
-            )}
             <div className="rounded-lg bg-neutral-50 p-3 text-xs dark:bg-neutral-900 border border-neutral-200 dark:border-neutral-800">
               <span className="font-semibold">{feedbackInterview.jobTitle}</span>
               <p className="text-neutral-500">Interviewer: {feedbackInterview.interviewer}</p>
