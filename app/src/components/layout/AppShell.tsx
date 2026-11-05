@@ -101,15 +101,17 @@ export function AppShell({ children }: { children: ReactNode }) {
           {/* Logo & Brand */}
           <div className="mb-6 flex items-center justify-between px-2 pt-2">
             <div className="flex items-center gap-3">
-              <img
-                src="/logo.png"
-                alt="RecruLens Logo"
-                className="h-12 w-12 rounded-xl object-contain shadow-sm border border-neutral-200 dark:border-neutral-700 bg-white dark:bg-neutral-800 p-1"
-                onError={(e) => {
-                  // Fallback if image fails to load
-                  (e.target as HTMLElement).style.display = 'none';
-                }}
-              />
+              <div className="flex h-12 w-12 items-center justify-center rounded-xl border border-neutral-200 bg-white p-1 shadow-sm dark:border-neutral-700 dark:bg-neutral-800">
+                <img
+                  src="/logo.png"
+                  alt="RecruLens Logo"
+                  className="h-full w-full object-contain"
+                  onError={(e) => {
+                    // Fallback if image fails to load
+                    (e.target as HTMLElement).style.display = 'none';
+                  }}
+                />
+              </div>
               <div>
                 <span className="font-display text-xl font-bold tracking-tight text-neutral-900 dark:text-white">
                   {APP_NAME}
@@ -178,11 +180,13 @@ export function AppShell({ children }: { children: ReactNode }) {
       {/* Mobile Header */}
       <header className="sticky top-0 z-40 flex items-center justify-between border-b border-neutral-200 bg-white px-4 py-2.5 dark:border-neutral-800 dark:bg-neutral-900 lg:hidden">
         <div className="flex items-center gap-2.5">
-          <img
-            src="/logo.png"
-            alt="RecruLens Logo"
-            className="h-9 w-9 rounded-lg object-contain bg-white dark:bg-neutral-800 p-0.5 border border-neutral-200 dark:border-neutral-700"
-          />
+          <div className="flex h-9 w-9 items-center justify-center rounded-lg border border-neutral-200 bg-white p-0.5 shadow-xs dark:border-neutral-700 dark:bg-neutral-800">
+            <img
+              src="/logo.png"
+              alt="RecruLens Logo"
+              className="h-full w-full object-contain"
+            />
+          </div>
           <span className="font-display text-base font-bold text-neutral-900 dark:text-white">
             {APP_NAME}
           </span>
@@ -192,6 +196,7 @@ export function AppShell({ children }: { children: ReactNode }) {
             variant="ghost"
             size="sm"
             onClick={handleLogout}
+            aria-label="Sign out"
             className="text-xs text-rose-600"
           >
             <LogOut className="h-4 w-4" />

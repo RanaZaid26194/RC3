@@ -458,10 +458,12 @@ export default function InterviewsPage() {
           {/* Candidate & Job Selectors */}
           <div className="grid gap-3 sm:grid-cols-2">
             <div>
-              <label className="block text-xs font-semibold text-neutral-700 dark:text-neutral-300 mb-1">
+              <label htmlFor="sched-candidate-select" className="block text-xs font-semibold text-neutral-700 dark:text-neutral-300 mb-1">
                 Candidate *
               </label>
               <select
+                id="sched-candidate-select"
+                aria-label="Candidate"
                 value={selectedCandidateId}
                 onChange={(e) => setSelectedCandidateId(e.target.value)}
                 className="w-full rounded-lg border border-neutral-300 bg-white p-2.5 text-xs focus:border-blue-500 focus:outline-none dark:border-neutral-700 dark:bg-neutral-900 dark:text-white"
@@ -475,10 +477,12 @@ export default function InterviewsPage() {
             </div>
 
             <div>
-              <label className="block text-xs font-semibold text-neutral-700 dark:text-neutral-300 mb-1">
+              <label htmlFor="sched-role-select" className="block text-xs font-semibold text-neutral-700 dark:text-neutral-300 mb-1">
                 Target Role *
               </label>
               <select
+                id="sched-role-select"
+                aria-label="Target Role"
                 value={selectedJobId}
                 onChange={(e) => setSelectedJobId(e.target.value)}
                 className="w-full rounded-lg border border-neutral-300 bg-white p-2.5 text-xs focus:border-blue-500 focus:outline-none dark:border-neutral-700 dark:bg-neutral-900 dark:text-white"
@@ -495,10 +499,12 @@ export default function InterviewsPage() {
           {/* Interviewer & Type */}
           <div className="grid gap-3 sm:grid-cols-2">
             <div>
-              <label className="block text-xs font-semibold text-neutral-700 dark:text-neutral-300 mb-1">
+              <label htmlFor="sched-interviewer-select" className="block text-xs font-semibold text-neutral-700 dark:text-neutral-300 mb-1">
                 Interviewer *
               </label>
               <select
+                id="sched-interviewer-select"
+                aria-label="Interviewer"
                 value={selectedInterviewer}
                 onChange={(e) => setSelectedInterviewer(e.target.value)}
                 className="w-full rounded-lg border border-neutral-300 bg-white p-2.5 text-xs focus:border-blue-500 focus:outline-none dark:border-neutral-700 dark:bg-neutral-900 dark:text-white"
@@ -512,10 +518,12 @@ export default function InterviewsPage() {
             </div>
 
             <div>
-              <label className="block text-xs font-semibold text-neutral-700 dark:text-neutral-300 mb-1">
+              <label htmlFor="sched-type-select" className="block text-xs font-semibold text-neutral-700 dark:text-neutral-300 mb-1">
                 Interview Stage
               </label>
               <select
+                id="sched-type-select"
+                aria-label="Interview Stage"
                 value={interviewType}
                 onChange={(e) => setInterviewType(e.target.value as Interview['interviewType'])}
                 className="w-full rounded-lg border border-neutral-300 bg-white p-2.5 text-xs focus:border-blue-500 focus:outline-none dark:border-neutral-700 dark:bg-neutral-900 dark:text-white"
@@ -553,10 +561,12 @@ export default function InterviewsPage() {
               />
             </div>
             <div>
-              <label className="block text-xs font-semibold text-neutral-700 dark:text-neutral-300 mb-1">
+              <label htmlFor="sched-duration-select" className="block text-xs font-semibold text-neutral-700 dark:text-neutral-300 mb-1">
                 Duration (min)
               </label>
               <select
+                id="sched-duration-select"
+                aria-label="Duration (minutes)"
                 value={durationMinutes}
                 onChange={(e) => setDurationMinutes(Number(e.target.value))}
                 className="w-full rounded-lg border border-neutral-300 bg-white p-2.5 text-xs focus:border-blue-500 focus:outline-none dark:border-neutral-700 dark:bg-neutral-900 dark:text-white"
@@ -650,10 +660,12 @@ export default function InterviewsPage() {
 
             <div className="grid gap-3 sm:grid-cols-4">
               <div>
-                <label className="block text-xs font-semibold text-neutral-700 dark:text-neutral-300 mb-1">
+                <label htmlFor="eval-overall-select" className="block text-xs font-semibold text-neutral-700 dark:text-neutral-300 mb-1">
                   Overall Rating
                 </label>
                 <select
+                  id="eval-overall-select"
+                  aria-label="Overall Rating"
                   value={feedbackRating}
                   onChange={(e) => setFeedbackRating(Number(e.target.value))}
                   className="w-full rounded-lg border border-neutral-300 bg-white p-2.5 text-xs dark:border-neutral-700 dark:bg-neutral-900 dark:text-white"
@@ -667,10 +679,12 @@ export default function InterviewsPage() {
               </div>
 
               <div>
-                <label className="block text-xs font-semibold text-neutral-700 dark:text-neutral-300 mb-1">
+                <label htmlFor="eval-tech-select" className="block text-xs font-semibold text-neutral-700 dark:text-neutral-300 mb-1">
                   Technical Depth
                 </label>
                 <select
+                  id="eval-tech-select"
+                  aria-label="Technical Depth"
                   value={feedbackTechRating}
                   onChange={(e) => setFeedbackTechRating(Number(e.target.value))}
                   className="w-full rounded-lg border border-neutral-300 bg-white p-2.5 text-xs dark:border-neutral-700 dark:bg-neutral-900 dark:text-white"
@@ -684,10 +698,12 @@ export default function InterviewsPage() {
               </div>
 
               <div>
-                <label className="block text-xs font-semibold text-neutral-700 dark:text-neutral-300 mb-1">
+                <label htmlFor="eval-comm-select" className="block text-xs font-semibold text-neutral-700 dark:text-neutral-300 mb-1">
                   Communication
                 </label>
                 <select
+                  id="eval-comm-select"
+                  aria-label="Communication"
                   value={feedbackCommRating}
                   onChange={(e) => setFeedbackCommRating(Number(e.target.value))}
                   className="w-full rounded-lg border border-neutral-300 bg-white p-2.5 text-xs dark:border-neutral-700 dark:bg-neutral-900 dark:text-white"
@@ -701,10 +717,12 @@ export default function InterviewsPage() {
               </div>
 
               <div>
-                <label className="block text-xs font-semibold text-neutral-700 dark:text-neutral-300 mb-1">
+                <label htmlFor="eval-decision-select" className="block text-xs font-semibold text-neutral-700 dark:text-neutral-300 mb-1">
                   Hiring Decision
                 </label>
                 <select
+                  id="eval-decision-select"
+                  aria-label="Hiring Decision"
                   value={feedbackDecision}
                   onChange={(e) => setFeedbackDecision(e.target.value as any)}
                   className="w-full rounded-lg border border-neutral-300 bg-white p-2.5 text-xs font-bold dark:border-neutral-700 dark:bg-neutral-900 dark:text-white"
@@ -718,10 +736,12 @@ export default function InterviewsPage() {
             </div>
 
             <div>
-              <label className="block text-xs font-semibold text-neutral-700 dark:text-neutral-300 mb-1">
+              <label htmlFor="eval-notes-textarea" className="block text-xs font-semibold text-neutral-700 dark:text-neutral-300 mb-1">
                 Detailed Evaluation Notes & Code Review Remarks
               </label>
               <textarea
+                id="eval-notes-textarea"
+                aria-label="Detailed Evaluation Notes"
                 value={feedbackComments}
                 onChange={(e) => setFeedbackComments(e.target.value)}
                 rows={4}

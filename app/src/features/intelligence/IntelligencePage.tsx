@@ -115,8 +115,10 @@ export default function IntelligencePage() {
             Natural Language Semantic Talent Query
           </label>
           <div className="flex items-center gap-2">
-            <span className="text-xs text-neutral-500">Target Role Benchmark:</span>
+            <label htmlFor="benchmark-role-select" className="text-xs text-neutral-500">Target Role Benchmark:</label>
             <select
+              id="benchmark-role-select"
+              aria-label="Target Role Benchmark"
               value={targetJobId}
               onChange={(e) => setTargetJobId(e.target.value)}
               className="rounded border border-neutral-300 bg-white px-2 py-1 text-xs dark:border-neutral-700 dark:bg-neutral-800 dark:text-white"

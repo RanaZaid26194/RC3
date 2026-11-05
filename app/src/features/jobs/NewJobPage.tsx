@@ -198,6 +198,7 @@ export default function NewJobPage() {
           </div>
 
           <textarea
+            aria-label="Job description"
             value={description}
             onChange={(e) => setDescription(e.target.value)}
             rows={4}
@@ -238,6 +239,7 @@ export default function NewJobPage() {
                   <div className="flex items-center gap-2 text-xs">
                     <span className="text-neutral-500">Weight:</span>
                     <select
+                      aria-label={`Weight for ${s.skill}`}
                       value={s.weight}
                       onChange={(e) => {
                         const val = parseInt(e.target.value, 10);
@@ -255,6 +257,7 @@ export default function NewJobPage() {
 
                   <button
                     type="button"
+                    aria-label={`Remove ${s.skill}`}
                     onClick={() => handleRemoveSkill(s.skill)}
                     className="text-neutral-400 hover:text-rose-600"
                   >
@@ -267,12 +270,14 @@ export default function NewJobPage() {
 
           <div className="flex items-center gap-2 pt-2">
             <Input
+              aria-label="Add additional skill"
               value={newSkillName}
               onChange={(e) => setNewSkillName(e.target.value)}
               placeholder="Add skill (e.g. Redis, GraphQL)..."
               className="flex-1"
             />
             <select
+              aria-label="New skill weight"
               value={newSkillWeight}
               onChange={(e) => setNewSkillWeight(parseInt(e.target.value, 10))}
               className="rounded-lg border border-neutral-300 bg-white px-3 py-2 text-sm dark:border-neutral-700 dark:bg-neutral-900"

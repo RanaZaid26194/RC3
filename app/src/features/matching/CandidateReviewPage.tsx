@@ -154,7 +154,7 @@ export default function CandidateReviewPage() {
   };
 
   return (
-    <div className="space-y-6">
+    <div className="w-full min-w-0 space-y-6">
       <div className="flex flex-col justify-between gap-4 sm:flex-row sm:items-center">
         <div>
           <h1 className="font-display text-2xl font-bold tracking-tight text-neutral-900 dark:text-white">
@@ -165,7 +165,7 @@ export default function CandidateReviewPage() {
           </p>
         </div>
 
-        <div className="flex items-center gap-2">
+        <div className="flex flex-wrap items-center gap-2">
           <Button
             size="sm"
             variant="outline"
@@ -174,8 +174,12 @@ export default function CandidateReviewPage() {
           >
             Compare Side-by-Side
           </Button>
-          <span className="text-xs font-semibold uppercase tracking-wider text-neutral-500">Vacancy:</span>
+          <label htmlFor="matching-vacancy-select" className="text-xs font-semibold uppercase tracking-wider text-neutral-500">
+            Vacancy:
+          </label>
           <select
+            id="matching-vacancy-select"
+            aria-label="Filter Vacancy"
             value={selectedJobId}
             onChange={(e) => setSelectedJobId(e.target.value)}
             className="rounded-lg border border-neutral-300 bg-white px-3 py-2 text-xs font-medium dark:border-neutral-700 dark:bg-neutral-900 dark:text-white"

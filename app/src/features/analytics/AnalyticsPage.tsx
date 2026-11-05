@@ -115,7 +115,7 @@ export default function AnalyticsPage() {
   };
 
   return (
-    <div className="space-y-6">
+    <div className="w-full min-w-0 space-y-6">
       {/* Page Header */}
       <div className="flex flex-col justify-between gap-4 sm:flex-row sm:items-center">
         <div>
@@ -128,6 +128,7 @@ export default function AnalyticsPage() {
         </div>
         <div className="flex items-center gap-3">
           <select
+            aria-label="Filter Analytics by Vacancy"
             value={selectedJobId}
             onChange={(e) => setSelectedJobId(e.target.value)}
             className="rounded-lg border border-neutral-300 bg-white px-3 py-1.5 text-xs font-medium text-neutral-700 dark:border-neutral-700 dark:bg-neutral-900 dark:text-neutral-200"

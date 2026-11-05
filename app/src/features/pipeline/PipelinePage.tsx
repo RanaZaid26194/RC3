@@ -143,7 +143,7 @@ export default function PipelinePage() {
   };
 
   return (
-    <div className="space-y-6">
+    <div className="w-full min-w-0 space-y-6">
       {/* Header */}
       <div className="flex flex-col justify-between gap-4 sm:flex-row sm:items-center">
         <div>
@@ -156,8 +156,12 @@ export default function PipelinePage() {
         </div>
 
         <div className="flex items-center gap-3">
-          <span className="text-xs font-semibold uppercase tracking-wider text-neutral-500">Filter Role:</span>
+          <label htmlFor="pipeline-role-filter" className="text-xs font-semibold uppercase tracking-wider text-neutral-500">
+            Filter Role:
+          </label>
           <select
+            id="pipeline-role-filter"
+            aria-label="Filter Role"
             value={selectedJobId}
             onChange={(e) => setSelectedJobId(e.target.value)}
             className="rounded-lg border border-neutral-300 bg-white px-3 py-2 text-xs font-medium dark:border-neutral-700 dark:bg-neutral-900 dark:text-white"
