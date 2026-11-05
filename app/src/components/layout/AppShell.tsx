@@ -23,8 +23,13 @@ export function AppShell({ children }: { children: ReactNode }) {
     setUser(getCurrentUser());
   }, [location.pathname]);
 
-  // Auth pages render without shell sidebar
-  if (location.pathname === '/login' || location.pathname === '/register') {
+  // Public auth and legal pages render without shell sidebar
+  if (
+    location.pathname === '/login' ||
+    location.pathname === '/register' ||
+    location.pathname === '/terms' ||
+    location.pathname === '/privacy'
+  ) {
     return (
       <main id="main" tabIndex={-1} className="min-h-screen bg-neutral-50 dark:bg-neutral-950">
         {children}

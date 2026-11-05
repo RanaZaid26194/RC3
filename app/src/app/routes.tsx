@@ -12,14 +12,18 @@ import Settings from '@/pages/Settings';
 import NotFound from '@/pages/NotFound';
 import LoginPage from '@/pages/LoginPage';
 import RegisterPage from '@/pages/RegisterPage';
+import TermsPage from '@/pages/TermsPage';
+import PrivacyPage from '@/pages/PrivacyPage';
 import { ProtectedRoute } from '@/components/auth/ProtectedRoute';
 
 export function AppRoutes() {
   return (
     <Routes>
-      {/* Public Auth Routes */}
+      {/* Public Auth & Legal Routes */}
       <Route path="/login" element={<LoginPage />} />
       <Route path="/register" element={<RegisterPage />} />
+      <Route path="/terms" element={<TermsPage />} />
+      <Route path="/privacy" element={<PrivacyPage />} />
 
       {/* Default Redirection */}
       <Route path="/" element={<Navigate to="/jobs" replace />} />
