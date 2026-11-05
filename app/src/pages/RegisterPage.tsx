@@ -1,7 +1,6 @@
 import { useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import {
-  Sparkles,
   Lock,
   Mail,
   User as UserIcon,
@@ -16,6 +15,7 @@ import {
 import { Button } from '@/components/ui/Button';
 import { Card } from '@/components/ui/Card';
 import { Input } from '@/components/ui/Input';
+import { RecuLensLogo } from '@/components/ui/CustomIcons';
 import { registerUser } from '@/lib/auth';
 import type { UserRole } from '@/types';
 
@@ -99,7 +99,7 @@ export default function RegisterPage() {
         {/* Brand Header */}
         <div className="text-center space-y-2">
           <div className="mx-auto flex h-12 w-12 items-center justify-center rounded-xl bg-brand-700 text-white shadow-md">
-            <Sparkles className="h-6 w-6" />
+            <RecuLensLogo className="h-6 w-6" />
           </div>
           <h1 className="font-display text-2xl font-bold tracking-tight text-neutral-900 dark:text-white">
             Create your <span className="text-brand-700 dark:text-brand-300">RecruLens</span> account
@@ -314,8 +314,25 @@ export default function RegisterPage() {
                 />
                 <span>
                   I agree to the{' '}
-                  <span className="text-brand-600 font-medium hover:underline">Terms of Service</span> and{' '}
-                  <span className="text-brand-600 font-medium hover:underline">Privacy Policy</span>.
+                  <Link
+                    to="/terms"
+                    target="_blank"
+                    rel="noreferrer"
+                    className="text-brand-600 font-semibold hover:underline dark:text-brand-400"
+                    onClick={(e) => e.stopPropagation()}
+                  >
+                    Terms of Service
+                  </Link>{' '}
+                  and{' '}
+                  <Link
+                    to="/privacy"
+                    target="_blank"
+                    rel="noreferrer"
+                    className="text-brand-600 font-semibold hover:underline dark:text-brand-400"
+                    onClick={(e) => e.stopPropagation()}
+                  >
+                    Privacy Policy
+                  </Link>.
                 </span>
               </label>
             </div>

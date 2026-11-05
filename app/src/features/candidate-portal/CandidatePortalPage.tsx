@@ -28,6 +28,15 @@ export default function CandidatePortalPage() {
     (a) => a.candidateEmail.toLowerCase() === user.email.toLowerCase() || a.candidateId === myProfile?.id
   );
 
+  const rankedJobs = myProfile
+    ? jobs
+        .map((job) => ({ job, match: calculateCandidateMatch(job, myProfile) }))
+        .sort((a, b) => b.match.totalScore - a.match.totalScore)
+    : jobs.map((job) => ({ job, match: undefined }));
+  const topUnappliedIndex = rankedJobs.findIndex(
+    ({ job }) => !myApplications.some((a) => a.jobId === job.id)
+  );
+
   const handleApply = (job: Job) => {
     const already = applications.some((a) => a.jobId === job.id && (a.candidateId === myProfile?.id || a.candidateEmail === user.email));
     if (already) {
@@ -140,14 +149,19 @@ export default function CandidatePortalPage() {
       {/* Tabs View */}
       {activeTab === 'jobs' ? (
         <div className="space-y-4">
-          <div className="flex items-center justify-between">
+          <div className="flex flex-wrap items-center justify-between gap-2">
             <h2 className="text-sm font-semibold uppercase tracking-wider text-neutral-500">
               Available Vacancies
             </h2>
+            {myProfile && (
+              <span className="text-xs text-neutral-500">
+                Sorted by fit with your parsed resume
+              </span>
+            )}
           </div>
 
           <div className="grid gap-4 md:grid-cols-2">
-            {jobs.map((job) => {
+            {rankedJobs.map(({ job, match }, index) => {
               const hasApplied = myApplications.some((a) => a.jobId === job.id);
               return (
                 <Card key={job.id} className="p-5 flex flex-col justify-between space-y-4">
@@ -180,6 +194,33 @@ export default function CandidatePortalPage() {
                         </span>
                       ))}
                     </div>
+
+                    {match && (
+                      <div className="mt-3 rounded-lg border border-neutral-200 bg-neutral-50 p-2.5 text-xs dark:border-neutral-800 dark:bg-neutral-800/40">
+                        <div className="flex items-center justify-between gap-2">
+                          <span className="font-semibold text-neutral-800 dark:text-neutral-200">
+                            Your resume fit: {match.totalScore}%
+                            {index === topUnappliedIndex && (
+                              <span className="ml-1.5 rounded bg-accent-100 px-1.5 py-0.5 text-[10px] font-bold uppercase tracking-wide text-accent-800 dark:bg-accent-900/50 dark:text-accent-300">
+                                Best fit
+                              </span>
+                            )}
+                          </span>
+                          <span className="text-neutral-500">
+                            {match.matchedSkills.length}/{job.requiredSkills.length} required skills verified
+                          </span>
+                        </div>
+                        {match.missingSkills.length > 0 ? (
+                          <p className="mt-1 text-neutral-500">
+                            Missing: {match.missingSkills.join(', ')}
+                          </p>
+                        ) : (
+                          <p className="mt-1 text-emerald-700 dark:text-emerald-400">
+                            All required skills found in your resume.
+                          </p>
+                        )}
+                      </div>
+                    )}
                   </div>
 
                   <div className="flex items-center justify-between border-t border-neutral-100 pt-3 dark:border-neutral-800">

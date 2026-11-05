@@ -1,6 +1,8 @@
 import { useState } from 'react';
-import { RotateCcw, Sparkles, CheckCircle2, AlertCircle, ShieldCheck, Zap } from 'lucide-react';
+import { RotateCcw, CheckCircle2, AlertCircle, ShieldCheck, Zap } from 'lucide-react';
 import { Card } from '@/components/ui/Card';
+import { ExtractionEvidence } from '@/components/ui/CustomIcons';
+import { Spinner } from '@/components/ui/Spinner';
 import { Button } from '@/components/ui/Button';
 import { Input } from '@/components/ui/Input';
 import { ConfirmDialog } from '@/components/ui/Modal';
@@ -243,7 +245,7 @@ export default function Settings() {
             ) : groqStatus === 'error' ? (
               <AlertCircle className="h-4 w-4 shrink-0 text-rose-600" />
             ) : (
-              <Sparkles className="h-4 w-4 shrink-0 animate-spin text-amber-600" />
+              <Spinner size="sm" color="brand" className="shrink-0" />
             )}
             <span>{groqMessage}</span>
           </div>
@@ -255,7 +257,7 @@ export default function Settings() {
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-2.5">
             <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-blue-100 text-blue-700 dark:bg-blue-900/40 dark:text-blue-300">
-              <Sparkles className="h-5 w-5" />
+              <ExtractionEvidence className="h-5 w-5" />
             </div>
             <div>
               <h2 className="text-base font-semibold text-neutral-900 dark:text-white">
@@ -349,7 +351,7 @@ export default function Settings() {
             ) : geminiStatus === 'error' ? (
               <AlertCircle className="h-4 w-4 shrink-0 text-rose-600" />
             ) : (
-              <Sparkles className="h-4 w-4 shrink-0 animate-spin text-blue-600" />
+              <Spinner size="sm" color="brand" className="shrink-0" />
             )}
             <span>{geminiMessage}</span>
           </div>

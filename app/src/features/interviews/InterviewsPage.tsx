@@ -3,7 +3,6 @@ import {
   Calendar,
   Plus,
   Video,
-  Sparkles,
   AlertTriangle,
   CheckCircle,
   XCircle,
@@ -13,12 +12,19 @@ import {
   Check,
   ChevronDown,
   ChevronUp,
+  Pencil,
+  Trash2,
+  RefreshCw,
+  Save,
 } from 'lucide-react';
+import { QuestionTiers } from '@/components/ui/CustomIcons';
 import { Button } from '@/components/ui/Button';
 import { Card } from '@/components/ui/Card';
 import { Input } from '@/components/ui/Input';
 import { Modal } from '@/components/ui/Modal';
 import { load, save, uid } from '@/lib/storage';
+import { getCurrentUser } from '@/lib/auth';
+import { calculateCandidateMatch } from '@/lib/ai/matcher';
 import { generateInterviewQuestionsUnified } from '@/lib/ai/orchestrator';
 import type { Interview, InterviewQuestion, CandidateProfile, Job, Application } from '@/types';
 
@@ -55,6 +61,9 @@ export default function InterviewsPage() {
   const [modalQuestions, setModalQuestions] = useState<InterviewQuestion[]>([]);
   const [isGeneratingQuestions, setIsGeneratingQuestions] = useState(false);
   const [generatedProvider, setGeneratedProvider] = useState<string | null>(null);
+  const [editingQuestionId, setEditingQuestionId] = useState<string | null>(null);
+  const [editingQuestionText, setEditingQuestionText] = useState('');
+  const [regeneratingQuestionId, setRegeneratingQuestionId] = useState<string | null>(null);
 
   // Feedback Modal State
   const [feedbackInterview, setFeedbackInterview] = useState<Interview | null>(null);
@@ -122,12 +131,63 @@ export default function InterviewsPage() {
     }
   };
 
+  const handleStartEditQuestion = (question: InterviewQuestion) => {
+    setEditingQuestionId(question.id);
+    setEditingQuestionText(question.text);
+  };
+
+  const handleSaveQuestionEdit = (questionId: string) => {
+    const trimmed = editingQuestionText.trim();
+    if (!trimmed) return;
+    setModalQuestions((current) =>
+      current.map((q) => (q.id === questionId ? { ...q, text: trimmed } : q))
+    );
+    setEditingQuestionId(null);
+    setEditingQuestionText('');
+  };
+
+  const handleRemoveQuestion = (questionId: string) => {
+    setModalQuestions((current) => current.filter((q) => q.id !== questionId));
+    if (editingQuestionId === questionId) setEditingQuestionId(null);
+  };
+
+  const handleRegenerateQuestion = async (questionId: string) => {
+    const candidate = candidates.find((c) => c.id === activeCandidateId);
+    const job = jobs.find((j) => j.id === activeJobId);
+    if (!candidate || !job) return;
+
+    setRegeneratingQuestionId(questionId);
+    try {
+      const projectNames = candidate.projects?.map((p) => p.name) || [];
+      const res = await generateInterviewQuestionsUnified(job.title, candidate.name, projectNames);
+      setModalQuestions((current) => {
+        const existing = current.find((q) => q.id === questionId);
+        const usedTexts = new Set(current.filter((q) => q.id !== questionId).map((q) => q.text));
+        const pool = res.questions.filter((q) => !usedTexts.has(q.text));
+        const replacement =
+          pool.find((q) => q.difficulty === existing?.difficulty) ||
+          pool[0] ||
+          res.questions[0];
+        if (!replacement) return current;
+        return current.map((q) =>
+          q.id === questionId ? { ...replacement, id: questionId } : q
+        );
+      });
+      setGeneratedProvider(res.provider);
+    } catch (err) {
+      console.error('Failed to regenerate question:', err);
+    } finally {
+      setRegeneratingQuestionId(null);
+    }
+  };
+
   // Open Schedule Modal pre-populated
   const handleOpenSchedule = (candidateId?: string, jobId?: string) => {
     if (candidateId) setSelectedCandidateId(candidateId);
     if (jobId) setSelectedJobId(jobId);
     setModalQuestions([]);
     setGeneratedProvider(null);
+    setEditingQuestionId(null);
     setIsScheduleOpen(true);
   };
 
@@ -152,13 +212,45 @@ export default function InterviewsPage() {
             },
           ];
 
-    const matchingApp = applications.find(
+    let matchingApp = applications.find(
       (a) => a.candidateId === candidate.id && a.jobId === job.id
     );
 
+    // Interviews must point at a real application so the final decision can update it.
+    if (!matchingApp) {
+      const match = calculateCandidateMatch(job, candidate);
+      matchingApp = {
+        id: uid('app'),
+        jobId: job.id,
+        candidateId: candidate.id,
+        candidateName: candidate.name,
+        candidateEmail: candidate.email,
+        status: 'Interview',
+        appliedAt: new Date().toISOString(),
+        updatedAt: new Date().toISOString(),
+        matchScore: match.totalScore,
+        scoreBreakdown: match,
+        notes: [],
+        auditTrail: [
+          {
+            id: uid('aud'),
+            applicationId: '',
+            fromStatus: 'Submitted',
+            toStatus: 'Interview',
+            changedBy: getCurrentUser()?.name ?? 'Recruiter',
+            timestamp: new Date().toISOString(),
+            note: 'Application opened from interview scheduling',
+          },
+        ],
+      };
+      matchingApp.auditTrail[0].applicationId = matchingApp.id;
+      const latestApplications = load<Application[]>('applications', []);
+      save('applications', [matchingApp, ...latestApplications]);
+    }
+
     const newInterview: Interview = {
       id: uid('int'),
-      applicationId: matchingApp?.id || uid('app'),
+      applicationId: matchingApp.id,
       candidateId: candidate.id,
       candidateName: candidate.name,
       jobId: job.id,
@@ -210,6 +302,41 @@ export default function InterviewsPage() {
 
     setInterviews(updated);
     save('interviews', updated);
+
+    const nextStatus =
+      feedbackDecision === 'Hire' || feedbackDecision === 'Strong Hire'
+        ? ('Selected' as const)
+        : feedbackDecision === 'No Hire'
+          ? ('Rejected' as const)
+          : null;
+
+    if (nextStatus) {
+      const actor = getCurrentUser()?.name ?? 'Interview Panel';
+      const storedApplications = load<Application[]>('applications', []);
+      const syncedApplications = storedApplications.map((app) =>
+        app.id === feedbackInterview.applicationId && app.status !== nextStatus
+          ? {
+              ...app,
+              status: nextStatus,
+              updatedAt: new Date().toISOString(),
+              auditTrail: [
+                ...app.auditTrail,
+                {
+                  id: uid('aud'),
+                  applicationId: app.id,
+                  fromStatus: app.status,
+                  toStatus: nextStatus,
+                  changedBy: actor,
+                  timestamp: new Date().toISOString(),
+                  note: `Interview outcome recorded: ${feedbackDecision} (${feedbackRating}/5 overall)`,
+                },
+              ],
+            }
+          : app
+      );
+      save('applications', syncedApplications);
+    }
+
     setFeedbackInterview(null);
     setFeedbackComments('');
   };
@@ -632,14 +759,14 @@ export default function InterviewsPage() {
                 disabled={isGeneratingQuestions}
                 className="gap-1.5 text-xs border-blue-200 bg-blue-50 text-blue-700 hover:bg-blue-100 dark:border-blue-800 dark:bg-blue-950/60 dark:text-blue-300"
               >
-                <Sparkles className="h-3.5 w-3.5 text-blue-600" />
+                <QuestionTiers className="h-3.5 w-3.5 text-blue-600" />
                 {isGeneratingQuestions ? 'Generating...' : 'Generate 3-Tier Questions'}
               </Button>
             </div>
 
             {generatedProvider && (
-              <div className="text-[11px] text-emerald-600 font-medium">
-                ✨ Successfully generated via {generatedProvider}
+              <div className="flex items-center gap-1.5 text-[11px] font-medium text-emerald-600">
+                <CheckCircle className="h-3.5 w-3.5" /> Successfully generated via {generatedProvider}
               </div>
             )}
 
@@ -650,12 +777,74 @@ export default function InterviewsPage() {
                     key={q.id || idx}
                     className="rounded-lg border border-neutral-200 bg-white p-2.5 text-xs dark:border-neutral-700 dark:bg-neutral-800"
                   >
-                    <div className="flex items-center justify-between">
+                    <div className="flex items-center justify-between gap-2">
                       <span className="font-semibold uppercase tracking-wider text-[10px] text-blue-600 dark:text-blue-400">
                         {q.difficulty} • {q.category}
                       </span>
+                      <div className="flex items-center gap-0.5">
+                        {editingQuestionId === q.id ? (
+                          <>
+                            <button
+                              type="button"
+                              onClick={() => handleSaveQuestionEdit(q.id)}
+                              aria-label="Save question"
+                              className="rounded p-1.5 text-emerald-600 transition hover:bg-emerald-50 dark:hover:bg-emerald-950/40"
+                            >
+                              <Save className="h-3.5 w-3.5" />
+                            </button>
+                            <button
+                              type="button"
+                              onClick={() => setEditingQuestionId(null)}
+                              aria-label="Cancel editing question"
+                              className="rounded p-1.5 text-neutral-500 transition hover:bg-neutral-100 dark:hover:bg-neutral-700"
+                            >
+                              <XCircle className="h-3.5 w-3.5" />
+                            </button>
+                          </>
+                        ) : (
+                          <>
+                            <button
+                              type="button"
+                              onClick={() => handleStartEditQuestion(q)}
+                              aria-label="Edit question"
+                              className="rounded p-1.5 text-neutral-500 transition hover:bg-neutral-100 dark:hover:bg-neutral-700"
+                            >
+                              <Pencil className="h-3.5 w-3.5" />
+                            </button>
+                            <button
+                              type="button"
+                              onClick={() => void handleRegenerateQuestion(q.id)}
+                              aria-label="Regenerate question"
+                              disabled={regeneratingQuestionId === q.id}
+                              className="rounded p-1.5 text-neutral-500 transition hover:bg-neutral-100 disabled:opacity-50 dark:hover:bg-neutral-700"
+                            >
+                              <RefreshCw
+                                className={`h-3.5 w-3.5 ${regeneratingQuestionId === q.id ? 'animate-spin' : ''}`}
+                              />
+                            </button>
+                            <button
+                              type="button"
+                              onClick={() => handleRemoveQuestion(q.id)}
+                              aria-label="Remove question"
+                              className="rounded p-1.5 text-neutral-500 transition hover:bg-red-50 hover:text-red-600 dark:hover:bg-red-950/40"
+                            >
+                              <Trash2 className="h-3.5 w-3.5" />
+                            </button>
+                          </>
+                        )}
+                      </div>
                     </div>
-                    <p className="mt-1 font-medium text-neutral-800 dark:text-neutral-200">{q.text}</p>
+                    {editingQuestionId === q.id ? (
+                      <textarea
+                        value={editingQuestionText}
+                        onChange={(e) => setEditingQuestionText(e.target.value)}
+                        aria-label="Question text"
+                        rows={2}
+                        className="mt-1 w-full rounded-md border border-blue-300 bg-white p-2 text-xs focus:border-blue-500 focus:outline-none dark:border-blue-700 dark:bg-neutral-900 dark:text-white"
+                      />
+                    ) : (
+                      <p className="mt-1 font-medium text-neutral-800 dark:text-neutral-200">{q.text}</p>
+                    )}
                     {q.expectedAnswerGuidelines && (
                       <p className="mt-1 text-[11px] text-neutral-500">
                         <span className="font-semibold">Rubric:</span> {q.expectedAnswerGuidelines}

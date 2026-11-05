@@ -121,7 +121,7 @@ export function ScrollProgress() {
   return (
     <div className="pointer-events-none fixed inset-x-0 top-0 z-[60] h-0.5 bg-transparent" aria-hidden="true">
       <div
-        className="h-full bg-gradient-to-r from-brand-500 via-brand-600 to-accent-500 transition-[width] duration-150 ease-out"
+        className="h-full bg-brand-600 transition-[width] duration-150 ease-out"
         style={{ width: `${progress}%` }}
       />
     </div>

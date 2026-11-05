@@ -1,7 +1,7 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
+import { useSearchParams } from 'react-router-dom';
 import {
   Search,
-  Sparkles,
   Shield,
   CheckCircle,
   GitCompare,
@@ -12,6 +12,7 @@ import {
   Layers,
   SlidersHorizontal,
 } from 'lucide-react';
+import { SemanticQuery } from '@/components/ui/CustomIcons';
 import { Button } from '@/components/ui/Button';
 import { Card } from '@/components/ui/Card';
 import { Input } from '@/components/ui/Input';
@@ -55,8 +56,18 @@ export default function IntelligencePage() {
   const [candidates, setCandidates] = useState<CandidateProfile[]>(() => load<CandidateProfile[]>('candidates', []));
   const jobs = load<Job[]>('jobs', []);
 
-  const [query, setQuery] = useState('Python developers with REST API and containerization experience');
+  const [searchParams] = useSearchParams();
+  const presetQuery = searchParams.get('q')?.trim();
+  const [query, setQuery] = useState(
+    presetQuery || 'Python developers with REST API and containerization experience'
+  );
   const [submittedQuery, setSubmittedQuery] = useState(query);
+  useEffect(() => {
+    if (presetQuery) {
+      setQuery(presetQuery);
+      setSubmittedQuery(presetQuery);
+    }
+  }, [presetQuery]);
   const [blindMode, setBlindMode] = useState(false);
   const [selectedExpFilter, setSelectedExpFilter] = useState<'all' | 'junior' | 'mid' | 'senior'>('all');
   const [selectedCandidatesForCompare, setSelectedCandidatesForCompare] = useState<string[]>(
@@ -235,7 +246,7 @@ export default function IntelligencePage() {
             />
           </div>
           <Button className="gap-2">
-            <Sparkles className="h-4 w-4" /> Run Search
+            <SemanticQuery className="h-4 w-4" /> Run Search
           </Button>
         </form>
 

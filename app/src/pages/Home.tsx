@@ -1,5 +1,6 @@
 import { useNavigate } from 'react-router-dom';
-import { Briefcase, Users, Sparkles, TrendingUp, Target, ArrowRight, Zap, BarChart3, MapPin, Plus, FileText } from 'lucide-react';
+import { Briefcase, Users, TrendingUp, Target, ArrowRight, Zap, BarChart3, MapPin, Plus, FileText } from 'lucide-react';
+import { RecuLensLogo, TalentMatch, ExtractionEvidence } from '@/components/ui/CustomIcons';
 import { Button } from '@/components/ui/Button';
 import { MagicButton, SubmitButton } from '@/components/ui/Button';
 import type { Job, Application } from '@/types';
@@ -42,11 +43,11 @@ export default function Home() {
       {/* Hero Section */}
       <div className="relative overflow-hidden rounded-[var(--radius-xl)] bg-brand-700 p-8 shadow-lg">
         <div className="absolute right-[-20px] top-[-20px] h-40 w-40 opacity-10">
-          <Sparkles className="h-full w-full" />
+          <RecuLensLogo className="h-full w-full" />
         </div>
         <div className="relative z-10 max-w-2xl">
           <div className="mb-4 flex items-center gap-2 text-white/90">
-            <Sparkles className="h-5 w-5" />
+            <TalentMatch className="h-5 w-5" />
             <span className="text-sm font-medium">AI-Powered Recruitment Platform</span>
           </div>
           <h1 className="mb-4 display-text text-3xl font-bold leading-tight sm:text-4xl lg:text-5xl">
@@ -226,7 +227,7 @@ export default function Home() {
           {/* AI Feature Highlight */}
           <div className="mt-6 rounded-[var(--radius-lg)] border border-accent-200 bg-accent-50 p-5 dark:border-accent-800 dark:bg-accent-900/40">
             <div className="mb-2 flex items-center gap-2">
-              <Sparkles className="h-4 w-4 text-accent-600" />
+              <ExtractionEvidence className="h-4 w-4 text-accent-600" />
               <span className="text-sm font-semibold text-accent-800 dark:text-accent-200">AI-Powered Insights</span>
             </div>
             <p className="text-sm text-accent-700 dark:text-accent-300">

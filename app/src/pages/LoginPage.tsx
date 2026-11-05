@@ -1,7 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import {
-  Sparkles,
   Lock,
   Mail,
   ArrowRight,
@@ -16,6 +15,7 @@ import {
 import { Button } from '@/components/ui/Button';
 import { Card } from '@/components/ui/Card';
 import { Input } from '@/components/ui/Input';
+import { RecuLensLogo } from '@/components/ui/CustomIcons';
 import { loginUser, findUserByEmail, resetPassword } from '@/lib/auth';
 
 const REMEMBERED_EMAIL_KEY = 'recrulens_remembered_email';
@@ -145,7 +145,7 @@ export default function LoginPage() {
         {/* Brand Header */}
         <div className="text-center space-y-2">
           <div className="mx-auto flex h-12 w-12 items-center justify-center rounded-xl bg-brand-700 text-white shadow-md">
-            <Sparkles className="h-6 w-6" />
+            <RecuLensLogo className="h-6 w-6" />
           </div>
           <h1 className="font-display text-2xl font-bold tracking-tight text-neutral-900 dark:text-white">
             Sign in to <span className="text-brand-700 dark:text-brand-300">RecruLens</span>
@@ -260,10 +260,21 @@ export default function LoginPage() {
           </div>
         </Card>
 
-        {/* Security assurance */}
-        <div className="flex items-center justify-center gap-2 text-[11px] text-neutral-400 dark:text-neutral-500">
-          <Shield className="h-3.5 w-3.5" />
-          <span>Encrypted session authentication & client-side security</span>
+        {/* Security assurance & Legal */}
+        <div className="flex flex-col items-center justify-center gap-1.5 text-[11px] text-neutral-400 dark:text-neutral-500">
+          <div className="flex items-center gap-1.5">
+            <Shield className="h-3.5 w-3.5 text-brand-600 dark:text-brand-400" />
+            <span>Encrypted session authentication & client-side security</span>
+          </div>
+          <div className="flex items-center gap-3 text-[10px]">
+            <Link to="/terms" className="hover:text-neutral-600 hover:underline dark:hover:text-neutral-300">
+              Terms of Service
+            </Link>
+            <span>•</span>
+            <Link to="/privacy" className="hover:text-neutral-600 hover:underline dark:hover:text-neutral-300">
+              Privacy Policy
+            </Link>
+          </div>
         </div>
       </div>
 
