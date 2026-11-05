@@ -3,6 +3,7 @@ import { NavLink, useNavigate, useLocation } from 'react-router-dom';
 import { Menu, X, UserCheck, ShieldCheck, RefreshCw, LogOut } from 'lucide-react';
 import { cn } from '@/lib/cn';
 import { Button } from '../ui/Button';
+import { ScrollProgress } from '../ui/Motion';
 import { Modal } from '../ui/Modal';
 import { NAV_ITEMS } from '@/app/nav';
 import { getCurrentUser, logoutUser, getStoredUsers, switchAccount, type StoredUser } from '@/lib/auth';
@@ -229,6 +230,7 @@ export function AppShell({ children }: { children: ReactNode }) {
 
       {/* Main Content Area */}
       <main id="main" tabIndex={-1} className="mx-auto w-full min-w-0 max-w-7xl overflow-x-hidden p-4 sm:p-6 lg:p-8">
+        <ScrollProgress />
         {children}
       </main>
 
