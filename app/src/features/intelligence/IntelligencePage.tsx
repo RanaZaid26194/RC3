@@ -264,7 +264,7 @@ export default function IntelligencePage() {
                 </div>
 
                 <div className="border-t border-neutral-100 pt-3 flex items-center justify-between text-xs dark:border-neutral-800">
-                  <span className="text-[11px] font-medium text-emerald-600 dark:text-emerald-400 flex items-center gap-1">
+                  <span className="text-[11px] font-medium text-emerald-700 dark:text-emerald-400 flex items-center gap-1">
                     <CheckCircle className="h-3 w-3" /> Semantic Match
                   </span>
                   <span className="text-[11px] text-neutral-600 dark:text-neutral-400">

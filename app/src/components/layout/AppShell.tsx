@@ -220,7 +220,7 @@ export function AppShell({ children }: { children: ReactNode }) {
       )}
 
       {/* Main Content Area */}
-      <main id="main" tabIndex={-1} className="mx-auto w-full min-w-0 max-w-7xl p-4 sm:p-6 lg:p-8">
+      <main id="main" tabIndex={-1} className="mx-auto w-full min-w-0 max-w-7xl overflow-x-hidden p-4 sm:p-6 lg:p-8">
         {children}
       </main>
     </div>
