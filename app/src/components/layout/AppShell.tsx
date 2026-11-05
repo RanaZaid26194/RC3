@@ -103,28 +103,32 @@ export function AppShell({ children }: { children: ReactNode }) {
       <aside className="hidden flex-col justify-between border-r border-neutral-200 bg-white p-4 dark:border-neutral-800 dark:bg-neutral-900 lg:flex">
         <div>
           {/* Logo & Brand */}
-          <div className="mb-6 flex items-center justify-between px-2 pt-2">
-            <div className="flex items-center gap-3">
-              <div className="flex h-12 w-12 items-center justify-center rounded-xl border border-neutral-200 bg-white p-1 shadow-sm dark:border-neutral-700 dark:bg-neutral-800">
+          <div className="mb-5 px-1 pt-1">
+            <NavLink
+              to="/"
+              className="group flex items-center gap-3 rounded-xl p-1.5 -ml-1.5 transition-all duration-200 hover:bg-neutral-50 dark:hover:bg-neutral-800/60 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-500"
+              title="RecruLens Home"
+            >
+              <div className="relative flex h-11 w-11 items-center justify-center rounded-xl border border-neutral-200/90 bg-white p-1.5 shadow-xs transition-all duration-300 ease-out-expo group-hover:scale-110 group-hover:-rotate-3 group-hover:border-brand-300 group-hover:shadow-md group-hover:ring-4 group-hover:ring-brand-500/15 dark:border-neutral-700 dark:bg-neutral-800 dark:group-hover:border-brand-600">
                 <img
                   src="/logo.png"
                   alt="RecruLens Logo"
-                  className="h-full w-full object-contain"
+                  className="h-full w-full object-contain transition-transform duration-500 ease-out group-hover:scale-110 group-hover:rotate-6"
                   onError={(e) => {
                     // Fallback if image fails to load
                     (e.target as HTMLElement).style.display = 'none';
                   }}
                 />
               </div>
-              <div>
-                <span className="font-display text-xl font-bold tracking-tight text-neutral-900 dark:text-white">
+              <div className="flex flex-col">
+                <span className="font-display text-xl font-bold tracking-tight text-neutral-900 transition-colors duration-200 group-hover:text-brand-700 dark:text-white dark:group-hover:text-brand-400 leading-tight">
                   {APP_NAME}
                 </span>
-                <span className="block text-[11px] font-semibold uppercase tracking-wider text-neutral-500">
+                <span className="block text-[10px] font-semibold uppercase tracking-wider text-neutral-400 transition-all duration-200 group-hover:text-brand-600 dark:group-hover:text-brand-400">
                   Talent Intelligence
                 </span>
               </div>
-            </div>
+            </NavLink>
           </div>
 
           {/* Authenticated User Account Card */}
@@ -193,18 +197,18 @@ export function AppShell({ children }: { children: ReactNode }) {
 
       {/* Mobile Header */}
       <header className="sticky top-0 z-40 flex items-center justify-between border-b border-neutral-200 bg-white px-4 py-2.5 dark:border-neutral-800 dark:bg-neutral-900 lg:hidden">
-        <div className="flex items-center gap-2.5">
-          <div className="flex h-9 w-9 items-center justify-center rounded-lg border border-neutral-200 bg-white p-0.5 shadow-xs dark:border-neutral-700 dark:bg-neutral-800">
+        <NavLink to="/" className="group flex items-center gap-2.5">
+          <div className="flex h-9 w-9 items-center justify-center rounded-lg border border-neutral-200 bg-white p-0.5 shadow-xs transition-all duration-300 group-hover:scale-105 group-hover:border-brand-400 group-hover:shadow-sm dark:border-neutral-700 dark:bg-neutral-800">
             <img
               src="/logo.png"
               alt="RecruLens Logo"
-              className="h-full w-full object-contain"
+              className="h-full w-full object-contain transition-transform duration-300 group-hover:rotate-6"
             />
           </div>
-          <span className="font-display text-base font-bold text-neutral-900 dark:text-white">
+          <span className="font-display text-base font-bold text-neutral-900 transition-colors group-hover:text-brand-700 dark:text-white dark:group-hover:text-brand-400">
             {APP_NAME}
           </span>
-        </div>
+        </NavLink>
         <div className="flex items-center gap-2">
           <Button
             variant="ghost"
