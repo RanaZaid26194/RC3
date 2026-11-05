@@ -100,21 +100,21 @@ export function AppShell({ children }: { children: ReactNode }) {
         <div>
           {/* Logo & Brand */}
           <div className="mb-6 flex items-center justify-between px-2 pt-2">
-            <div className="flex items-center gap-2.5">
+            <div className="flex items-center gap-3">
               <img
                 src="/logo.png"
                 alt="RecruLens Logo"
-                className="h-9 w-9 rounded-lg object-contain shadow-xs border border-neutral-200 dark:border-neutral-700 bg-white dark:bg-neutral-800 p-0.5"
+                className="h-12 w-12 rounded-xl object-contain shadow-sm border border-neutral-200 dark:border-neutral-700 bg-white dark:bg-neutral-800 p-1"
                 onError={(e) => {
                   // Fallback if image fails to load
                   (e.target as HTMLElement).style.display = 'none';
                 }}
               />
               <div>
-                <span className="font-display text-lg font-bold tracking-tight text-neutral-900 dark:text-white">
+                <span className="font-display text-xl font-bold tracking-tight text-neutral-900 dark:text-white">
                   {APP_NAME}
                 </span>
-                <span className="block text-[10px] font-medium uppercase tracking-wider text-neutral-500">
+                <span className="block text-[11px] font-semibold uppercase tracking-wider text-neutral-500">
                   Talent Intelligence
                 </span>
               </div>
@@ -177,11 +177,11 @@ export function AppShell({ children }: { children: ReactNode }) {
 
       {/* Mobile Header */}
       <header className="sticky top-0 z-40 flex items-center justify-between border-b border-neutral-200 bg-white px-4 py-2.5 dark:border-neutral-800 dark:bg-neutral-900 lg:hidden">
-        <div className="flex items-center gap-2">
+        <div className="flex items-center gap-2.5">
           <img
             src="/logo.png"
             alt="RecruLens Logo"
-            className="h-8 w-8 rounded-lg object-contain bg-white dark:bg-neutral-800 p-0.5 border border-neutral-200 dark:border-neutral-700"
+            className="h-9 w-9 rounded-lg object-contain bg-white dark:bg-neutral-800 p-0.5 border border-neutral-200 dark:border-neutral-700"
           />
           <span className="font-display text-base font-bold text-neutral-900 dark:text-white">
             {APP_NAME}
