@@ -211,12 +211,12 @@ export default function IntelligencePage() {
       </div>
 
       {/* Semantic Search Box */}
-      <Card className="p-5 space-y-4">
-        <div className="flex items-center justify-between">
+      <Card className="p-4 sm:p-5 space-y-4">
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
           <label htmlFor="nl-search" className="block text-xs font-bold uppercase tracking-wider text-neutral-700 dark:text-neutral-300">
             Natural Language Semantic Talent Query
           </label>
-          <div className="flex items-center gap-2">
+          <div className="flex flex-wrap items-center gap-2">
             <label htmlFor="benchmark-role-select" className="text-xs text-neutral-500">Target Role Benchmark:</label>
             <select
               id="benchmark-role-select"
@@ -234,7 +234,7 @@ export default function IntelligencePage() {
           </div>
         </div>
 
-        <form className="flex gap-2" onSubmit={runSearch}>
+        <form className="flex flex-col sm:flex-row gap-2" onSubmit={runSearch}>
           <div className="relative flex-1">
             <Search className="absolute left-3 top-3 h-4 w-4 text-neutral-400" />
             <Input
@@ -245,7 +245,7 @@ export default function IntelligencePage() {
               className="pl-9 text-xs"
             />
           </div>
-          <Button className="gap-2">
+          <Button className="gap-2 shrink-0 justify-center">
             <SemanticQuery className="h-4 w-4" /> Run Search
           </Button>
         </form>

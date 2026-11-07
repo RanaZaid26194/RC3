@@ -4,6 +4,7 @@ import { HashRouter } from 'react-router-dom';
 import '@fontsource-variable/inter';
 import '@fontsource-variable/fraunces';
 import './styles/index.css';
+import '@/lib/theme';
 import App from './App';
 import { ToastProvider } from './components/ui/Toast';
 import { Analytics } from '@vercel/analytics/react';

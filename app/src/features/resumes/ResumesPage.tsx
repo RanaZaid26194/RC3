@@ -155,7 +155,7 @@ export default function ResumesPage() {
       </Card>
 
       {status && (
-        <div className={`flex items-center gap-2 rounded-md border p-3 text-sm ${status.tone === 'success' ? 'border-emerald-200 bg-emerald-50 text-emerald-800' : 'border-red-200 bg-red-50 text-red-800'}`} role="status">
+        <div className={`flex items-center gap-2 rounded-md border p-3 text-sm ${status.tone === 'success' ? 'border-emerald-200 bg-emerald-50 text-emerald-800 dark:border-emerald-800 dark:bg-emerald-950/40 dark:text-emerald-300' : 'border-red-200 bg-red-50 text-red-800 dark:border-red-800 dark:bg-red-950/40 dark:text-red-300'}`} role="status">
           {status.tone === 'success' ? <CheckCircle2 className="h-4 w-4" /> : <AlertCircle className="h-4 w-4" />}
           {status.message}
         </div>

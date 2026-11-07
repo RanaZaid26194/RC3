@@ -1,6 +1,7 @@
 import { useRef, useState } from 'react';
-import { RotateCcw, CheckCircle2, AlertCircle, ShieldCheck, Zap, Download, Upload } from 'lucide-react';
+import { RotateCcw, CheckCircle2, AlertCircle, ShieldCheck, Zap, Download, Upload, Sun, Moon } from 'lucide-react';
 import { Card } from '@/components/ui/Card';
+import { ThemeToggle } from '@/components/ui/ThemeToggle';
 import { ExtractionEvidence } from '@/components/ui/CustomIcons';
 import { Spinner } from '@/components/ui/Spinner';
 import { Button } from '@/components/ui/Button';
@@ -172,9 +173,24 @@ export default function Settings() {
           System & AI Engine Settings
         </h1>
         <p className="text-sm text-neutral-500">
-          Configure Google Gemini and Groq API keys, model selections, and local persistence.
+          Configure interface theme, Google Gemini and Groq API keys, model selections, and local persistence.
         </p>
       </div>
+
+      {/* Appearance & Color Theme */}
+      <Card className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 p-6">
+        <div>
+          <div className="flex items-center gap-2">
+            <Sun className="h-5 w-5 text-amber-500 dark:hidden" />
+            <Moon className="h-5 w-5 text-accent-400 hidden dark:block" />
+            <h2 className="text-base font-semibold text-neutral-900 dark:text-white">Interface Appearance & Theme</h2>
+          </div>
+          <p className="mt-1 text-xs text-neutral-500">
+            Select light mode, dark mode, or follow your operating system automatically with zero layout flickering.
+          </p>
+        </div>
+        <ThemeToggle variant="segmented" className="p-1 shrink-0" />
+      </Card>
 
       {/* Groq LPU Acceleration Card */}
       <Card className="p-6 space-y-4">

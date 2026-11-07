@@ -4,6 +4,23 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <meta name="theme-color" content="#2563eb" />
+    <script>
+      (function() {
+        try {
+          var stored = localStorage.getItem('recrulens_theme');
+          var isDark = stored === 'dark' || ((!stored || stored === 'system') && window.matchMedia('(prefers-color-scheme: dark)').matches);
+          if (isDark) {
+            document.documentElement.classList.add('dark');
+            document.documentElement.setAttribute('data-theme', 'dark');
+            document.documentElement.style.colorScheme = 'dark';
+          } else {
+            document.documentElement.classList.remove('dark');
+            document.documentElement.setAttribute('data-theme', 'light');
+            document.documentElement.style.colorScheme = 'light';
+          }
+        } catch (e) {}
+      })();
+    </script>
     <meta name="robots" content="index, follow" />
     <title>RecruLens — Explainable Talent Intelligence & Semantic Candidate Matching</title>
     <meta name="description" content="AI-powered recruitment intelligence platform featuring semantic talent matching, explainable evidence scoring (50/25/15/10), 3-tier interview kits, and bias-free blind evaluation." />
@@ -60,8 +77,8 @@
       ]
     }
     </script>
-    <script type="module" crossorigin src="./assets/index-CnjvpXjM.js"></script>
-    <link rel="stylesheet" crossorigin href="./assets/index-D3lNJT-L.css">
+    <script type="module" crossorigin src="./assets/index-C4z-5_9X.js"></script>
+    <link rel="stylesheet" crossorigin href="./assets/index-CefvCaaf.css">
   </head>
   <body>
     <div id="root"></div>

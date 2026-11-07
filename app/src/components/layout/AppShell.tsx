@@ -3,6 +3,7 @@ import { NavLink, useNavigate, useLocation, Navigate } from 'react-router-dom';
 import { Menu, X, UserCheck, ShieldCheck, RefreshCw, LogOut } from 'lucide-react';
 import { cn } from '@/lib/cn';
 import { Button } from '../ui/Button';
+import { ThemeToggle } from '../ui/ThemeToggle';
 import { ScrollProgress } from '../ui/Motion';
 import { Modal } from '../ui/Modal';
 import { NAV_ITEMS } from '@/app/nav';
@@ -167,8 +168,14 @@ export function AppShell({ children }: { children: ReactNode }) {
           {nav}
         </div>
 
-        {/* Footer actions with Logout and Reset */}
-        <div className="border-t border-neutral-200 pt-3 space-y-1.5 dark:border-neutral-800">
+        {/* Footer actions with Theme Toggle, Logout and Reset */}
+        <div className="border-t border-neutral-200 pt-3 space-y-2 dark:border-neutral-800">
+          <div className="flex items-center justify-between px-1">
+            <span className="text-[10px] font-semibold uppercase tracking-wider text-neutral-400 dark:text-neutral-500">
+              Appearance
+            </span>
+            <ThemeToggle variant="segmented" />
+          </div>
           <div className="mb-2 flex items-center gap-2 px-2 text-[10px] font-semibold uppercase tracking-wider text-neutral-400 dark:text-neutral-500">
             <span className="animate-breathe h-1.5 w-1.5 rounded-full bg-emerald-500" aria-hidden="true" />
             Local workspace · offline ready
@@ -196,8 +203,8 @@ export function AppShell({ children }: { children: ReactNode }) {
       </aside>
 
       {/* Mobile Header */}
-      <header className="sticky top-0 z-40 flex items-center justify-between border-b border-neutral-200 bg-white px-4 py-2.5 dark:border-neutral-800 dark:bg-neutral-900 lg:hidden">
-        <NavLink to="/" className="group flex items-center gap-2.5">
+      <header className="sticky top-0 z-40 flex items-center justify-between border-b border-neutral-200 bg-white px-3.5 py-2.5 dark:border-neutral-800 dark:bg-neutral-900 lg:hidden">
+        <NavLink to="/" className="group flex items-center gap-2">
           <div className="flex h-9 w-9 items-center justify-center rounded-lg border border-neutral-200 bg-white p-0.5 shadow-xs transition-all duration-300 group-hover:scale-105 group-hover:border-brand-400 group-hover:shadow-sm dark:border-neutral-700 dark:bg-neutral-800">
             <img
               src="/logo.png"
@@ -205,17 +212,23 @@ export function AppShell({ children }: { children: ReactNode }) {
               className="h-full w-full object-contain transition-transform duration-300 group-hover:rotate-6"
             />
           </div>
-          <span className="font-display text-base font-bold text-neutral-900 transition-colors group-hover:text-brand-700 dark:text-white dark:group-hover:text-brand-400">
-            {APP_NAME}
-          </span>
+          <div className="flex flex-col">
+            <span className="font-display text-base font-bold leading-tight text-neutral-900 transition-colors group-hover:text-brand-700 dark:text-white dark:group-hover:text-brand-400">
+              {APP_NAME}
+            </span>
+            <span className="text-[10px] uppercase tracking-wider text-neutral-400 font-semibold leading-none">
+              {user.role}
+            </span>
+          </div>
         </NavLink>
-        <div className="flex items-center gap-2">
+        <div className="flex items-center gap-1.5">
+          <ThemeToggle className="h-9 w-9" />
           <Button
             variant="ghost"
             size="sm"
             onClick={handleLogout}
             aria-label="Sign out"
-            className="text-xs text-rose-600"
+            className="!h-9 !w-9 !p-0 text-xs text-rose-600"
           >
             <LogOut className="h-4 w-4" />
           </Button>
@@ -224,6 +237,7 @@ export function AppShell({ children }: { children: ReactNode }) {
             aria-label={open ? 'Close menu' : 'Open menu'}
             aria-expanded={open}
             onClick={() => setOpen(!open)}
+            className="!h-9 !w-9 !p-0"
           >
             {open ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}
           </Button>
@@ -231,13 +245,68 @@ export function AppShell({ children }: { children: ReactNode }) {
       </header>
 
       {open && (
-        <div className="animate-fade-up border-b border-neutral-200 bg-white p-3 dark:border-neutral-800 dark:bg-neutral-900 lg:hidden">
+        <div className="animate-fade-up border-b border-neutral-200 bg-white p-4 dark:border-neutral-800 dark:bg-neutral-900 lg:hidden space-y-4 shadow-xl">
+          {/* Mobile User Card */}
+          <div className="rounded-xl border border-neutral-200 bg-neutral-50/90 p-3 dark:border-neutral-800 dark:bg-neutral-800/60">
+            <div className="flex items-center justify-between">
+              <span className={`inline-flex items-center gap-1 rounded-full px-2 py-0.5 text-[10px] font-bold uppercase tracking-wider ${
+                user.role === 'recruiter'
+                  ? 'bg-blue-100 text-blue-700 dark:bg-blue-950/60 dark:text-blue-300'
+                  : 'bg-emerald-100 text-emerald-700 dark:bg-emerald-950/60 dark:text-emerald-300'
+              }`}>
+                {user.role === 'recruiter' ? <ShieldCheck className="h-3 w-3" /> : <UserCheck className="h-3 w-3" />}
+                {user.role}
+              </span>
+              <button
+                type="button"
+                onClick={() => {
+                  setOpen(false);
+                  setShowAccountModal(true);
+                }}
+                className="text-xs font-semibold text-blue-600 dark:text-blue-400"
+              >
+                Switch Account
+              </button>
+            </div>
+            <p className="mt-1.5 text-xs font-bold text-neutral-900 dark:text-white truncate">{user.name}</p>
+            <p className="text-[11px] text-neutral-500 truncate">{user.email}</p>
+          </div>
+
+          {/* Navigation */}
           {nav}
+
+          {/* Mobile Theme Selector & Actions */}
+          <div className="border-t border-neutral-200 pt-3 dark:border-neutral-800 space-y-2">
+            <div className="flex items-center justify-between px-1">
+              <span className="text-xs font-medium text-neutral-500">Theme</span>
+              <ThemeToggle variant="segmented" />
+            </div>
+            <div className="flex gap-2 pt-1">
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={handleResetData}
+                className="flex-1 text-xs justify-center"
+              >
+                <RefreshCw className="mr-1.5 h-3.5 w-3.5" />
+                Reset Data
+              </Button>
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={handleLogout}
+                className="flex-1 text-xs justify-center text-rose-600 dark:text-rose-400 border-rose-200 dark:border-rose-900"
+              >
+                <LogOut className="mr-1.5 h-3.5 w-3.5" />
+                Sign Out
+              </Button>
+            </div>
+          </div>
         </div>
       )}
 
       {/* Main Content Area */}
-      <main id="main" tabIndex={-1} className="mx-auto w-full min-w-0 max-w-7xl overflow-x-hidden p-4 sm:p-6 lg:p-8">
+      <main id="main" tabIndex={-1} className="mx-auto w-full min-w-0 max-w-7xl overflow-x-hidden p-3.5 sm:p-6 lg:p-8">
         <ScrollProgress />
         {children}
       </main>

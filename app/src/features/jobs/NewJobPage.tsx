@@ -312,7 +312,7 @@ export default function NewJobPage() {
             {skills.map((s) => (
               <div
                 key={s.skill}
-                className="flex items-center justify-between rounded-lg border border-neutral-200 bg-neutral-50 p-3 dark:border-neutral-800 dark:bg-neutral-800/50"
+                className="flex flex-col sm:flex-row sm:items-center justify-between gap-2.5 rounded-lg border border-neutral-200 bg-neutral-50 p-3 dark:border-neutral-800 dark:bg-neutral-800/50"
               >
                 <div className="flex items-center gap-2">
                   <span className="font-semibold text-sm text-neutral-900 dark:text-white">
@@ -323,7 +323,7 @@ export default function NewJobPage() {
                   </span>
                 </div>
 
-                <div className="flex items-center gap-4">
+                <div className="flex items-center justify-between sm:justify-end gap-4">
                   <div className="flex items-center gap-2 text-xs">
                     <span className="text-neutral-500">Weight:</span>
                     <select
@@ -356,7 +356,7 @@ export default function NewJobPage() {
             ))}
           </div>
 
-          <div className="flex items-center gap-2 pt-2">
+          <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-2 pt-2">
             <Input
               aria-label="Add additional skill"
               value={newSkillName}
@@ -364,24 +364,26 @@ export default function NewJobPage() {
               placeholder="Add skill (e.g. Redis, GraphQL)..."
               className="flex-1"
             />
-            <select
-              aria-label="New skill weight"
-              value={newSkillWeight}
-              onChange={(e) => setNewSkillWeight(parseInt(e.target.value, 10))}
-              className="rounded-lg border border-neutral-300 bg-white px-3 py-2 text-sm dark:border-neutral-700 dark:bg-neutral-900"
-            >
-              <option value={5}>Weight 5</option>
-              <option value={4}>Weight 4</option>
-              <option value={3}>Weight 3</option>
-              <option value={2}>Weight 2</option>
-            </select>
-            <Button type="button" variant="outline" onClick={handleAddSkill}>
-              <Plus className="h-4 w-4" /> Add
-            </Button>
+            <div className="flex items-center gap-2">
+              <select
+                aria-label="New skill weight"
+                value={newSkillWeight}
+                onChange={(e) => setNewSkillWeight(parseInt(e.target.value, 10))}
+                className="flex-1 sm:flex-initial rounded-lg border border-neutral-300 bg-white px-3 py-2 text-sm dark:border-neutral-700 dark:bg-neutral-900 min-h-10"
+              >
+                <option value={5}>Weight 5</option>
+                <option value={4}>Weight 4</option>
+                <option value={3}>Weight 3</option>
+                <option value={2}>Weight 2</option>
+              </select>
+              <Button type="button" variant="outline" onClick={handleAddSkill} className="shrink-0">
+                <Plus className="h-4 w-4" /> Add
+              </Button>
+            </div>
           </div>
         </Card>
 
-        <div className="flex justify-end gap-3">
+        <div className="flex flex-col-reverse sm:flex-row justify-end gap-3">
           <Button type="button" variant="ghost" onClick={() => navigate('/jobs')}>
             Cancel
           </Button>

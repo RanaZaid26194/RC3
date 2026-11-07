@@ -16,7 +16,7 @@ export function Card({ className, variant = 'default', ...rest }: CardProps) {
   return (
     <div
       className={cn(
-        'rounded-[var(--radius-lg)] border border-line-heavy bg-surface shadow-md hover:shadow-lg transition-all duration-300 ease-out',
+        'rounded-[var(--radius-lg)] border border-line-heavy bg-surface text-ink shadow-md hover:shadow-lg transition-all duration-300 ease-out',
         variants[variant],
         className
       )}
@@ -29,7 +29,7 @@ export function Card({ className, variant = 'default', ...rest }: CardProps) {
 export function AnimatedCard({ children, delay = 0, className }: { children: React.ReactNode; delay?: number; className?: string }) {
   return (
     <div
-      className={cn('animate-fade-up', className)}
+      className={cn('animate-fade-up rounded-[var(--radius-lg)] border border-line-heavy bg-surface text-ink shadow-md hover:shadow-lg transition-all duration-300 ease-out', className)}
       style={{ animationDelay: `${delay}ms`, animationFillMode: 'both' }}
     >
       {children}
@@ -40,10 +40,10 @@ export function AnimatedCard({ children, delay = 0, className }: { children: Rea
 type Tone = 'neutral' | 'success' | 'warning' | 'danger' | 'info';
 const tones: Record<Tone, string> = {
   neutral: 'bg-canvas text-ink-muted border-line', 
-  success: 'bg-green-50 text-success border-green-200',
-  warning: 'bg-amber-50 text-warning border-amber-200', 
-  danger: 'bg-red-50 text-danger border-red-200', 
-  info: 'bg-blue-50 text-info border-blue-200',
+  success: 'bg-green-50 text-success border-green-200 dark:bg-emerald-950/50 dark:text-emerald-300 dark:border-emerald-800',
+  warning: 'bg-amber-50 text-warning border-amber-200 dark:bg-amber-950/50 dark:text-amber-300 dark:border-amber-800', 
+  danger: 'bg-red-50 text-danger border-red-200 dark:bg-red-950/50 dark:text-red-300 dark:border-red-800', 
+  info: 'bg-blue-50 text-info border-blue-200 dark:bg-blue-950/50 dark:text-blue-300 dark:border-blue-800',
 };
 
 export function Badge({ tone = 'neutral', className, ...rest }: HTMLAttributes<HTMLSpanElement> & { tone?: Tone }) {

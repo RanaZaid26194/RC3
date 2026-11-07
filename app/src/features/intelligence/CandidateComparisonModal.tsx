@@ -84,10 +84,12 @@ export function CandidateComparisonModal({
         </div>
 
         {/* Side-by-Side Matrix Table */}
-        <div className="overflow-x-auto">
-          <table className="w-full text-left text-xs border-collapse">
-            <thead>
-              <tr className="border-b border-neutral-200 dark:border-neutral-800">
+        <div className="space-y-1">
+          <p className="text-[11px] text-neutral-400 sm:hidden">Swipe horizontally to compare columns →</p>
+          <div className="overflow-x-auto rounded-lg border border-neutral-200 dark:border-neutral-800">
+            <table className="w-full text-left text-xs border-collapse min-w-[500px]">
+              <thead>
+                <tr className="border-b border-neutral-200 dark:border-neutral-800 bg-neutral-50/80 dark:bg-neutral-800/40">
                 <th className="py-3 px-3 font-semibold text-neutral-500 w-44">Evaluation Metric</th>
                 {comparedCandidates.map((c) => {
                   const match = matchFor(c);
@@ -213,12 +215,13 @@ export function CandidateComparisonModal({
             </tbody>
           </table>
         </div>
+      </div>
 
-        <div className="flex justify-end pt-3 border-t border-neutral-200 dark:border-neutral-800">
-          <Button size="sm" onClick={onClose}>
-            Close Comparison
-          </Button>
-        </div>
+      <div className="flex justify-end pt-3 border-t border-neutral-200 dark:border-neutral-800">
+        <Button size="sm" onClick={onClose}>
+          Close Comparison
+        </Button>
+      </div>
       </div>
     </Modal>
   );

@@ -14,7 +14,7 @@ export function Tabs({ tabs, label }: { tabs: { id: string; label: string; conte
         {tabs.map((t, i) => (
           <button key={t.id} id={`tab-${t.id}`} role="tab" type="button" aria-selected={active === t.id} aria-controls={`panel-${t.id}`} tabIndex={active === t.id ? 0 : -1}
             onClick={() => setActive(t.id)} onKeyDown={(e) => onKey(e, i)}
-            className={cn('min-h-11 whitespace-nowrap border-b-2 px-4 text-sm font-medium transition', active === t.id ? 'border-brand-600 text-brand-900' : 'border-transparent text-ink-muted hover:text-ink')}>{t.label}</button>))}
+            className={cn('min-h-11 whitespace-nowrap border-b-2 px-4 text-sm font-medium transition', active === t.id ? 'border-brand-600 text-brand-700 dark:text-brand-300 font-semibold' : 'border-transparent text-ink-muted hover:text-ink')}>{t.label}</button>))}
       </div>
       {tabs.map((t) => <div key={t.id} id={`panel-${t.id}`} role="tabpanel" aria-labelledby={`tab-${t.id}`} hidden={active !== t.id} className="pt-4">{active === t.id && t.content}</div>)}
     </div>

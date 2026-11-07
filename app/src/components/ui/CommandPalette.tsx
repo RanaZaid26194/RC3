@@ -2,6 +2,7 @@ import { useEffect, useMemo, useState } from 'react';
 import { createPortal } from 'react-dom';
 import { useNavigate } from 'react-router-dom';
 import { Search } from 'lucide-react';
+import { setTheme } from '@/lib/theme';
 
 export interface Command { id: string; label: string; hint?: string; run: () => void; }
 
@@ -11,7 +12,18 @@ export function CommandPalette({ routes, extra = [] }: { routes: { to: string; l
   const [open, setOpen] = useState(false);
   const [q, setQ] = useState('');
   const [idx, setIdx] = useState(0);
-  const all: Command[] = useMemo(() => [...routes.map((r) => ({ id: r.to, label: `Go to ${r.label}`, run: () => nav(r.to) })), ...extra], [routes, extra, nav]);
+
+  const themeCommands: Command[] = useMemo(() => [
+    { id: 'theme-dark', label: 'Theme: Switch to Dark Mode', hint: 'Dark', run: () => setTheme('dark') },
+    { id: 'theme-light', label: 'Theme: Switch to Light Mode', hint: 'Light', run: () => setTheme('light') },
+    { id: 'theme-system', label: 'Theme: Follow System Preference', hint: 'Auto', run: () => setTheme('system') },
+  ], []);
+
+  const all: Command[] = useMemo(() => [
+    ...routes.map((r) => ({ id: r.to, label: `Go to ${r.label}`, run: () => nav(r.to) })),
+    ...themeCommands,
+    ...extra
+  ], [routes, extra, nav, themeCommands]);
   const list = all.filter((c) => c.label.toLowerCase().includes(q.toLowerCase()));
 
   useEffect(() => {

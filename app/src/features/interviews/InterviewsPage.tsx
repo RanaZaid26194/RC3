@@ -356,26 +356,26 @@ export default function InterviewsPage() {
       {/* Top Header */}
       <div className="flex flex-col justify-between gap-4 sm:flex-row sm:items-center">
         <div>
-          <h1 className="font-display text-2xl font-bold tracking-tight text-neutral-900 dark:text-white">
+          <h1 className="font-display text-xl sm:text-2xl font-bold tracking-tight text-neutral-900 dark:text-white">
             Interview Schedules & Question Kit
           </h1>
-          <p className="text-sm text-neutral-500">
+          <p className="text-xs sm:text-sm text-neutral-500">
             Intelligent calendar scheduling with conflict detection and automated 3-tier AI question rubrics.
           </p>
         </div>
-        <Button onClick={() => handleOpenSchedule()} className="gap-2">
+        <Button onClick={() => handleOpenSchedule()} className="gap-2 w-full sm:w-auto justify-center">
           <Plus className="h-4 w-4" /> Schedule Interview
         </Button>
       </div>
 
       {/* Filter and Search Controls */}
       <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
-        <div className="flex items-center gap-1.5 rounded-lg border border-neutral-200 bg-white p-1 dark:border-neutral-800 dark:bg-neutral-900">
+        <div className="flex items-center gap-1.5 overflow-x-auto max-w-full rounded-lg border border-neutral-200 bg-white p-1 dark:border-neutral-800 dark:bg-neutral-900">
           {(['all', 'scheduled', 'completed', 'cancelled'] as const).map((st) => (
             <button
               key={st}
               onClick={() => setStatusFilter(st)}
-              className={`rounded-md px-3 py-1 text-xs font-semibold capitalize transition ${
+              className={`shrink-0 rounded-md px-3 py-1 text-xs font-semibold capitalize transition ${
                 statusFilter === st
                   ? 'bg-blue-600 text-white shadow-xs'
                   : 'text-neutral-600 hover:text-neutral-900 dark:text-neutral-400 dark:hover:text-white'

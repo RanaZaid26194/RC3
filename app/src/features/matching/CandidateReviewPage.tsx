@@ -336,20 +336,20 @@ export default function CandidateReviewPage() {
                     </div>
                   </div>
 
-                  <div className="flex flex-col items-end gap-3 shrink-0">
-                    <div className="text-right">
+                  <div className="flex flex-col sm:flex-row md:flex-col items-start sm:items-center md:items-end justify-between gap-3 shrink-0 pt-3 md:pt-0 border-t md:border-t-0 border-neutral-100 dark:border-neutral-800">
+                    <div className="flex items-center md:flex-col md:items-end gap-3">
                       <ScoreRing score={score} />
-                      <span className="mt-1 block text-[10px] font-medium text-neutral-500 dark:text-neutral-400">
+                      <span className="block text-[10px] font-medium text-neutral-500 dark:text-neutral-400 text-left md:text-right max-w-[200px]">
                         Job relevance · skills 50 / exp 25 / projects 15 / edu 10
                       </span>
                     </div>
 
-                    <div className="flex items-center gap-2">
+                    <div className="flex flex-wrap items-center gap-2 w-full sm:w-auto">
                       <Button
                         variant="outline"
                         size="sm"
                         onClick={() => handleOpenInspect(app)}
-                        className="gap-1.5 text-xs"
+                        className="gap-1.5 text-xs flex-1 sm:flex-initial justify-center"
                       >
                         <Eye className="h-3.5 w-3.5" /> Inspect Evidence
                       </Button>
@@ -358,7 +358,7 @@ export default function CandidateReviewPage() {
                         <Button
                           size="sm"
                           onClick={() => handleUpdateStatus(app.id, 'Shortlisted', 'Shortlisted by Recruiter after semantic evidence inspection')}
-                          className="gap-1.5 text-xs bg-emerald-700 hover:bg-emerald-800 text-white"
+                          className="gap-1.5 text-xs bg-emerald-700 hover:bg-emerald-800 text-white flex-1 sm:flex-initial justify-center"
                         >
                           <CheckCircle2 className="h-3.5 w-3.5" /> Shortlist
                         </Button>
@@ -368,7 +368,7 @@ export default function CandidateReviewPage() {
                         <Button
                           size="sm"
                           onClick={() => navigate('/interviews')}
-                          className="gap-1.5 text-xs bg-purple-600 hover:bg-purple-700 text-white"
+                          className="gap-1.5 text-xs bg-purple-600 hover:bg-purple-700 text-white flex-1 sm:flex-initial justify-center"
                         >
                           <Calendar className="h-3.5 w-3.5" /> Schedule Interview
                         </Button>

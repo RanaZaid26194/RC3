@@ -75,19 +75,19 @@ export default function Home() {
           {quickStats.map((stat) => (
             <div
               key={stat.label}
-              className="group relative overflow-hidden rounded-[var(--radius-lg)] border border-neutral-200 bg-white p-5 shadow-sm transition-all duration-300 hover:border-brand-200 hover:shadow-md"
+              className="group relative overflow-hidden rounded-[var(--radius-lg)] border border-neutral-200 bg-white p-5 shadow-sm transition-all duration-300 hover:border-brand-200 hover:shadow-md dark:border-neutral-800 dark:bg-neutral-900"
             >
               <div className={`absolute left-0 top-0 h-full w-1 ${stat.bg}`} />
               <div className="flex items-start justify-between">
                 <div>
-                  <p className="text-sm font-medium text-neutral-500">{stat.label}</p>
+                  <p className="text-sm font-medium text-neutral-500 dark:text-neutral-400">{stat.label}</p>
                   <p className={`mt-2 text-3xl font-bold ${stat.color}`}>{stat.value}</p>
                 </div>
                 <div className={`${stat.bg} rounded-full p-3`}>
                   <stat.icon className="h-5 w-5" />
                 </div>
               </div>
-              <div className="mt-3 h-0.5 w-full overflow-hidden rounded-full bg-neutral-100">
+              <div className="mt-3 h-0.5 w-full overflow-hidden rounded-full bg-neutral-100 dark:bg-neutral-800">
                 <div 
                   className={`h-full rounded-full transition-all duration-500 ${stat.bg.replace('bg-', 'bg-').replace('100', '500')}`}
                   style={{ width: stat.label.includes('Applications') ? '70%' : stat.label.includes('Score') ? '80%' : '60%' }}
@@ -116,20 +116,20 @@ export default function Home() {
                 return (
                   <div
                     key={job.id}
-                    className="group cursor-pointer rounded-[var(--radius-lg)] border border-neutral-200 bg-white p-5 shadow-sm transition-all duration-300 hover:border-brand-200 hover:shadow-md"
+                    className="group cursor-pointer rounded-[var(--radius-lg)] border border-neutral-200 bg-white p-5 shadow-sm transition-all duration-300 hover:border-brand-200 hover:shadow-md dark:border-neutral-800 dark:bg-neutral-900"
                     onClick={() => navigate(`/pipeline?jobId=${job.id}`)}
                   >
                     <div className="mb-3 flex items-start justify-between">
-                      <span className="text-xs font-semibold text-brand-600">{job.department}</span>
+                      <span className="text-xs font-semibold text-brand-600 dark:text-brand-400">{job.department}</span>
                       <span className="inline-flex items-center gap-1 rounded-full px-2 py-0.5 text-[10px] font-medium bg-green-100 text-green-800 dark:bg-green-900/60 dark:text-green-300">
                         <span className="h-1.5 w-1.5 rounded-full bg-green-600 animate-pulse" />
                         Open
                       </span>
                     </div>
                     
-                    <h3 className="mb-2 font-semibold text-neutral-900 line-clamp-1">{job.title}</h3>
+                    <h3 className="mb-2 font-semibold text-neutral-900 dark:text-white line-clamp-1">{job.title}</h3>
                     
-                    <div className="mb-3 space-y-1.5 text-xs text-neutral-500">
+                    <div className="mb-3 space-y-1.5 text-xs text-neutral-500 dark:text-neutral-400">
                       <div className="flex items-center gap-2">
                         <MapPin className="h-3.5 w-3.5" />
                         {job.location} • {job.type}
@@ -149,12 +149,12 @@ export default function Home() {
                       </div>
                     </div>
 
-                    <div className="flex items-center justify-between border-t border-neutral-100 pt-3">
-                      <div className="flex items-center gap-1.5 text-xs font-medium text-neutral-600">
-                        <Users className="h-3.5 w-3.5 text-brand-600" />
+                    <div className="flex items-center justify-between border-t border-neutral-100 pt-3 dark:border-neutral-800">
+                      <div className="flex items-center gap-1.5 text-xs font-medium text-neutral-600 dark:text-neutral-300">
+                        <Users className="h-3.5 w-3.5 text-brand-600 dark:text-brand-400" />
                         {appCount} applied
                       </div>
-                      <button className="text-xs text-brand-600 hover:text-brand-700 transition-colors">
+                      <button className="text-xs text-brand-600 hover:text-brand-700 dark:text-brand-400 dark:hover:text-brand-300 transition-colors">
                         Review →
                       </button>
                     </div>
@@ -163,10 +163,10 @@ export default function Home() {
               })}
             </div>
           ) : (
-            <div className="rounded-[var(--radius-lg)] border border-dashed border-neutral-300 bg-neutral-50 p-12 text-center">
+            <div className="rounded-[var(--radius-lg)] border border-dashed border-neutral-300 bg-neutral-50 p-12 text-center dark:border-neutral-800 dark:bg-neutral-900/50">
               <Briefcase className="mx-auto mb-3 h-12 w-12 text-neutral-400" />
-              <h3 className="font-semibold text-neutral-700">No jobs posted yet</h3>
-              <p className="mt-1 text-sm text-neutral-500">Start by creating your first job opening</p>
+              <h3 className="font-semibold text-neutral-700 dark:text-neutral-200">No jobs posted yet</h3>
+              <p className="mt-1 text-sm text-neutral-500 dark:text-neutral-400">Start by creating your first job opening</p>
               <Button variant="secondary" className="mt-4" onClick={() => navigate('/jobs/new')}>
                 <Plus className="h-4 w-4" /> Post Your First Job
               </Button>
