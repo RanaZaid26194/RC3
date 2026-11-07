@@ -5,9 +5,9 @@ import { cn } from '@/lib/cn';
 
 export function EmptyState({ title, message, action, icon }: { title: string; message: string; action?: ReactNode; icon?: ReactNode }) {
   return (
-    <div className="flex flex-col items-center rounded-[var(--radius-md)] border border-dashed border-line bg-surface px-6 py-12 text-center animate-fade-up">
-      <div className="mb-3 text-brand-600 animate-float" aria-hidden="true">{icon ?? <Inbox className="h-10 w-10" />}</div>
-      <h3 className="text-lg font-semibold">{title}</h3>
+    <div className="flex flex-col items-center rounded-[var(--radius-md)] border border-dashed border-line bg-surface px-6 py-12 text-center animate-fade-up text-ink">
+      <div className="mb-3 text-brand-600 dark:text-brand-400 animate-float" aria-hidden="true">{icon ?? <Inbox className="h-10 w-10" />}</div>
+      <h3 className="text-lg font-semibold text-ink">{title}</h3>
       <p className="mt-1 max-w-sm text-sm text-ink-muted">{message}</p>
       {action && <div className="mt-5">{action}</div>}
     </div>
@@ -15,9 +15,9 @@ export function EmptyState({ title, message, action, icon }: { title: string; me
 }
 export function ErrorState({ message = 'Something went wrong.', onRetry }: { message?: string; onRetry?: () => void }) {
   return (
-    <div role="alert" className="flex flex-col items-center rounded-[var(--radius-md)] border border-red-200 bg-red-50 px-6 py-10 text-center animate-fade-up">
-      <AlertTriangle className="mb-3 h-9 w-9 text-danger animate-pop" aria-hidden="true" />
-      <p className="text-sm font-medium text-danger">{message}</p>
+    <div role="alert" className="flex flex-col items-center rounded-[var(--radius-md)] border border-red-200 bg-red-50 dark:border-red-900/60 dark:bg-red-950/40 px-6 py-10 text-center animate-fade-up">
+      <AlertTriangle className="mb-3 h-9 w-9 text-danger dark:text-red-400 animate-pop" aria-hidden="true" />
+      <p className="text-sm font-medium text-danger dark:text-red-300">{message}</p>
       {onRetry && <Button variant="secondary" className="mt-4" onClick={onRetry}>Try again</Button>}
     </div>
   );
@@ -25,10 +25,10 @@ export function ErrorState({ message = 'Something went wrong.', onRetry }: { mes
 
 export function SuccessState({ title, message, className }: { title: string; message?: string; className?: string }) {
   return (
-    <div role="status" className={cn('flex flex-col items-center rounded-[var(--radius-md)] border border-emerald-200 bg-emerald-50 px-6 py-10 text-center animate-fade-up', className)}>
-      <CheckCircle2 className="mb-3 h-9 w-9 text-emerald-600 animate-pop" aria-hidden="true" />
-      <h3 className="text-base font-semibold text-emerald-900">{title}</h3>
-      {message && <p className="mt-1 max-w-sm text-sm text-emerald-700">{message}</p>}
+    <div role="status" className={cn('flex flex-col items-center rounded-[var(--radius-md)] border border-emerald-200 bg-emerald-50 dark:border-emerald-900/60 dark:bg-emerald-950/40 px-6 py-10 text-center animate-fade-up', className)}>
+      <CheckCircle2 className="mb-3 h-9 w-9 text-emerald-600 dark:text-emerald-400 animate-pop" aria-hidden="true" />
+      <h3 className="text-base font-semibold text-emerald-900 dark:text-emerald-200">{title}</h3>
+      {message && <p className="mt-1 max-w-sm text-sm text-emerald-700 dark:text-emerald-300">{message}</p>}
     </div>
   );
 }

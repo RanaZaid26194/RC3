@@ -2,6 +2,7 @@ import { Link } from 'react-router-dom';
 import { ArrowLeft, Shield, Lock, EyeOff, Database, Cpu, UserCheck } from 'lucide-react';
 import { Card } from '@/components/ui/Card';
 import { Button } from '@/components/ui/Button';
+import { ThemeToggle } from '@/components/ui/ThemeToggle';
 
 export default function PrivacyPage() {
   return (
@@ -32,6 +33,7 @@ export default function PrivacyPage() {
                 Terms of Service
               </Button>
             </Link>
+            <ThemeToggle />
           </div>
         </div>
 

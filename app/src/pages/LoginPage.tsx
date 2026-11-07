@@ -15,6 +15,7 @@ import {
 import { Button } from '@/components/ui/Button';
 import { Card } from '@/components/ui/Card';
 import { Input } from '@/components/ui/Input';
+import { ThemeToggle } from '@/components/ui/ThemeToggle';
 import { RecuLensLogo } from '@/components/ui/CustomIcons';
 import { loginUser, findUserByEmail, resetPassword } from '@/lib/auth';
 
@@ -138,6 +139,9 @@ export default function LoginPage() {
 
   return (
     <div className="relative flex min-h-screen items-center justify-center overflow-hidden bg-neutral-50 px-4 py-12 dark:bg-neutral-950">
+      <div className="absolute top-4 right-4 z-20">
+        <ThemeToggle />
+      </div>
       <div className="relative w-full max-w-md space-y-6 animate-fade-up">
         {/* Brand Header */}
         <div className="text-center space-y-2">

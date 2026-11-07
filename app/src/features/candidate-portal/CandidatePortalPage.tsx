@@ -297,13 +297,13 @@ export default function CandidatePortalPage() {
                         Application closed after recruiter review
                       </div>
                     ) : (
-                      <div className="grid gap-2 pt-2 text-center text-[10px] font-medium text-neutral-500 sm:grid-cols-4 lg:grid-cols-7">
+                      <div className="grid grid-cols-2 gap-2 pt-2 text-center text-[10px] font-medium text-neutral-500 sm:grid-cols-4 lg:grid-cols-7">
                         {pipelineStages.map((stage, index) => {
                           const completed = currentStageIndex >= index;
                           return (
                             <div
                               key={stage}
-                              className={`rounded p-1.5 ${completed ? 'bg-emerald-100 text-emerald-800 dark:bg-emerald-950/60 dark:text-emerald-300' : 'bg-neutral-100 dark:bg-neutral-800'}`}
+                              className={`rounded p-1.5 transition-colors ${completed ? 'bg-emerald-100 text-emerald-800 dark:bg-emerald-950/60 dark:text-emerald-300 font-semibold' : 'bg-neutral-100 dark:bg-neutral-800 text-neutral-600 dark:text-neutral-400'}`}
                             >
                               {index + 1}. {stage === 'AI Assessment Available' ? 'AI Assessment' : stage}
                               {completed ? ' ✓' : ''}

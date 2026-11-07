@@ -150,21 +150,21 @@ export default function AnalyticsPage() {
       {/* Page Header */}
       <div className="flex flex-col justify-between gap-4 sm:flex-row sm:items-center">
         <div>
-          <h1 className="font-display text-2xl font-bold tracking-tight text-neutral-900 dark:text-white">
+          <h1 className="font-display text-xl sm:text-2xl font-bold tracking-tight text-neutral-900 dark:text-white">
             Recruitment Intelligence & Analytics
           </h1>
-          <p className="text-sm text-neutral-500">
+          <p className="text-xs sm:text-sm text-neutral-500">
             Real-time talent conversion funnels, skill deficit diagnostics, and candidate quality distributions.
           </p>
         </div>
-        <div className="flex items-center gap-3">
+        <div className="flex flex-wrap items-center gap-2 sm:gap-3">
           <select
             id="analytics-vacancy-filter"
             name="vacancy"
             aria-label="Filter Analytics by Vacancy"
             value={selectedJobId}
             onChange={(e) => setSelectedJobId(e.target.value)}
-            className="rounded-lg border border-neutral-300 bg-white px-3 py-1.5 text-xs font-medium text-neutral-700 dark:border-neutral-700 dark:bg-neutral-900 dark:text-neutral-200"
+            className="w-full sm:w-auto rounded-lg border border-neutral-300 bg-white px-3 py-1.5 text-xs font-medium text-neutral-700 dark:border-neutral-700 dark:bg-neutral-900 dark:text-neutral-200"
           >
             <option value="all">All Vacancies ({jobs.length})</option>
             {jobs.map((j) => (
@@ -173,7 +173,7 @@ export default function AnalyticsPage() {
               </option>
             ))}
           </select>
-          <Button variant="outline" size="sm" onClick={handleExportData} className="gap-2 text-xs">
+          <Button variant="outline" size="sm" onClick={handleExportData} className="gap-2 text-xs w-full sm:w-auto justify-center">
             <Download className="h-3.5 w-3.5" /> {exported ? 'Report Downloaded' : 'Export Report'}
           </Button>
         </div>

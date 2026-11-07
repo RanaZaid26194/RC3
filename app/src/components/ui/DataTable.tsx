@@ -41,12 +41,12 @@ export function DataTable<T>({ rows, columns, rowKey, searchText, pageSize = 10,
           <div className="relative w-full sm:w-72">
             <Search className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-ink-muted" aria-hidden="true" />
             <input type="search" aria-label={`Search ${caption}`} placeholder="Search..." value={q} onChange={(e) => { setQ(e.target.value); setPage(0); }}
-              className="min-h-11 w-full rounded-[var(--radius-sm)] border border-line bg-surface pl-9 pr-3 text-sm" />
+              className="min-h-11 w-full rounded-[var(--radius-sm)] border border-line bg-surface pl-9 pr-3 text-sm text-ink placeholder:text-ink-muted focus:outline-none focus:border-brand-500" />
           </div>)}
         {toolbar}
       </div>
       {filtered.length === 0 ? <EmptyState title={emptyTitle} message={emptyMessage} /> : (
-        <div className="overflow-x-auto rounded-[var(--radius-md)] border border-line bg-surface">
+        <div className="overflow-x-auto rounded-[var(--radius-md)] border border-line bg-surface text-ink">
           <table className="w-full min-w-[560px] text-left text-sm">
             <caption className="sr-only">{caption}</caption>
             <thead className="border-b border-line bg-canvas text-xs uppercase tracking-wide text-ink-muted">
@@ -60,8 +60,8 @@ export function DataTable<T>({ rows, columns, rowKey, searchText, pageSize = 10,
             </thead>
             <tbody>
               {slice.map((r) => (
-                <tr key={rowKey(r)} className="border-b border-line last:border-0 hover:bg-brand-50/50">
-                  {columns.map((c) => <td key={c.key} className={cn('px-4 py-3', c.className)}>{c.render ? c.render(r) : String((r as Record<string, unknown>)[c.key] ?? '')}</td>)}
+                <tr key={rowKey(r)} className="border-b border-line last:border-0 hover:bg-neutral-100/60 dark:hover:bg-neutral-800/60 transition-colors">
+                  {columns.map((c) => <td key={c.key} className={cn('px-4 py-3 text-ink', c.className)}>{c.render ? c.render(r) : String((r as Record<string, unknown>)[c.key] ?? '')}</td>)}
                 </tr>))}
             </tbody>
           </table>

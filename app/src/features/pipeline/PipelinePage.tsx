@@ -33,6 +33,7 @@ export default function PipelinePage() {
   const candidates = load<CandidateProfile[]>('candidates', []);
   const [applications, setApplications] = useState<Application[]>(load<Application[]>('applications', []));
   const [selectedJobId, setSelectedJobId] = useState<string>(filterJobId || (jobs[0]?.id ?? ''));
+  const [mobileStage, setMobileStage] = useState<string>('all');
 
   // Modals state
   const [auditModalApp, setAuditModalApp] = useState<Application | null>(null);
@@ -157,13 +158,13 @@ export default function PipelinePage() {
           </p>
         </div>
 
-        <div className="flex items-center gap-3">
+        <div className="flex flex-wrap items-center gap-2 sm:gap-3">
           <span className="text-xs font-semibold uppercase tracking-wider text-neutral-500">Filter Role:</span>
           <select
             aria-label="Filter pipeline by role"
             value={selectedJobId}
             onChange={(e) => setSelectedJobId(e.target.value)}
-            className="rounded-lg border border-neutral-300 bg-white px-3 py-2 text-xs font-medium dark:border-neutral-700 dark:bg-neutral-900 dark:text-white"
+            className="w-full sm:w-auto rounded-lg border border-neutral-300 bg-white px-3 py-2 text-xs font-medium dark:border-neutral-700 dark:bg-neutral-900 dark:text-white"
           >
             {jobs.map((j) => (
               <option key={j.id} value={j.id}>
@@ -174,15 +175,49 @@ export default function PipelinePage() {
         </div>
       </div>
 
-      {/* Kanban Board Container with horizontal scroll on smaller screens */}
-      <div className="flex gap-4 overflow-x-auto pb-6 pt-2">
+      {/* Mobile Stage Selector Tabs (only shown on narrow screens) */}
+      <div className="flex sm:hidden overflow-x-auto gap-1.5 pb-2 pt-1 border-b border-neutral-200 dark:border-neutral-800">
+        <button
+          type="button"
+          onClick={() => setMobileStage('all')}
+          className={`shrink-0 rounded-full px-3 py-1 text-xs font-semibold transition ${
+            mobileStage === 'all'
+              ? 'bg-brand-700 text-white'
+              : 'bg-neutral-100 text-neutral-600 dark:bg-neutral-800 dark:text-neutral-300'
+          }`}
+        >
+          All Stages ({filteredApps.length})
+        </button>
         {PIPELINE_COLUMNS.map((col) => {
+          const count = filteredApps.filter((a) => a.status === col.status).length;
+          return (
+            <button
+              key={col.status}
+              type="button"
+              onClick={() => setMobileStage(col.status)}
+              className={`shrink-0 rounded-full px-3 py-1 text-xs font-semibold transition ${
+                mobileStage === col.status
+                  ? 'bg-brand-700 text-white'
+                  : 'bg-neutral-100 text-neutral-600 dark:bg-neutral-800 dark:text-neutral-300'
+              }`}
+            >
+              {col.label} ({count})
+            </button>
+          );
+        })}
+      </div>
+
+      {/* Kanban Board Container with horizontal scroll on smaller screens */}
+      <div className="flex gap-4 overflow-x-auto pb-6 pt-2 snap-x snap-mandatory">
+        {PIPELINE_COLUMNS.filter((col) => mobileStage === 'all' || col.status === mobileStage).map((col) => {
           const colApps = filteredApps.filter((a) => a.status === col.status);
 
           return (
             <div
               key={col.status}
-              className="flex w-72 shrink-0 flex-col rounded-xl border border-neutral-200 bg-neutral-100/70 p-3 dark:border-neutral-800 dark:bg-neutral-900/60"
+              className={`flex flex-col rounded-xl border border-neutral-200 bg-neutral-100/70 p-3 dark:border-neutral-800 dark:bg-neutral-900/60 snap-center ${
+                mobileStage !== 'all' ? 'w-full' : 'w-72 sm:w-80 shrink-0'
+              }`}
             >
               {/* Column Header */}
               <div className="mb-3 flex items-center justify-between px-1">

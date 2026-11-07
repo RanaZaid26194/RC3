@@ -96,28 +96,28 @@ export function Modal({
         )}
       >
         {/* Modal Header */}
-        <div className="flex items-center justify-between border-b border-neutral-100 dark:border-neutral-800 px-6 py-4 shrink-0">
-          <h2 className="text-lg font-bold text-neutral-900 dark:text-white truncate pr-2">
+        <div className="flex items-center justify-between border-b border-neutral-100 dark:border-neutral-800 px-4 sm:px-6 py-3.5 sm:py-4 shrink-0">
+          <h2 className="text-base sm:text-lg font-bold text-neutral-900 dark:text-white truncate pr-2">
             {title}
           </h2>
           <Button
             variant="ghost"
             aria-label="Close dialog"
             onClick={onClose}
-            className="!min-h-8 !w-8 !p-0 rounded-lg text-neutral-400 hover:text-neutral-700 dark:hover:text-neutral-200"
+            className="!min-h-8 !w-8 !p-0 rounded-lg text-neutral-400 hover:text-neutral-700 dark:hover:text-neutral-200 shrink-0"
           >
             <X className="h-5 w-5" aria-hidden="true" />
           </Button>
         </div>
 
         {/* Modal Body with proper scroll container */}
-        <div className="flex-1 overflow-y-auto px-6 py-5">
+        <div className="flex-1 overflow-y-auto px-4 sm:px-6 py-4 sm:py-5">
           {children}
         </div>
 
         {/* Modal Footer */}
         {footer && (
-          <div className="flex flex-wrap items-center justify-end gap-2.5 border-t border-neutral-100 dark:border-neutral-800 px-6 py-3.5 bg-neutral-50/50 dark:bg-neutral-900/50 rounded-b-2xl shrink-0">
+          <div className="flex flex-wrap items-center justify-end gap-2 border-t border-neutral-100 dark:border-neutral-800 px-4 sm:px-6 py-3 sm:py-3.5 bg-neutral-50/50 dark:bg-neutral-900/50 rounded-b-2xl shrink-0">
             {footer}
           </div>
         )}
